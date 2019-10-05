@@ -10,6 +10,8 @@ extern "C" {
 #include <1541img/d64reader.h>
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
+#include <1541img/cbmdosfile.h>
+#include <1541img/filedata.h>
 }
 
 V1541ImgWidget::V1541ImgWidget() : QWidget(), d64(0), fs(0)
@@ -50,8 +52,71 @@ void V1541ImgWidget::open(const QString& filename)
 		const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
 		uint8_t namelen;
 		const char *rawname = CbmdosVfs_name(vfs, &namelen);
-		PetsciiStr name(rawname, namelen);
-		label->setText(name.toString(0, 1));
+		QString dirstr("0 ");
+		dirstr.append(0xe222);
+		if (namelen > 0)
+		{
+		    PetsciiStr name(rawname, namelen);
+		    dirstr.append(name.toString(0, 1));
+		}
+		if (namelen < 16)
+		{
+			dirstr.append(QString(16 - namelen, 0xe2a0));
+		}
+		dirstr.append(0xe222);
+		dirstr.append(0xe2a0);
+		const char *rawid = CbmdosVfs_id(vfs, &namelen);
+		if (namelen > 0)
+		{
+		    PetsciiStr id(rawid, namelen);
+		    dirstr.append(id.toString(0, 1));
+		}
+		if (namelen < 5)
+		{
+		    if (namelen < 3)
+		    {
+			dirstr.append(QString(3 - namelen, 0xe2a0));
+		    }
+		    if (namelen < 4)
+		    {
+			dirstr.append(0xe232);
+		    }
+		    dirstr.append(0xe241);
+		}
+		for (unsigned fn = 0; fn < CbmdosVfs_fileCount(vfs); ++fn)
+		{
+
+		    const CbmdosFile *file = CbmdosVfs_rfile(vfs, fn);
+		    uint16_t blocks = CbmdosFile_forcedBlocks(file);
+		    if (blocks == 0xffff)
+		    {
+			const FileData *dat = CbmdosFile_rdata(file);
+			if (!dat || CbmdosFile_type(file) == CFT_DEL)
+			{
+			    blocks = 0;
+			}
+			else
+			{
+			    size_t size = FileData_size(dat);
+			    blocks = size / 254;
+			    if (size % 254) ++blocks;
+			}
+		    }
+		    dirstr.append(QString("\n%1\"").arg(blocks, -5, 10));
+		    rawname = CbmdosFile_name(file, &namelen);
+		    if (namelen > 0)
+		    {
+			PetsciiStr name(rawname, namelen);
+			dirstr.append(name.toString());
+		    }
+		    if (namelen < 16)
+		    {
+			dirstr.append(QString(16 - namelen, 0xe0a0));
+		    }
+		    dirstr.append("\" ");
+		    dirstr.append(CbmdosFileType_name(CbmdosFile_type(file)));
+		}
+		label->setText(dirstr);
 	    }
 	    setWindowTitle(filename);
 	}
