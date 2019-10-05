@@ -9,6 +9,7 @@
 #include <QKeySequence>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFontDatabase>
 
 extern "C" {
 #include <1541img/log.h>
@@ -57,7 +58,7 @@ void MainWindow::open()
 	imgWidget->open(imgFile);
 	if (imgWidget->hasValidImage())
 	{
-	    QMdiArea *mdiArea = (QMdiArea *)centralWidget();
+	    QMdiArea *mdiArea = static_cast<QMdiArea *>(centralWidget());
 	    mdiArea->addSubWindow(imgWidget)->show();
 	}
 	else
@@ -82,6 +83,7 @@ MainWindow::MainWindow()
 #ifdef DEBUG
     setMaxLogLevel(L_DEBUG);
 #endif
+    QFontDatabase::addApplicationFont(":/C64_Pro_Mono-STYLE.ttf");
     createActions();
     createMenus();
     setCentralWidget(new QMdiArea);
