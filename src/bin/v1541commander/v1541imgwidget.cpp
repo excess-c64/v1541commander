@@ -1,4 +1,5 @@
 #include "v1541imgwidget.h"
+#include "petsciistr.h"
 
 #include <QLabel>
 #include <QFont>
@@ -49,8 +50,8 @@ void V1541ImgWidget::open(const QString& filename)
 		const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
 		uint8_t namelen;
 		const char *rawname = CbmdosVfs_name(vfs, &namelen);
-		QString name(QByteArray(rawname, namelen));
-		label->setText(name);
+		PetsciiStr name(rawname, namelen);
+		label->setText(name.toString(0, 1));
 	    }
 	    setWindowTitle(filename);
 	}

@@ -1,5 +1,5 @@
 v1541commander_PREPROCMODULES:= mainwindow v1541imgwidget
-v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main
+v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr
 v1541commander_QRC:= resources
 v1541commander_PREPROC:= MOC
 v1541commander_PREPROCFLAGS:= -p.
