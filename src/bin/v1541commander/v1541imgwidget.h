@@ -5,7 +5,8 @@
 
 struct D64;
 struct CbmdosFs;
-class QLabel;
+class QListView;
+class CbmdosFsModel;
 
 class V1541ImgWidget: public QWidget
 {
@@ -14,7 +15,8 @@ class V1541ImgWidget: public QWidget
     private:
 	D64 *d64;
 	CbmdosFs *fs;
-	QLabel *label;
+	CbmdosFsModel *model;
+	QListView *dirList;
 
     public slots:
 	void open(const QString& filename);
