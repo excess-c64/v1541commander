@@ -21,6 +21,7 @@ class V1541ImgWidget: public QWidget
 
     public:
 	V1541ImgWidget();
+	~V1541ImgWidget();
 	bool hasValidImage() const;
 };
 

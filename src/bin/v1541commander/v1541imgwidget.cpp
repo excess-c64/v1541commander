@@ -23,6 +23,18 @@ V1541ImgWidget::V1541ImgWidget() : QWidget(), d64(0), fs(0)
     setLayout(layout);
 }
 
+V1541ImgWidget::~V1541ImgWidget()
+{
+    if (fs)
+    {
+	CbmdosFs_destroy(fs);
+    }
+    else if (d64)
+    {
+	D64_destroy(d64);
+    }
+}
+
 void V1541ImgWidget::open(const QString& filename)
 {
     if (fs)
