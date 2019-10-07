@@ -6,13 +6,6 @@
 #include <QFont>
 #include <QFontDatabase>
 #include <QMessageBox>
-#ifdef DEBUG
-#include <QDebug>
-#include <QFontMetricsF>
-#include <QScreen>
-#include <QStyle>
-#include <QWindow>
-#endif
 
 #include <1541img/log.h>
 
@@ -93,15 +86,6 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::close);
     connect(&d->exitAction, &QAction::triggered,
 	    this, &V1541Commander::exit);
-#ifdef DEBUG
-    QScreen *screen = d->lastActiveWindow->window()->windowHandle()->screen();
-    qDebug() << "DPI:         " << screen->logicalDotsPerInch();
-    QFontMetricsF metrics(d->c64font);
-    qDebug() << "ascent:      " << metrics.ascent();
-    qDebug() << "avgWidth:    " << metrics.averageCharWidth();
-    qDebug() << "scrBarWidth: "
-	<< style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-#endif
 }
 
 V1541Commander::~V1541Commander()
