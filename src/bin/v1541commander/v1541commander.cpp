@@ -7,9 +7,7 @@
 #include <QFontDatabase>
 #include <QMessageBox>
 
-extern "C" {
 #include <1541img/log.h>
-}
 
 class V1541Commander::priv
 {

@@ -4,11 +4,9 @@
 #include <QListView>
 #include <QVBoxLayout>
 
-extern "C" {
 #include <1541img/d64.h>
 #include <1541img/d64reader.h>
 #include <1541img/cbmdosfs.h>
-}
 
 V1541ImgWidget::V1541ImgWidget() : QWidget(), d64(0), fs(0), model(0)
 {

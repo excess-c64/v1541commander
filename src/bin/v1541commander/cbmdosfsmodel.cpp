@@ -5,11 +5,9 @@
 #include <QSize>
 #include <QFontMetrics>
 
-extern "C" {
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
 #include <1541img/cbmdosfile.h>
-}
 
 CbmdosFsModel::CbmdosFsModel(CbmdosFs *fs, QObject *parent)
     : QAbstractListModel(parent), fs(fs)
