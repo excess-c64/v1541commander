@@ -2,8 +2,9 @@
 #include "v1541commander.h"
 #include "petsciistr.h"
 
-#include <QSize>
-#include <QFontMetrics>
+#include <QFontMetricsF>
+#include <QSizeF>
+#include <QStyle>
 
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
@@ -31,8 +32,10 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::SizeHintRole)
     {
-	QFontMetrics fm(app.c64font());
-	return QSize(fm.averageCharWidth() * 22, fm.ascent() - 1);
+	QFontMetricsF fm(app.c64font());
+	return QSizeF(fm.averageCharWidth() * 23
+		+ app.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
+		fm.ascent() - 1);
     }
 
     if (role != Qt::DisplayRole)
