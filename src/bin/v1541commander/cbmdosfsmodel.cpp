@@ -33,9 +33,9 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::SizeHintRole)
     {
 	QFontMetricsF fm(app.c64font());
-	return QSizeF(fm.averageCharWidth() * 23
+	return QSizeF(fm.ascent() * 28 * 13 / 14
 		+ app.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
-		fm.ascent() - 1);
+		fm.ascent() * 13 / 14);
     }
 
     if (role != Qt::DisplayRole)
