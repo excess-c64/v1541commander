@@ -51,12 +51,12 @@ MainWindow *V1541Commander::priv::addWindow()
     lastActiveWindow = new MainWindow();
     lastActiveWindow->show();
     allWindows.append(lastActiveWindow);
-    connect(lastActiveWindow, MainWindow::activated,
-            commander, V1541Commander::windowActivated);
-    connect(lastActiveWindow, MainWindow::closed,
-            commander, V1541Commander::windowClosed);
-    connect(lastActiveWindow, MainWindow::contentChanged,
-            commander, V1541Commander::windowContentChanged);
+    connect(lastActiveWindow, &MainWindow::activated,
+            commander, &V1541Commander::windowActivated);
+    connect(lastActiveWindow, &MainWindow::closed,
+            commander, &V1541Commander::windowClosed);
+    connect(lastActiveWindow, &MainWindow::contentChanged,
+            commander, &V1541Commander::windowContentChanged);
     return lastActiveWindow;
 }
 
@@ -78,10 +78,14 @@ V1541Commander::V1541Commander(int &argc, char **argv)
     QFontDatabase::addApplicationFont(":/C64_Pro_Mono-STYLE.ttf");
     d = new priv(this);
     d->addWindow();
-    connect(&d->newAction, QAction::triggered, this, V1541Commander::newImage);
-    connect(&d->openAction, QAction::triggered, this, V1541Commander::open);
-    connect(&d->closeAction, QAction::triggered, this, V1541Commander::close);
-    connect(&d->exitAction, QAction::triggered, this, V1541Commander::exit);
+    connect(&d->newAction, &QAction::triggered,
+	    this, &V1541Commander::newImage);
+    connect(&d->openAction, &QAction::triggered,
+	    this, &V1541Commander::open);
+    connect(&d->closeAction, &QAction::triggered,
+	    this, &V1541Commander::close);
+    connect(&d->exitAction, &QAction::triggered,
+	    this, &V1541Commander::exit);
 }
 
 V1541Commander::~V1541Commander()
