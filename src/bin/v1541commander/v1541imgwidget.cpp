@@ -14,6 +14,8 @@ V1541ImgWidget::V1541ImgWidget() : QWidget(), d64(0), fs(0), model(0)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     dirList = new QListView(this);
+    dirList->setMinimumHeight(200);
+    dirList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     layout->addWidget(dirList);
     setLayout(layout);
 }
@@ -59,6 +61,15 @@ void V1541ImgWidget::open(const QString& filename)
 		dirList->setModel(newModel);
 		if (model) delete model;
 		model = newModel;
+                dirList->setMinimumWidth(
+                        dirList->sizeHintForColumn(0)
+                        + 2 * dirList->frameWidth());
+                int minItems = model->rowCount();
+                if (minItems < 10) minItems = 10;
+                if (minItems > 40) minItems = 40;
+                dirList->setMinimumHeight(
+                        dirList->sizeHintForRow(0) * minItems
+                        + 2 * dirList->frameWidth());
 	    }
 	    setWindowTitle(filename);
 	}

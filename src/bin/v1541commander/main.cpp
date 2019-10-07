@@ -1,12 +1,8 @@
-#include <QApplication>
-#include "mainwindow.h"
+#include "v1541commander.h"
 
 int main(int argc, char **argv)
 {
-    QApplication app(argc, argv);
-    MainWindow w;
-
-    w.show();
-    return app.exec();
+    V1541Commander commander(argc, argv);
+    return commander.exec();
 }
 

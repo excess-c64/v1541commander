@@ -2,7 +2,6 @@
 #define V1541C_CBMDOSFSMODEL_H
 
 #include <QAbstractListModel>
-#include <QFont>
 
 struct CbmdosFs;
 
@@ -12,7 +11,6 @@ class CbmdosFsModel: public QAbstractListModel
 
     private:
 	CbmdosFs *fs;
-	QFont c64font;
 
     public:
 	CbmdosFsModel(CbmdosFs *fs, QObject *parent = nullptr);

@@ -1,92 +1,103 @@
 #include "mainwindow.h"
+#include "v1541commander.h"
 #include "v1541imgwidget.h"
 
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QAction>
+#include <QEvent>
 #include <QMenu>
 #include <QMenuBar>
-#include <QKeySequence>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QFontDatabase>
 
-extern "C" {
-#include <1541img/log.h>
-}
-
-void MainWindow::createActions()
+class MainWindow::priv
 {
-    newAct = new QAction(tr("&New"), this);
-    newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new disk image"));
-    connect(newAct, &QAction::triggered, this, &MainWindow::newImage);
+    public:
+        priv();
+        Content content;
+};
 
-    openAct = new QAction(tr("&Open"), this);
-    openAct->setShortcuts(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open a disk image"));
-    connect(openAct, &QAction::triggered, this, &MainWindow::open);
+MainWindow::priv::priv() :
+    content(None)
+{}
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcuts(QKeySequence::Quit);
-    exitAct->setStatusTip(tr("Exit the application"));
-    connect(exitAct, &QAction::triggered, this, &MainWindow::exit);
-}
-
-void MainWindow::createMenus()
+MainWindow::MainWindow()
 {
-    fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(newAct);
-    fileMenu->addAction(openAct);
+    d = new priv();
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(&app.newAction());
+    fileMenu->addAction(&app.openAction());
+    fileMenu->addAction(&app.closeAction());
     fileMenu->addSeparator();
-    fileMenu->addAction(exitAct);
+    fileMenu->addAction(&app.exitAction());
+
+    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
 }
 
-void MainWindow::newImage()
+MainWindow::~MainWindow()
 {
-    QMessageBox::information(this, "Not implemented",
-	    "Function not yet implemented");
+    delete d;
 }
 
-void MainWindow::open()
+MainWindow::Content MainWindow::content()
 {
-    QString imgFile = QFileDialog::getOpenFileName(this, tr("Open disk image"),
-	    QString(), tr("1541 disk images (*.d64)"));
+    return d->content;
+}
+
+bool MainWindow::event(QEvent *e)
+{
+    if (e->type() == QEvent::WindowActivate)
+    {
+        emit activated();
+    }
+    return QMainWindow::event(e);
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    (void) e;
+    emit closed();
+}
+
+QSize MainWindow::sizeHint() const
+{
+    if (d->content == Content::None)
+    {
+        return QSize(320,200);
+    }
+    else
+    {
+        return QWidget::sizeHint();
+    }
+}
+
+void MainWindow::openImage(QString &imgFile)
+{
     if (!imgFile.isEmpty())
     {
 	V1541ImgWidget *imgWidget = new V1541ImgWidget();
 	imgWidget->open(imgFile);
 	if (imgWidget->hasValidImage())
 	{
-	    QMdiArea *mdiArea = static_cast<QMdiArea *>(centralWidget());
-	    mdiArea->addSubWindow(imgWidget)->show();
+            QWidget *current = centralWidget();
+            setCentralWidget(imgWidget);
+            delete current;
+            imgWidget->setParent(this);
+            setWindowTitle(imgWidget->windowTitle());
+            d->content = Content::Image;
+            emit contentChanged();
+            adjustSize();
 	}
 	else
 	{
-	    QMessageBox::critical(this, tr("Error reading file"),
-		    tr("<p>The file you selected couldn't be read.</p>"
-			"<p>This means you either haven't permission to read "
-			"it or it doesn't contain a valid 1541 disc "
-			"image.</p>"));
+            delete imgWidget;
 	}
     }
 }
 
-void MainWindow::exit()
+void MainWindow::closeDocument()
 {
-    close();
-}
-
-MainWindow::MainWindow()
-{
-    setFileLogger(stderr);
-#ifdef DEBUG
-    setMaxLogLevel(L_DEBUG);
-#endif
-    QFontDatabase::addApplicationFont(":/C64_Pro_Mono-STYLE.ttf");
-    createActions();
-    createMenus();
-    setCentralWidget(new QMdiArea);
-    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
+    QWidget *current = centralWidget();
+    setCentralWidget(0);
+    delete current;
+    d->content = Content::None;
+    emit contentChanged();
+    adjustSize();
 }
 

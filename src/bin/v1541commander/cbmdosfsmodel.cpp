@@ -1,4 +1,5 @@
 #include "cbmdosfsmodel.h"
+#include "v1541commander.h"
 #include "petsciistr.h"
 
 #include <QSize>
@@ -11,7 +12,7 @@ extern "C" {
 }
 
 CbmdosFsModel::CbmdosFsModel(CbmdosFs *fs, QObject *parent)
-    : QAbstractListModel(parent), fs(fs), c64font("C64 Pro Mono")
+    : QAbstractListModel(parent), fs(fs)
 {}
 
 int CbmdosFsModel::rowCount(const QModelIndex &parent) const
@@ -27,13 +28,13 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::FontRole)
     {
-	return c64font;
+	return app.c64font();
     }
 
     if (role == Qt::SizeHintRole)
     {
-	QFontMetrics fm(c64font);
-	return QSize(fm.width("A") * 27, fm.ascent() - 1);
+	QFontMetrics fm(app.c64font());
+	return QSize(fm.averageCharWidth() * 22, fm.ascent() - 1);
     }
 
     if (role != Qt::DisplayRole)
