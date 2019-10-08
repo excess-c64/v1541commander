@@ -1,6 +1,7 @@
 v1541commander_PREPROCMODULES:= v1541commander mainwindow v1541imgwidget \
-	cbmdosfsmodel
-v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr
+	cbmdosfsmodel cbmdosfilewidget petsciiedit
+v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr \
+	petsciiconvert
 v1541commander_QRC:= resources
 v1541commander_PREPROC:= MOC
 v1541commander_PREPROCFLAGS:= -p.

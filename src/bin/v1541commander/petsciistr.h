@@ -12,7 +12,7 @@ class PetsciiStr
 
     public:
 	PetsciiStr(const char *raw, uint8_t len);
-	QString toString(bool lower = 0, bool reverse = 0);
+	QString toString(bool reverse = false);
 };
 
 #endif

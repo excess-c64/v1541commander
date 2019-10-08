@@ -10,14 +10,55 @@
 #include <1541img/cbmdosvfs.h>
 #include <1541img/cbmdosfile.h>
 
-CbmdosFsModel::CbmdosFsModel(CbmdosFs *fs, QObject *parent)
-    : QAbstractListModel(parent), fs(fs)
+class CbmdosFsModel::priv
+{
+    public:
+	priv();
+	CbmdosFs *fs;
+};
+
+CbmdosFsModel::priv::priv() :
+    fs(0)
 {}
+
+CbmdosFsModel::CbmdosFsModel(QObject *parent)
+    : QAbstractListModel(parent)
+{
+    d = new priv();
+}
+
+CbmdosFsModel::~CbmdosFsModel()
+{
+    delete d;
+}
+
+CbmdosFs *CbmdosFsModel::fs() const
+{
+    return d->fs;
+}
+
+void CbmdosFsModel::setFs(CbmdosFs *fs)
+{
+    if (d->fs)
+    {
+	beginRemoveRows(QModelIndex(), 0, rowCount()-1);
+	d->fs = 0;
+	endRemoveRows();
+    }
+    if (fs)
+    {
+	const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
+	beginInsertRows(QModelIndex(), 0, CbmdosVfs_fileCount(vfs)+1);
+	d->fs = fs;
+	endInsertRows();
+    }
+}
 
 int CbmdosFsModel::rowCount(const QModelIndex &parent) const
 {
     (void) parent;
-    const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
+    if (!d->fs) return 0;
+    const CbmdosVfs *vfs = CbmdosFs_rvfs(d->fs);
     return CbmdosVfs_fileCount(vfs) + 2;
 }
 
@@ -38,6 +79,8 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 		fm.ascent() * 13 / 14);
     }
 
+    if (!d->fs) return QVariant();
+
     if (role != Qt::DisplayRole)
     {
 	return QVariant();
@@ -45,7 +88,7 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 
     int row = index.row();
     int rowcount = rowCount();
-    const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
+    const CbmdosVfs *vfs = CbmdosFs_rvfs(d->fs);
 
     if (row > 0 && row < rowcount - 1)
     {
@@ -60,11 +103,11 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 	QString heading("0 ");
 	CbmdosVfs_getDirHeader(vfs, buffer);
 	PetsciiStr dirHeader((char *)buffer, 24);
-	heading.append(dirHeader.toString(0, 1));
+	heading.append(dirHeader.toString(true));
 	return heading;
     }
 
-    CbmdosFs_getFreeBlocksLine(fs, buffer);
+    CbmdosFs_getFreeBlocksLine(d->fs, buffer);
     PetsciiStr freeLine((char *)buffer, 16);
     return freeLine.toString();
 }

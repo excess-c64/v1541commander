@@ -3,20 +3,18 @@
 
 #include <QWidget>
 
-struct D64;
-struct CbmdosFs;
-class QListView;
-class CbmdosFsModel;
+class QModelIndex;
 
 class V1541ImgWidget: public QWidget
 {
     Q_OBJECT
 
     private:
-	D64 *d64;
-	CbmdosFs *fs;
-	CbmdosFsModel *model;
-	QListView *dirList;
+	class priv;
+	priv *d;
+
+    private slots:
+	void selected(const QModelIndex &current, const QModelIndex &previous);
 
     public slots:
 	void open(const QString& filename);

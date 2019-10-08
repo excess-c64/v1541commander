@@ -10,10 +10,14 @@ class CbmdosFsModel: public QAbstractListModel
     Q_OBJECT
 
     private:
-	CbmdosFs *fs;
+	class priv;
+	priv *d;
 
     public:
-	CbmdosFsModel(CbmdosFs *fs, QObject *parent = nullptr);
+	CbmdosFsModel(QObject *parent = nullptr);
+	~CbmdosFsModel();
+	CbmdosFs *fs() const;
+	void setFs(CbmdosFs *fs);
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index,
 		int role = Qt::DisplayRole) const;
