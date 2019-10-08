@@ -3,6 +3,8 @@
 
 #include <QLineEdit>
 
+class PetsciiStr;
+
 class PetsciiEdit : public QLineEdit
 {
     Q_OBJECT
@@ -10,8 +12,12 @@ class PetsciiEdit : public QLineEdit
     private slots:
 	void editText(const QString &text);
 
+    signals:
+	void petsciiEdited(const PetsciiStr &petscii);
+
     public:
 	PetsciiEdit(QWidget *parent = 0);
+	virtual void setMaxLength(int length);
 };
 
 #endif

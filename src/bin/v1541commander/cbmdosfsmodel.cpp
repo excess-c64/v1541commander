@@ -8,7 +8,19 @@
 
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
+#include <1541img/cbmdosvfseventargs.h>
 #include <1541img/cbmdosfile.h>
+#include <1541img/event.h>
+
+static void evhdl(void *receiver, int id, const void *sender, const void *args)
+{
+    (void) id;
+    (void) sender;
+
+    CbmdosFsModel *model = (CbmdosFsModel *)receiver;
+    const CbmdosVfsEventArgs *eventArgs = (const CbmdosVfsEventArgs *)args;
+    model->fsChanged(eventArgs);
+}
 
 class CbmdosFsModel::priv
 {
@@ -29,7 +41,21 @@ CbmdosFsModel::CbmdosFsModel(QObject *parent)
 
 CbmdosFsModel::~CbmdosFsModel()
 {
+    if (d->fs)
+    {
+	CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+	Event_unregister(CbmdosVfs_changedEvent(vfs), this, evhdl);
+    }
     delete d;
+}
+
+void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
+{
+    if (args->what == CbmdosVfsEventArgs::CVE_FILECHANGED)
+    {
+	QModelIndex pos = createIndex(args->filepos + 1, 0);
+	emit dataChanged(pos, pos, QVector<int>(Qt::DisplayRole));
+    }
 }
 
 CbmdosFs *CbmdosFsModel::fs() const
@@ -41,15 +67,18 @@ void CbmdosFsModel::setFs(CbmdosFs *fs)
 {
     if (d->fs)
     {
-	beginRemoveRows(QModelIndex(), 0, rowCount()-1);
+	CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+	Event_unregister(CbmdosVfs_changedEvent(vfs), this, evhdl);
+	beginRemoveRows(QModelIndex(), 0, CbmdosVfs_fileCount(vfs)+1);
 	d->fs = 0;
 	endRemoveRows();
     }
     if (fs)
     {
-	const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
+	CbmdosVfs *vfs = CbmdosFs_vfs(fs);
 	beginInsertRows(QModelIndex(), 0, CbmdosVfs_fileCount(vfs)+1);
 	d->fs = fs;
+	Event_register(CbmdosVfs_changedEvent(vfs), this, evhdl);
 	endInsertRows();
     }
 }

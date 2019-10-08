@@ -46,3 +46,18 @@ QChar PetsciiConvert::petsciiToFont(unsigned char petscii, bool reverse)
     if (reverse) val ^= 0x200;
     return QChar(val);
 }
+
+unsigned char PetsciiConvert::fontToPetscii(const QChar &fc, bool reverse)
+{
+    ushort val = fc.unicode();
+    if (reverse) val ^= 0x200;
+    if (val < 0xe000 || val > 0xe2ff || val & 0x100) return '?';
+    if (val > 0xe200)
+    {
+	val -= 0xe200;
+	if ((val >= 0x40 && val < 0x60) || (val >= 0xc0 && val < 0xe0))
+	    val += (0xe000 - 0x40);
+	else return '?';
+    }
+    return val & 0xff;
+}

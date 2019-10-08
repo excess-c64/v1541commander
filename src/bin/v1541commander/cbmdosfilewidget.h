@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 struct CbmdosFile;
+class PetsciiStr;
 
 class CbmdosFileWidget: public QGroupBox
 {
@@ -12,6 +13,9 @@ class CbmdosFileWidget: public QGroupBox
     private:
 	class priv;
 	priv *d;
+
+    private slots:
+	void nameChanged(const PetsciiStr &name);
 
     public:
 	CbmdosFileWidget(QWidget *parent = 0);

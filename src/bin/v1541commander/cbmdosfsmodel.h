@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 
 struct CbmdosFs;
+struct CbmdosVfsEventArgs;
 
 class CbmdosFsModel: public QAbstractListModel
 {
@@ -12,6 +13,9 @@ class CbmdosFsModel: public QAbstractListModel
     private:
 	class priv;
 	priv *d;
+
+    public slots:
+	void fsChanged(const CbmdosVfsEventArgs *args);
 
     public:
 	CbmdosFsModel(QObject *parent = nullptr);

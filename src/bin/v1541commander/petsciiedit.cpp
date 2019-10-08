@@ -1,9 +1,14 @@
 #include "petsciiedit.h"
 #include "petsciiconvert.h"
+#include "petsciistr.h"
+#include "v1541commander.h"
+
+#include <QStyle>
 
 PetsciiEdit::PetsciiEdit(QWidget *parent) :
     QLineEdit(QString(), parent)
 {
+    setFont(app.c64font());
     connect(this, &QLineEdit::textEdited, this, &PetsciiEdit::editText);
 }
 
@@ -25,4 +30,14 @@ void PetsciiEdit::editText(const QString &text)
     }
     setText(translated);
     setCursorPosition(pos);
+    PetsciiStr petscii(translated);
+    emit petsciiEdited(petscii);
+}
+
+void PetsciiEdit::setMaxLength(int length)
+{
+    QFontMetricsF fm(font());
+    setMinimumWidth((length+1) * fm.averageCharWidth()
+	    + 2 * app.style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+    QLineEdit::setMaxLength(length);
 }

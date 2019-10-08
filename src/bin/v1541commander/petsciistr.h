@@ -7,12 +7,16 @@
 class PetsciiStr
 {
     private:
-	const char *raw;
+	char *raw;
 	uint8_t len;
 
     public:
 	PetsciiStr(const char *raw, uint8_t len);
+	PetsciiStr(const QString &str, bool reverse = false);
+	~PetsciiStr();
 	QString toString(bool reverse = false);
+	const char *petscii() const;
+	uint8_t length() const;
 };
 
 #endif

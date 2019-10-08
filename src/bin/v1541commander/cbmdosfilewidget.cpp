@@ -1,9 +1,7 @@
 #include "cbmdosfilewidget.h"
-#include "v1541commander.h"
 #include "petsciistr.h"
 #include "petsciiedit.h"
 
-#include <QFontMetricsF>
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -33,17 +31,24 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
     d = new priv();
     d->nameLayout.addWidget(&d->nameLabel);
     d->nameLayout.addWidget(&d->name);
-    QFontMetricsF fm(app.c64font());
-    d->name.setMinimumWidth(fm.ascent() * 18 * 13 / 14);
-    d->name.setFont(app.c64font());
     d->name.setMaxLength(16);
     setLayout(&d->nameLayout);
     setEnabled(false);
+    connect(&d->name, &PetsciiEdit::petsciiEdited,
+	    this, &CbmdosFileWidget::nameChanged);
 }
 
 CbmdosFileWidget::~CbmdosFileWidget()
 {
     delete d;
+}
+
+void CbmdosFileWidget::nameChanged(const PetsciiStr &name)
+{
+    if (d->file)
+    {
+	CbmdosFile_setName(d->file, name.petscii(), name.length());
+    }
 }
 
 CbmdosFile *CbmdosFileWidget::file() const
