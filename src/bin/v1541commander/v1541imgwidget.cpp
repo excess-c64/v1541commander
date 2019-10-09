@@ -45,15 +45,18 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
 
 V1541ImgWidget::~V1541ImgWidget()
 {
-    if (d->fs)
-    {
-	CbmdosFs_destroy(d->fs);
-    }
-    else if (d->d64)
-    {
-	D64_destroy(d->d64);
-    }
+    CbmdosFs *fs = d->fs;
+    D64 *d64 = d->d64;
     delete d;
+
+    if (fs)
+    {
+	CbmdosFs_destroy(fs);
+    }
+    else if (d64)
+    {
+	D64_destroy(d64);
+    }
 }
 
 void V1541ImgWidget::selected(const QModelIndex &current,
