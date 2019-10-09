@@ -130,6 +130,24 @@ void CbmdosFileWidget::typeChanged(int typeIndex)
     if (typeIndex >= 0 && d->file)
     {
 	CbmdosFileType type = (CbmdosFileType) d->type.currentData().toInt();
+	if (type == CbmdosFileType::CFT_DEL)
+	{
+	    const FileData *data = CbmdosFile_rdata(d->file);
+	    size_t size = FileData_size(data);
+	    if (size)
+	    {
+		QMessageBox::StandardButton reply = QMessageBox::question(
+			this, "Erase file contents?", "Changing the file type "
+			"to DEL will erase all file contents. Proceed anyways?",
+			QMessageBox::Ok|QMessageBox::Cancel);
+		if (reply != QMessageBox::Ok)
+		{
+		    d->type.setCurrentIndex(d->type.findData(
+				CbmdosFile_type(d->file)));
+		    return;
+		}
+	    }
+	}
 	CbmdosFile_setType(d->file, type);
 	if (type == CbmdosFileType::CFT_DEL)
 	{
