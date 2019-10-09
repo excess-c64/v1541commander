@@ -16,6 +16,11 @@ class CbmdosFileWidget: public QGroupBox
 
     private slots:
 	void nameChanged(const PetsciiStr &name);
+	void typeChanged(int typeIndex);
+	void lockedChanged(int lockedState);
+	void closedChanged(int closedState);
+	void forcedBlocksActiveChanged(int activeState);
+	void forcedBlocksValueChanged(int value);
 
     public:
 	CbmdosFileWidget(QWidget *parent = 0);
