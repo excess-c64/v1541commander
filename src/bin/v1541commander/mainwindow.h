@@ -35,6 +35,7 @@ class MainWindow: public QMainWindow
 
     public slots:
         void openImage(QString &imgFile);
+	void save(QString &imgFile);
         void closeDocument();
 };
 

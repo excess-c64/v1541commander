@@ -23,6 +23,7 @@ MainWindow::MainWindow()
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(&app.newAction());
     fileMenu->addAction(&app.openAction());
+    fileMenu->addAction(&app.saveAsAction());
     fileMenu->addAction(&app.closeAction());
     fileMenu->addSeparator();
     fileMenu->addAction(&app.exitAction());
@@ -88,6 +89,22 @@ void MainWindow::openImage(QString &imgFile)
 	{
             delete imgWidget;
 	}
+    }
+}
+
+void MainWindow::save(QString &imgFile)
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    imgWidget->save(imgFile);
+	    break;
+
+	default:
+	    break;
     }
 }
 

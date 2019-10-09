@@ -18,6 +18,7 @@ class V1541ImgWidget: public QWidget
 
     public slots:
 	void open(const QString& filename);
+	void save(const QString& filename);
 
     public:
 	V1541ImgWidget();

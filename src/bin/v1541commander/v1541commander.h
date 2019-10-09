@@ -18,6 +18,7 @@ class V1541Commander: public QApplication
     private slots:
         void newImage();
         void open();
+	void saveAs();
         void close();
         void exit();
         void windowActivated();
@@ -30,6 +31,7 @@ class V1541Commander: public QApplication
         QFont &c64font();
         QAction &newAction();
         QAction &openAction();
+	QAction &saveAsAction();
         QAction &closeAction();
         QAction &exitAction();
 

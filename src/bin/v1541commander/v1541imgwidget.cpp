@@ -2,11 +2,13 @@
 #include "cbmdosfsmodel.h"
 #include "cbmdosfilewidget.h"
 
-#include <QListView>
 #include <QHBoxLayout>
+#include <QListView>
+#include <QMessageBox>
 
 #include <1541img/d64.h>
 #include <1541img/d64reader.h>
+#include <1541img/d64writer.h>
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
 
@@ -114,6 +116,28 @@ void V1541ImgWidget::open(const QString& filename)
                         + 2 * d->dirList.frameWidth());
 	    }
 	    setWindowTitle(filename);
+	}
+    }
+}
+
+void V1541ImgWidget::save(const QString& filename)
+{
+    if (d->d64)
+    {
+	FILE *d64file = fopen(filename.toUtf8().data(), "wb");
+	if (d64file)
+	{
+	    if (writeD64(d64file, d->d64) < 0)
+	    {
+		QMessageBox::critical(this, tr("Error writing file"),
+			tr("The selected file couldn't be written."));
+	    }
+	    fclose(d64file);
+	}
+	else
+	{
+	    QMessageBox::critical(this, tr("Error opening file"),
+		    tr("The selected file couldn't be opened for writing."));
 	}
     }
 }
