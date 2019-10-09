@@ -2,14 +2,20 @@
 #include "petsciistr.h"
 #include "petsciiedit.h"
 
+#include <QPushButton>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMessageBox>
 #include <QSpinBox>
 #include <QVBoxLayout>
 
 #include <1541img/cbmdosfile.h>
+#include <1541img/filedata.h>
+#include <1541img/hostfilereader.h>
+#include <1541img/hostfilewriter.h>
 
 class CbmdosFileWidget::priv
 {
@@ -28,6 +34,11 @@ class CbmdosFileWidget::priv
 	QHBoxLayout forcedBlocksLayout;
 	QCheckBox forcedBlocksActive;
 	QSpinBox forcedBlocks;
+	QHBoxLayout dataLayout;
+	QLabel dataLabel;
+	QLabel dataSizeLabel;
+	QPushButton importButton;
+	QPushButton exportButton;
 };
 
 CbmdosFileWidget::priv::priv() :
@@ -43,7 +54,12 @@ CbmdosFileWidget::priv::priv() :
     closed(tr("closed")),
     forcedBlocksLayout(),
     forcedBlocksActive(tr("forced block size: ")),
-    forcedBlocks()
+    forcedBlocks(),
+    dataLayout(),
+    dataLabel(tr("Content: ")),
+    dataSizeLabel(tr("<none>")),
+    importButton(tr("import")),
+    exportButton(tr("export"))
 {
 }
 
@@ -68,9 +84,14 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
     d->forcedBlocks.setEnabled(false);
     d->forcedBlocksLayout.addWidget(&d->forcedBlocksActive);
     d->forcedBlocksLayout.addWidget(&d->forcedBlocks);
+    d->dataLayout.addWidget(&d->dataLabel);
+    d->dataLayout.addWidget(&d->dataSizeLabel);
+    d->dataLayout.addWidget(&d->importButton);
+    d->dataLayout.addWidget(&d->exportButton);
     d->layout.addLayout(&d->nameLayout);
     d->layout.addLayout(&d->optionsLayout);
     d->layout.addLayout(&d->forcedBlocksLayout);
+    d->layout.addLayout(&d->dataLayout);
     setLayout(&d->layout);
     setEnabled(false);
     connect(&d->name, &PetsciiEdit::petsciiEdited,
@@ -85,6 +106,10 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 	    this, &CbmdosFileWidget::forcedBlocksActiveChanged);
     connect(&d->forcedBlocks, SIGNAL(valueChanged(int)),
 	    this, SLOT(forcedBlocksValueChanged(int)));
+    connect(&d->importButton, &QPushButton::clicked,
+	    this, &CbmdosFileWidget::importFile);
+    connect(&d->exportButton, &QPushButton::clicked,
+	    this, &CbmdosFileWidget::exportFile);
 }
 
 CbmdosFileWidget::~CbmdosFileWidget()
@@ -104,8 +129,32 @@ void CbmdosFileWidget::typeChanged(int typeIndex)
 {
     if (typeIndex >= 0 && d->file)
     {
-	CbmdosFile_setType(d->file,
-		(CbmdosFileType) d->type.currentData().toInt());
+	CbmdosFileType type = (CbmdosFileType) d->type.currentData().toInt();
+	CbmdosFile_setType(d->file, type);
+	if (type == CbmdosFileType::CFT_DEL)
+	{
+	    d->dataSizeLabel.setText(tr("<none>"));
+	    d->importButton.setEnabled(false);
+	    d->exportButton.setEnabled(false);
+	}
+	else
+	{
+	    const FileData *data = CbmdosFile_rdata(d->file);
+	    size_t size = FileData_size(data);
+	    if (!size)
+	    {
+		d->dataSizeLabel.setText(tr("<none>"));
+		d->importButton.setEnabled(true);
+		d->exportButton.setEnabled(false);
+	    }
+	    else
+	    {
+		d->dataSizeLabel.setText(QString("%1 KiB")
+			.arg(size/1024.0, 5, 'f', 3));
+		d->importButton.setEnabled(true);
+		d->exportButton.setEnabled(true);
+	    }
+	}
     }
 }
 
@@ -152,6 +201,81 @@ void CbmdosFileWidget::forcedBlocksValueChanged(int value)
     }
 }
 
+static QString getFilterForType(CbmdosFileType type)
+{
+    switch (type)
+    {
+	case CbmdosFileType::CFT_PRG:
+	    return QString(QT_TR_NOOP("PRG files (*.prg);;all files (*)"));
+	case CbmdosFileType::CFT_SEQ:
+	    return QString(QT_TR_NOOP("SEQ files (*.seq);;all files (*)"));
+	case CbmdosFileType::CFT_USR:
+	    return QString(QT_TR_NOOP("USR files (*.use);;all files (*)"));
+	default:
+	    return QString(QT_TR_NOOP("all files (*)"));
+    }
+}
+
+void CbmdosFileWidget::importFile()
+{
+    if (CbmdosFile_type(d->file) == CbmdosFileType::CFT_DEL) return;
+    QString hostFile = QFileDialog::getOpenFileName(this, tr("Import file"),
+	    QString(), getFilterForType(CbmdosFile_type(d->file)));
+    if (!hostFile.isEmpty())
+    {
+	FILE *f = fopen(hostFile.toUtf8().data(), "rb");
+	if (f)
+	{
+	    FileData *data = readHostFile(f);
+	    fclose(f);
+	    if (data)
+	    {
+		CbmdosFile_setData(d->file, data);
+		d->dataSizeLabel.setText(QString("%1 KiB")
+			.arg(FileData_size(data)/1024.0, 5, 'f', 3));
+		d->exportButton.setEnabled(true);
+	    }
+	    else
+	    {
+		QMessageBox::critical(this, tr("Error reading file"),
+			tr("The selected file couldn't be read."));
+	    }
+	}
+	else
+	{
+	    QMessageBox::critical(this, tr("Error opening file"),
+		    tr("The selected file couldn't be opened for reading."));
+	}
+    }
+}
+
+void CbmdosFileWidget::exportFile()
+{
+    if (CbmdosFile_type(d->file) == CbmdosFileType::CFT_DEL) return;
+    const FileData *data = CbmdosFile_rdata(d->file);
+    if (!data || !FileData_size(data)) return;
+    QString hostFile = QFileDialog::getSaveFileName(this, tr("Export file"),
+	    QString(), getFilterForType(CbmdosFile_type(d->file)));
+    if (!hostFile.isEmpty())
+    {
+	FILE *f = fopen(hostFile.toUtf8().data(), "wb");
+	if (f)
+	{
+	    if (writeHostFile(data, f) < 0)
+	    {
+		QMessageBox::critical(this, tr("Error writing file"),
+			tr("The selected file couldn't be written."));
+	    }
+	    fclose(f);
+	}
+	else
+	{
+	    QMessageBox::critical(this, tr("Error opening file"),
+		    tr("The selected file couldn't be opened for writing."));
+	}
+    }
+}
+
 CbmdosFile *CbmdosFileWidget::file() const
 {
     return d->file;
@@ -167,7 +291,8 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	const char *name = CbmdosFile_name(file, &nameLength);
 	PetsciiStr str(name, nameLength);
 	d->name.setText(str.toString());
-	d->type.setCurrentIndex(d->type.findData(CbmdosFile_type(file)));
+	CbmdosFileType type = CbmdosFile_type(file);
+	d->type.setCurrentIndex(d->type.findData(type));
 	d->locked.setChecked(CbmdosFile_locked(file));
 	d->closed.setChecked(CbmdosFile_closed(file));
 	uint16_t forcedBlocks = CbmdosFile_forcedBlocks(file);
@@ -183,11 +308,33 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	    d->forcedBlocks.setEnabled(true);
 	    d->forcedBlocks.setValue(forcedBlocks);
 	}
+	const FileData *fd = CbmdosFile_rdata(file);
+	size_t size = FileData_size(fd);
+	if (type == CbmdosFileType::CFT_DEL)
+	{
+	    d->dataSizeLabel.setText(tr("<none>"));
+	    d->importButton.setEnabled(false);
+	    d->exportButton.setEnabled(false);
+	}
+	else if (!size)
+	{
+	    d->dataSizeLabel.setText(tr("<none>"));
+	    d->importButton.setEnabled(true);
+	    d->exportButton.setEnabled(false);
+	}
+	else
+	{
+	    d->dataSizeLabel.setText(QString("%1 KiB")
+		    .arg(size/1024.0, 5, 'f', 3));
+	    d->importButton.setEnabled(true);
+	    d->exportButton.setEnabled(true);
+	}
     }
     else
     {
 	setEnabled(false);
 	d->name.setText(QString());
+	d->dataSizeLabel.setText(tr("<none>"));
     }
     d->file = file;
 }
