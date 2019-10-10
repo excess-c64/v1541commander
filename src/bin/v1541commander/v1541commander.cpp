@@ -1,5 +1,6 @@
 #include "v1541commander.h"
 #include "mainwindow.h"
+#include "petsciiwindow.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -20,8 +21,10 @@ class V1541Commander::priv
 	QAction saveAsAction;
         QAction closeAction;
         QAction exitAction;
+        QAction petsciiWindowAction;
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
+        PetsciiWindow *petsciiWindow;
         
         MainWindow *addWindow();
         void removeWindow(MainWindow *w);
@@ -35,8 +38,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     saveAsAction(tr("Save &As")),
     closeAction(tr("&Close")),
     exitAction(tr("E&xit")),
+    petsciiWindowAction(tr("&PETSCII Input")),
     allWindows(),
-    lastActiveWindow(0)
+    lastActiveWindow(0),
+    petsciiWindow(0)
 {
     newAction.setShortcuts(QKeySequence::New);
     newAction.setStatusTip(tr("Create a new disk image"));
@@ -48,6 +53,8 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     closeAction.setStatusTip(tr("Close current file"));
     exitAction.setShortcuts(QKeySequence::Quit);
     exitAction.setStatusTip(tr("Exit the application"));
+    petsciiWindowAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_P));
+    petsciiWindowAction.setStatusTip(tr("Show PETSCII input window"));
 }
 
 MainWindow *V1541Commander::priv::addWindow()
@@ -70,6 +77,7 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
     allWindows.removeAll(w);
     w->close();
     w->deleteLater();
+    if (allWindows.count() == 0) closeAllWindows();
 }
 
 V1541Commander::V1541Commander(int &argc, char **argv)
@@ -92,10 +100,13 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::close);
     connect(&d->exitAction, &QAction::triggered,
 	    this, &V1541Commander::exit);
+    connect(&d->petsciiWindowAction, &QAction::triggered,
+            this, &V1541Commander::showPetsciiWindow);
 }
 
 V1541Commander::~V1541Commander()
 {
+    delete d->petsciiWindow;
     delete d;
 }
 
@@ -202,6 +213,15 @@ void V1541Commander::windowContentChanged()
     }
 }
 
+void V1541Commander::showPetsciiWindow()
+{
+    if (!d->petsciiWindow)
+    {
+        d->petsciiWindow = new PetsciiWindow();
+    }
+    d->petsciiWindow->show();
+}
+
 QFont &V1541Commander::c64font()
 {
     return d->c64font;
@@ -230,6 +250,11 @@ QAction &V1541Commander::closeAction()
 QAction &V1541Commander::exitAction()
 {
     return d->exitAction;
+}
+
+QAction &V1541Commander::petsciiWindowAction()
+{
+    return d->petsciiWindowAction;
 }
 
 V1541Commander &V1541Commander::instance()

@@ -24,6 +24,7 @@ class V1541Commander: public QApplication
         void windowActivated();
         void windowClosed();
         void windowContentChanged();
+        void showPetsciiWindow();
         
     public:
         V1541Commander(int &argc, char **argv);
@@ -34,6 +35,7 @@ class V1541Commander: public QApplication
 	QAction &saveAsAction();
         QAction &closeAction();
         QAction &exitAction();
+        QAction &petsciiWindowAction();
 
         static V1541Commander &instance();
 };
