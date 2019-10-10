@@ -34,6 +34,11 @@ void PetsciiEdit::editText(const QString &text)
     emit petsciiEdited(petscii);
 }
 
+void PetsciiEdit::petsciiInput(ushort val)
+{
+    insert(QString(val));
+}
+
 void PetsciiEdit::setMaxLength(int length)
 {
     QFontMetricsF fm(font());

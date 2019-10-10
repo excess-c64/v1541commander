@@ -1,6 +1,7 @@
 #include "v1541commander.h"
 #include "mainwindow.h"
 #include "petsciiwindow.h"
+#include "petsciiedit.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -218,8 +219,16 @@ void V1541Commander::showPetsciiWindow()
     if (!d->petsciiWindow)
     {
         d->petsciiWindow = new PetsciiWindow();
+	connect(d->petsciiWindow, &PetsciiWindow::petsciiInput,
+		this, &V1541Commander::petsciiInput);
     }
     d->petsciiWindow->show();
+}
+
+void V1541Commander::petsciiInput(ushort val)
+{
+    PetsciiEdit *pe = dynamic_cast<PetsciiEdit *>(focusWidget());
+    if (pe) pe->petsciiInput(val);
 }
 
 QFont &V1541Commander::c64font()

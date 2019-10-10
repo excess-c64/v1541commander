@@ -25,6 +25,7 @@ class V1541Commander: public QApplication
         void windowClosed();
         void windowContentChanged();
         void showPetsciiWindow();
+	void petsciiInput(ushort val);
         
     public:
         V1541Commander(int &argc, char **argv);

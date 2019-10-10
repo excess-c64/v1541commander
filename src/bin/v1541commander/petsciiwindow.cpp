@@ -27,6 +27,8 @@ PetsciiWindow::PetsciiWindow(QWidget *parent) :
                 petscii += 0xe000;
             }
             PetsciiButton *button = new PetsciiButton(petscii, this);
+	    connect(button, &PetsciiButton::clicked,
+		    this, &PetsciiWindow::buttonClicked);
             layout->addWidget(button, row, col);
         }
     }
@@ -39,3 +41,7 @@ PetsciiWindow::PetsciiWindow(QWidget *parent) :
 #endif
 }
 
+void PetsciiWindow::buttonClicked(ushort val)
+{
+    emit petsciiInput(val);
+}

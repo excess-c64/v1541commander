@@ -12,6 +12,9 @@ class PetsciiEdit : public QLineEdit
     private slots:
 	void editText(const QString &text);
 
+    public slots:
+	void petsciiInput(ushort val);
+
     signals:
 	void petsciiEdited(const PetsciiStr &petscii);
 
