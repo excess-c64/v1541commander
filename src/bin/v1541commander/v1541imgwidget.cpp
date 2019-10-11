@@ -1,10 +1,12 @@
 #include "v1541imgwidget.h"
 #include "cbmdosfsmodel.h"
+#include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
 
 #include <QHBoxLayout>
 #include <QListView>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 #include <1541img/d64.h>
 #include <1541img/d64reader.h>
@@ -20,6 +22,7 @@ class V1541ImgWidget::priv
 	CbmdosFs *fs;
 	CbmdosFsModel model;
 	QListView dirList;
+	CbmdosFsWidget fsprop;
 	CbmdosFileWidget file;
 };
 
@@ -28,6 +31,7 @@ V1541ImgWidget::priv::priv() :
     fs(0),
     model(),
     dirList(),
+    fsprop(),
     file()
 {}
 
@@ -35,11 +39,14 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
 {
     d = new priv();
     QHBoxLayout *layout = new QHBoxLayout(this);
+    QVBoxLayout *propLayout = new QVBoxLayout(this);
     d->dirList.setMinimumHeight(200);
     d->dirList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     d->dirList.setModel(&d->model);
     layout->addWidget(&d->dirList);
-    layout->addWidget(&d->file);
+    propLayout->addWidget(&d->fsprop);
+    propLayout->addWidget(&d->file);
+    layout->addLayout(propLayout);
     setLayout(layout);
     connect(d->dirList.selectionModel(), &QItemSelectionModel::currentChanged,
 	    this, &V1541ImgWidget::selected);
@@ -105,6 +112,7 @@ void V1541ImgWidget::open(const QString& filename)
 	    if (d->fs)
 	    {
 		d->model.setFs(d->fs);
+		d->fsprop.setFs(d->fs);
                 d->dirList.setMinimumWidth(
                         d->dirList.sizeHintForColumn(0)
                         + 2 * d->dirList.frameWidth());

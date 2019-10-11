@@ -51,10 +51,25 @@ CbmdosFsModel::~CbmdosFsModel()
 
 void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
 {
-    if (args->what == CbmdosVfsEventArgs::CVE_FILECHANGED)
+    switch (args->what)
     {
-	QModelIndex pos = createIndex(args->filepos + 1, 0);
-	emit dataChanged(pos, pos, QVector<int>(Qt::DisplayRole));
+	case CbmdosVfsEventArgs::CVE_FILECHANGED:
+	    {
+		QModelIndex pos = createIndex(args->filepos + 1, 0);
+		emit dataChanged(pos, pos, QVector<int>(Qt::DisplayRole));
+	    }
+	    break;
+
+	case CbmdosVfsEventArgs::CVE_NAMECHANGED:
+	case CbmdosVfsEventArgs::CVE_IDCHANGED:
+	    {
+		QModelIndex pos = createIndex(0, 0);
+		emit dataChanged(pos, pos, QVector<int>(Qt::DisplayRole));
+	    }
+	    break;
+
+	default:
+	    break;
     }
 }
 
@@ -93,7 +108,7 @@ int CbmdosFsModel::rowCount(const QModelIndex &parent) const
 
 QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 {
-    uint8_t buffer[27];
+    uint8_t buffer[28];
 
     if (role == Qt::FontRole)
     {
@@ -103,7 +118,7 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::SizeHintRole)
     {
 	QFontMetricsF fm(app.c64font());
-	return QSizeF(fm.ascent() * 28 * 13 / 14
+	return QSizeF(fm.ascent() * 29 * 13 / 14
 		+ app.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
 		fm.ascent() * 13 / 14);
     }
@@ -123,7 +138,7 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
     {
 	const CbmdosFile *file = CbmdosVfs_rfile(vfs, row-1);
 	CbmdosFile_getDirLine(file, buffer);
-	PetsciiStr dirLine((char *)buffer, 27);
+	PetsciiStr dirLine((char *)buffer, 28);
 	return dirLine.toString();
     }
 
