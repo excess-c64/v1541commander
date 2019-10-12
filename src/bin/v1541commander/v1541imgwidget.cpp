@@ -46,6 +46,7 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
     layout->addWidget(&d->dirList);
     propLayout->addWidget(&d->fsprop);
     propLayout->addWidget(&d->file);
+    propLayout->addStretch();
     layout->addLayout(propLayout);
     setLayout(layout);
     connect(d->dirList.selectionModel(), &QItemSelectionModel::currentChanged,

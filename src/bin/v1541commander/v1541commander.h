@@ -25,6 +25,7 @@ class V1541Commander: public QApplication
         void windowClosed();
         void windowContentChanged();
         void showPetsciiWindow();
+	void showLogWindow();
 	void petsciiInput(ushort val);
         
     public:
@@ -37,6 +38,7 @@ class V1541Commander: public QApplication
         QAction &closeAction();
         QAction &exitAction();
         QAction &petsciiWindowAction();
+	QAction &logWindowAction();
 
         static V1541Commander &instance();
 };

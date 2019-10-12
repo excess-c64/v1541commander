@@ -1,4 +1,5 @@
 #include "v1541commander.h"
+#include "logwindow.h"
 #include "mainwindow.h"
 #include "petsciiwindow.h"
 #include "petsciiedit.h"
@@ -23,9 +24,11 @@ class V1541Commander::priv
         QAction closeAction;
         QAction exitAction;
         QAction petsciiWindowAction;
+	QAction logWindowAction;
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
         PetsciiWindow *petsciiWindow;
+	LogWindow logWindow;
         
         MainWindow *addWindow();
         void removeWindow(MainWindow *w);
@@ -40,9 +43,11 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     closeAction(tr("&Close")),
     exitAction(tr("E&xit")),
     petsciiWindowAction(tr("&PETSCII Input")),
+    logWindowAction(tr("lib1541img &log")),
     allWindows(),
     lastActiveWindow(0),
-    petsciiWindow(0)
+    petsciiWindow(0),
+    logWindow()
 {
     newAction.setShortcuts(QKeySequence::New);
     newAction.setStatusTip(tr("Create a new disk image"));
@@ -56,6 +61,8 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     exitAction.setStatusTip(tr("Exit the application"));
     petsciiWindowAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_P));
     petsciiWindowAction.setStatusTip(tr("Show PETSCII input window"));
+    logWindowAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_L));
+    logWindowAction.setStatusTip(tr("Show lib1541img log messages"));
 }
 
 MainWindow *V1541Commander::priv::addWindow()
@@ -84,7 +91,6 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
 V1541Commander::V1541Commander(int &argc, char **argv)
     : QApplication(argc, argv)
 {
-    setFileLogger(stderr);
 #ifdef DEBUG
     setMaxLogLevel(L_DEBUG);
 #endif
@@ -103,6 +109,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::exit);
     connect(&d->petsciiWindowAction, &QAction::triggered,
             this, &V1541Commander::showPetsciiWindow);
+    connect(&d->logWindowAction, &QAction::triggered,
+            this, &V1541Commander::showLogWindow);
 }
 
 V1541Commander::~V1541Commander()
@@ -225,6 +233,11 @@ void V1541Commander::showPetsciiWindow()
     d->petsciiWindow->show();
 }
 
+void V1541Commander::showLogWindow()
+{
+    d->logWindow.show();
+}
+
 void V1541Commander::petsciiInput(ushort val)
 {
     PetsciiEdit *pe = dynamic_cast<PetsciiEdit *>(focusWidget());
@@ -264,6 +277,11 @@ QAction &V1541Commander::exitAction()
 QAction &V1541Commander::petsciiWindowAction()
 {
     return d->petsciiWindowAction;
+}
+
+QAction &V1541Commander::logWindowAction()
+{
+    return d->logWindowAction;
 }
 
 V1541Commander &V1541Commander::instance()

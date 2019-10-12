@@ -29,6 +29,7 @@ MainWindow::MainWindow()
     fileMenu->addAction(&app.exitAction());
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
     windowsMenu->addAction(&app.petsciiWindowAction());
+    windowsMenu->addAction(&app.logWindowAction());
 
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
 }
