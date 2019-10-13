@@ -241,7 +241,7 @@ void CbmdosFileWidget::importFile()
 	    QString(), getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
-	FILE *f = fopen(hostFile.toUtf8().data(), "rb");
+	FILE *f = fopen(hostFile.toLocal8Bit().data(), "rb");
 	if (f)
 	{
 	    FileData *data = readHostFile(f);
@@ -276,7 +276,7 @@ void CbmdosFileWidget::exportFile()
 	    QString(), getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
-	FILE *f = fopen(hostFile.toUtf8().data(), "wb");
+	FILE *f = fopen(hostFile.toLocal8Bit().data(), "wb");
 	if (f)
 	{
 	    if (writeHostFile(data, f) < 0)

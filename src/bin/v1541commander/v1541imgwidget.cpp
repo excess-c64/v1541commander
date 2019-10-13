@@ -99,7 +99,7 @@ void V1541ImgWidget::open(const QString& filename)
 	D64_destroy(d->d64);
 	d->d64 = 0;
     }
-    FILE *d64file = fopen(filename.toUtf8().data(), "rb");
+    FILE *d64file = fopen(filename.toLocal8Bit().data(), "rb");
     if (d64file)
     {
 	d->d64 = readD64(d64file);
@@ -133,7 +133,7 @@ void V1541ImgWidget::save(const QString& filename)
 {
     if (d->d64)
     {
-	FILE *d64file = fopen(filename.toUtf8().data(), "wb");
+	FILE *d64file = fopen(filename.toLocal8Bit().data(), "wb");
 	if (d64file)
 	{
 	    if (writeD64(d64file, d->d64) < 0)
