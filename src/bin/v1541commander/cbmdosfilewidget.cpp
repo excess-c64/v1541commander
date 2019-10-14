@@ -1,6 +1,7 @@
 #include "cbmdosfilewidget.h"
 #include "petsciistr.h"
 #include "petsciiedit.h"
+#include "utils.h"
 
 #include <QPushButton>
 #include <QCheckBox>
@@ -241,7 +242,7 @@ void CbmdosFileWidget::importFile()
 	    QString(), getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
-	FILE *f = fopen(hostFile.toLocal8Bit().data(), "rb");
+	FILE *f = qfopen(hostFile, "rb");
 	if (f)
 	{
 	    FileData *data = readHostFile(f);
@@ -276,7 +277,7 @@ void CbmdosFileWidget::exportFile()
 	    QString(), getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
-	FILE *f = fopen(hostFile.toLocal8Bit().data(), "wb");
+	FILE *f = qfopen(hostFile, "wb");
 	if (f)
 	{
 	    if (writeHostFile(data, f) < 0)
