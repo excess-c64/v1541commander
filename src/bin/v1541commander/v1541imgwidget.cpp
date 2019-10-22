@@ -40,7 +40,7 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
 {
     d = new priv();
     QHBoxLayout *layout = new QHBoxLayout(this);
-    QVBoxLayout *propLayout = new QVBoxLayout(this);
+    QVBoxLayout *propLayout = new QVBoxLayout();
     d->dirList.setMinimumHeight(200);
     d->dirList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     d->dirList.setModel(&d->model);
@@ -49,7 +49,6 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
     propLayout->addWidget(&d->file);
     propLayout->addStretch();
     layout->addLayout(propLayout);
-    setLayout(layout);
     connect(d->dirList.selectionModel(), &QItemSelectionModel::currentChanged,
 	    this, &V1541ImgWidget::selected);
 }
