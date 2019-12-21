@@ -11,10 +11,12 @@ class MainWindow::priv
     public:
         priv();
         Content content;
+	QString filename;
 };
 
 MainWindow::priv::priv() :
-    content(None)
+    content(None),
+    filename()
 {}
 
 MainWindow::MainWindow()
@@ -23,6 +25,7 @@ MainWindow::MainWindow()
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(&app.newAction());
     fileMenu->addAction(&app.openAction());
+    fileMenu->addAction(&app.saveAction());
     fileMenu->addAction(&app.saveAsAction());
     fileMenu->addAction(&app.closeAction());
     fileMenu->addSeparator();
@@ -42,6 +45,11 @@ MainWindow::~MainWindow()
 MainWindow::Content MainWindow::content()
 {
     return d->content;
+}
+
+const QString &MainWindow::filename()
+{
+    return d->filename;
 }
 
 bool MainWindow::event(QEvent *e)
@@ -71,7 +79,7 @@ QSize MainWindow::sizeHint() const
     }
 }
 
-void MainWindow::openImage(QString &imgFile)
+void MainWindow::openImage(const QString &imgFile)
 {
     if (!imgFile.isEmpty())
     {
@@ -85,6 +93,7 @@ void MainWindow::openImage(QString &imgFile)
             imgWidget->setParent(this);
             setWindowTitle(imgWidget->windowTitle());
             d->content = Content::Image;
+	    d->filename = imgFile;
             emit contentChanged();
             adjustSize();
 	}
@@ -95,7 +104,7 @@ void MainWindow::openImage(QString &imgFile)
     }
 }
 
-void MainWindow::save(QString &imgFile)
+void MainWindow::save(const QString &imgFile)
 {
     switch (d->content)
     {
@@ -103,7 +112,8 @@ void MainWindow::save(QString &imgFile)
 
 	case Content::Image:
 	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
-	    imgWidget->save(imgFile);
+	    imgWidget->save(imgFile.isEmpty() ? d->filename : imgFile);
+	    if (d->filename.isEmpty()) d->filename = imgFile;
 	    break;
 
 	default:

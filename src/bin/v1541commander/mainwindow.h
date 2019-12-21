@@ -24,6 +24,7 @@ class MainWindow: public QMainWindow
 	MainWindow();
         ~MainWindow();
         Content content();
+	const QString &filename();
         virtual bool event(QEvent *e);
         virtual void closeEvent(QCloseEvent *e);
         virtual QSize sizeHint() const;
@@ -34,8 +35,8 @@ class MainWindow: public QMainWindow
         void contentChanged();
 
     public slots:
-        void openImage(QString &imgFile);
-	void save(QString &imgFile);
+        void openImage(const QString &imgFile);
+	void save(const QString &imgFile = QString());
         void closeDocument();
 };
 

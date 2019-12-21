@@ -20,6 +20,7 @@ class V1541Commander::priv
         QFont c64font;
         QAction newAction;
         QAction openAction;
+	QAction saveAction;
 	QAction saveAsAction;
         QAction closeAction;
         QAction exitAction;
@@ -39,6 +40,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     c64font("C64 Pro Mono"),
     newAction(tr("&New")),
     openAction(tr("&Open")),
+    saveAction(tr("&Save")),
     saveAsAction(tr("Save &As")),
     closeAction(tr("&Close")),
     exitAction(tr("E&xit")),
@@ -53,6 +55,8 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     newAction.setStatusTip(tr("Create a new disk image"));
     openAction.setShortcuts(QKeySequence::Open);
     openAction.setStatusTip(tr("Open a disk image"));
+    saveAction.setShortcuts(QKeySequence::Save);
+    saveAction.setStatusTip(tr("Save disk image"));
     saveAsAction.setShortcuts(QKeySequence::SaveAs);
     saveAsAction.setStatusTip(tr("Save disk image as new file"));
     closeAction.setShortcuts(QKeySequence::Close);
@@ -101,6 +105,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::newImage);
     connect(&d->openAction, &QAction::triggered,
 	    this, &V1541Commander::open);
+    connect(&d->saveAction, &QAction::triggered,
+	    this, &V1541Commander::save);
     connect(&d->saveAsAction, &QAction::triggered,
 	    this, &V1541Commander::saveAs);
     connect(&d->closeAction, &QAction::triggered,
@@ -169,6 +175,14 @@ static QString getFilterForWindowContent(MainWindow::Content content)
     }
 }
 
+void V1541Commander::save()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->save();
+}
+
 void V1541Commander::saveAs()
 {
     MainWindow *w = d->lastActiveWindow;
@@ -204,6 +218,7 @@ void V1541Commander::windowActivated()
     MainWindow *w = static_cast<MainWindow *>(sender());
     d->lastActiveWindow = w;
     d->closeAction.setEnabled(w->content() != MainWindow::Content::None);
+    d->saveAction.setEnabled(!w->filename().isEmpty());
     d->saveAsAction.setEnabled(w->content() != MainWindow::Content::None);
 }
 
@@ -218,6 +233,7 @@ void V1541Commander::windowContentChanged()
     if (w == d->lastActiveWindow)
     {
         d->closeAction.setEnabled(w->content() != MainWindow::Content::None);
+	d->saveAction.setEnabled(!w->filename().isEmpty());
         d->saveAsAction.setEnabled(w->content() != MainWindow::Content::None);
     }
 }
@@ -257,6 +273,11 @@ QAction &V1541Commander::newAction()
 QAction &V1541Commander::openAction()
 {
     return d->openAction;
+}
+
+QAction &V1541Commander::saveAction()
+{
+    return d->saveAction;
 }
 
 QAction &V1541Commander::saveAsAction()
