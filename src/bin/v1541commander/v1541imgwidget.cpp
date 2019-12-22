@@ -44,6 +44,9 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
     d->dirList.setMinimumHeight(200);
     d->dirList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     d->dirList.setModel(&d->model);
+    d->dirList.setDragEnabled(true);
+    d->dirList.setAcceptDrops(true);
+    d->dirList.setDragDropMode(QAbstractItemView::InternalMove);
     layout->addWidget(&d->dirList);
     propLayout->addWidget(&d->fsprop);
     propLayout->addWidget(&d->file);

@@ -3,6 +3,7 @@
 #include "petsciistr.h"
 
 #include <QFontMetricsF>
+#include <QMimeData>
 #include <QSizeF>
 #include <QStyle>
 
@@ -57,6 +58,21 @@ void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
 	    {
 		QModelIndex pos = createIndex(args->filepos + 1, 0);
 		emit dataChanged(pos, pos, QVector<int>(Qt::DisplayRole));
+	    }
+	    break;
+
+	case CbmdosVfsEventArgs::CVE_FILEMOVED:
+	    if (args->targetpos > args->filepos)
+	    {
+		QModelIndex from = createIndex(args->filepos + 1, 0);
+		QModelIndex to = createIndex(args->targetpos + 1, 0);
+		emit dataChanged(from, to, QVector<int>(Qt::DisplayRole));
+	    }
+	    else
+	    {
+		QModelIndex from = createIndex(args->targetpos + 1, 0);
+		QModelIndex to = createIndex(args->filepos + 1, 0);
+		emit dataChanged(from, to, QVector<int>(Qt::DisplayRole));
 	    }
 	    break;
 
@@ -156,3 +172,66 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
     return freeLine.toString();
 }
 
+Qt::ItemFlags CbmdosFsModel::flags(const QModelIndex &index) const
+{
+    if (!d->fs) return Qt::ItemNeverHasChildren;
+    if (!index.isValid()) return Qt::ItemIsDropEnabled;
+
+    int row = index.row();
+    int rowcount = rowCount();
+    if (row > 0 && row < rowcount - 1)
+    {
+	return Qt::ItemIsSelectable | Qt::ItemIsDragEnabled
+	    | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+    }
+
+    return Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
+}
+
+QStringList CbmdosFsModel::mimeTypes() const
+{
+    return QStringList("application/x-cbmdosfs-filepos");
+}
+
+QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
+{
+    if (indexes.count() != 1) return 0;
+    const QModelIndex &index = indexes.front();
+    if (!index.isValid()) return 0;
+    int row = index.row();
+    if (row > 0 && row < rowCount() - 1)
+    {
+	--row;
+	QByteArray itemData;
+	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+	dataStream << row;
+	QMimeData *mimeData = new QMimeData;
+	mimeData->setData("application/x-cbmdosfs-filepos", itemData);
+	return mimeData;
+    }
+    return 0;
+}
+
+Qt::DropActions CbmdosFsModel::supportedDropActions() const
+{
+    return Qt::MoveAction;
+}
+
+bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
+	int row, int column, const QModelIndex &parent)
+{
+    (void) parent;
+    if (!d->fs) return false;
+    if (action != Qt::MoveAction) return false;
+    if (row < 0 || column < 0) return false;
+    if (row < 1) ++row;
+    if (!data->hasFormat("application/x-cbmdosfs-filepos")) return false;
+    int to = row - 1;
+    const QByteArray &itemData = data->data("application/x-cbmdosfs-filepos");
+    QDataStream dataStream(itemData);
+    int from;
+    dataStream >> from;
+    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+    CbmdosVfs_move(vfs, to, from);
+    return true;
+}
