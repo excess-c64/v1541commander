@@ -2,6 +2,7 @@
 #define V1541C_CBMDOSFSMODEL_H
 
 #include <QAbstractListModel>
+#include <QItemSelectionModel>
 
 struct CbmdosFs;
 struct CbmdosVfsEventArgs;
@@ -31,6 +32,10 @@ class CbmdosFsModel: public QAbstractListModel
 	virtual Qt::DropActions supportedDropActions() const;
 	virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action,
 		int row, int column, const QModelIndex &parent);
+
+    signals:
+	void selectedIndexChanged(const QModelIndex &to,
+		QItemSelectionModel::SelectionFlags command);
 };
 
 #endif

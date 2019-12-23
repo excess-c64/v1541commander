@@ -54,6 +54,12 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
     layout->addLayout(propLayout);
     connect(d->dirList.selectionModel(), &QItemSelectionModel::currentChanged,
 	    this, &V1541ImgWidget::selected);
+    connect(&d->model,
+	    SIGNAL(selectedIndexChanged(const QModelIndex &,
+		    QItemSelectionModel::SelectionFlags)),
+	    d->dirList.selectionModel(),
+	    SLOT(setCurrentIndex(const QModelIndex &,
+		    QItemSelectionModel::SelectionFlags)));
 }
 
 V1541ImgWidget::~V1541ImgWidget()

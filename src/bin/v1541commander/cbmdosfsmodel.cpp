@@ -13,6 +13,8 @@
 #include <1541img/cbmdosfile.h>
 #include <1541img/event.h>
 
+static const QString fileposMimeType("application/x-cbmdosfs-filepos");
+
 static void evhdl(void *receiver, int id, const void *sender, const void *args)
 {
     (void) id;
@@ -67,12 +69,16 @@ void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
 		QModelIndex from = createIndex(args->filepos + 1, 0);
 		QModelIndex to = createIndex(args->targetpos + 1, 0);
 		emit dataChanged(from, to, QVector<int>(Qt::DisplayRole));
+		emit selectedIndexChanged(to,
+			QItemSelectionModel::ClearAndSelect);
 	    }
 	    else
 	    {
 		QModelIndex from = createIndex(args->targetpos + 1, 0);
 		QModelIndex to = createIndex(args->filepos + 1, 0);
 		emit dataChanged(from, to, QVector<int>(Qt::DisplayRole));
+		emit selectedIndexChanged(from,
+			QItemSelectionModel::ClearAndSelect);
 	    }
 	    break;
 
@@ -190,7 +196,7 @@ Qt::ItemFlags CbmdosFsModel::flags(const QModelIndex &index) const
 
 QStringList CbmdosFsModel::mimeTypes() const
 {
-    return QStringList("application/x-cbmdosfs-filepos");
+    return QStringList(fileposMimeType);
 }
 
 QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
@@ -206,7 +212,7 @@ QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
 	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
 	dataStream << row;
 	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("application/x-cbmdosfs-filepos", itemData);
+	mimeData->setData(fileposMimeType, itemData);
 	return mimeData;
     }
     return 0;
@@ -225,13 +231,14 @@ bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
     if (action != Qt::MoveAction) return false;
     if (row < 0 || column < 0) return false;
     if (row < 1) ++row;
-    if (!data->hasFormat("application/x-cbmdosfs-filepos")) return false;
+    if (!data->hasFormat(fileposMimeType)) return false;
     int to = row - 1;
-    const QByteArray &itemData = data->data("application/x-cbmdosfs-filepos");
+    const QByteArray &itemData = data->data(fileposMimeType);
     QDataStream dataStream(itemData);
     int from;
     dataStream >> from;
     CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+    if (to > from) --to;
     CbmdosVfs_move(vfs, to, from);
     return true;
 }
