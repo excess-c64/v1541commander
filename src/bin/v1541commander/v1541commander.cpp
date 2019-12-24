@@ -153,10 +153,14 @@ V1541Commander::~V1541Commander()
 
 void V1541Commander::newImage()
 {
-    if (!d->lastActiveWindow) return;
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
 
-    QMessageBox::information(d->lastActiveWindow, "Not implemented",
-	    "Function not yet implemented");
+    if (w->content() != MainWindow::Content::None)
+    {
+	w = d->addWindow();
+    }
+    w->newImage();
 }
 
 void V1541Commander::open()

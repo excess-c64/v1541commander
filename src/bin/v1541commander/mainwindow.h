@@ -41,6 +41,7 @@ class MainWindow: public QMainWindow
 	void selectionChanged();
 
     public slots:
+	void newImage();
         void openImage(const QString &imgFile);
 	void save(const QString &imgFile = QString());
         void closeDocument();

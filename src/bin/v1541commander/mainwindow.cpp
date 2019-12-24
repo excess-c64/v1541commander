@@ -110,12 +110,28 @@ QSize MainWindow::sizeHint() const
 {
     if (d->content == Content::None)
     {
-        return QSize(320,200);
+        return QSize(480,200);
     }
     else
     {
         return QWidget::sizeHint();
     }
+}
+
+void MainWindow::newImage()
+{
+    V1541ImgWidget *imgWidget = new V1541ImgWidget();
+    imgWidget->newImage();
+    QWidget *current = centralWidget();
+    setCentralWidget(imgWidget);
+    delete current;
+    imgWidget->setParent(this);
+    setWindowTitle(tr("<new disk image>"));
+    d->content = Content::Image;
+    connect(imgWidget, &V1541ImgWidget::selectionChanged,
+	    this, &MainWindow::contentSelectionChanged);
+    emit contentChanged();
+    adjustSize();
 }
 
 void MainWindow::openImage(const QString &imgFile)
@@ -130,9 +146,9 @@ void MainWindow::openImage(const QString &imgFile)
             setCentralWidget(imgWidget);
             delete current;
             imgWidget->setParent(this);
-            setWindowTitle(imgWidget->windowTitle());
             d->content = Content::Image;
 	    d->filename = imgFile;
+            setWindowTitle(d->filename);
 	    connect(imgWidget, &V1541ImgWidget::selectionChanged,
 		    this, &MainWindow::contentSelectionChanged);
             emit contentChanged();
@@ -154,7 +170,11 @@ void MainWindow::save(const QString &imgFile)
 	case Content::Image:
 	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
 	    imgWidget->save(imgFile.isEmpty() ? d->filename : imgFile);
-	    if (d->filename.isEmpty()) d->filename = imgFile;
+	    if (d->filename.isEmpty())
+	    {
+		d->filename = imgFile;
+		setWindowTitle(d->filename);
+	    }
 	    break;
 
 	default:
@@ -170,6 +190,7 @@ void MainWindow::closeDocument()
     d->content = Content::None;
     emit contentChanged();
     adjustSize();
+    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
 }
 
 void MainWindow::newFile()

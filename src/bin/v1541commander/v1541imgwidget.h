@@ -17,6 +17,7 @@ class V1541ImgWidget: public QWidget
 	void selected(const QModelIndex &current, const QModelIndex &previous);
 
     public slots:
+	void newImage();
 	void open(const QString& filename);
 	void save(const QString& filename);
 	void newFile();

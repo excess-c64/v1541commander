@@ -101,6 +101,30 @@ void V1541ImgWidget::selected(const QModelIndex &current,
     emit selectionChanged();
 }
 
+void V1541ImgWidget::newImage()
+{
+    if (d->fs)
+    {
+	CbmdosFs_destroy(d->fs);
+	d->fs = 0;
+	d->d64 = 0;
+    }
+    if (d->d64)
+    {
+	D64_destroy(d->d64);
+	d->d64 = 0;
+    }
+    d->fs = CbmdosFs_create(CFO_DEFAULT);
+    d->model.setFs(d->fs);
+    d->fsprop.setFs(d->fs);
+    d->dirList.setMinimumWidth(
+	    d->dirList.sizeHintForColumn(0)
+	    + 2 * d->dirList.frameWidth());
+    d->dirList.setMinimumHeight(
+	    d->dirList.sizeHintForRow(0) * 10
+	    + 2 * d->dirList.frameWidth());
+}
+
 void V1541ImgWidget::open(const QString& filename)
 {
     if (d->fs)
@@ -139,19 +163,20 @@ void V1541ImgWidget::open(const QString& filename)
                         d->dirList.sizeHintForRow(0) * minItems
                         + 2 * d->dirList.frameWidth());
 	    }
-	    setWindowTitle(filename);
 	}
     }
 }
 
 void V1541ImgWidget::save(const QString& filename)
 {
-    if (d->d64)
+    const D64 *d64 = d->d64;
+    if (!d64 && d->fs) d64 = CbmdosFs_image(d->fs);
+    if (d64)
     {
 	FILE *d64file = qfopen(filename, "wb");
 	if (d64file)
 	{
-	    if (writeD64(d64file, d->d64) < 0)
+	    if (writeD64(d64file, d64) < 0)
 	    {
 		QMessageBox::critical(this, tr("Error writing file"),
 			tr("The selected file couldn't be written."));
