@@ -150,7 +150,7 @@ void CbmdosFsModel::deleteAt(const QModelIndex &at)
 
 void CbmdosFsModel::addFile(const QModelIndex &at, CbmdosFile *newFile)
 {
-    if (at.isValid())
+    if (at.isValid() && at.row() > 0)
     {
 	beginInsertRows(QModelIndex(), at.row(), at.row());
 	CbmdosVfs_insert(CbmdosFs_vfs(d->fs), newFile, at.row() - 1);
