@@ -90,6 +90,25 @@ void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
 	    }
 	    break;
 
+	case CbmdosVfsEventArgs::CVE_FILEDELETED:
+	    {
+		endRemoveRows();
+		QModelIndex last = createIndex(rowCount() - 1, 0);
+		emit dataChanged(last, last, QVector<int>(Qt::DisplayRole));
+	    }
+	    break;
+
+	case CbmdosVfsEventArgs::CVE_FILEADDED:
+	    {
+		endInsertRows();
+		QModelIndex last = createIndex(rowCount() - 1, 0);
+		emit dataChanged(last, last, QVector<int>(Qt::DisplayRole));
+		QModelIndex at = createIndex(args->filepos + 1, 0);
+		emit selectedIndexChanged(at,
+			QItemSelectionModel::ClearAndSelect);
+	    }
+	    break;
+
 	default:
 	    break;
     }
@@ -117,6 +136,29 @@ void CbmdosFsModel::setFs(CbmdosFs *fs)
 	d->fs = fs;
 	Event_register(CbmdosVfs_changedEvent(vfs), this, evhdl);
 	endInsertRows();
+    }
+}
+
+void CbmdosFsModel::deleteAt(const QModelIndex &at)
+{
+    if (at.row() > 0 && at.row() < rowCount() - 1)
+    {
+	beginRemoveRows(QModelIndex(), at.row(), at.row());
+	CbmdosVfs_deleteAt(CbmdosFs_vfs(d->fs), at.row() - 1);
+    }
+}
+
+void CbmdosFsModel::addFile(const QModelIndex &at, CbmdosFile *newFile)
+{
+    if (at.isValid())
+    {
+	beginInsertRows(QModelIndex(), at.row(), at.row());
+	CbmdosVfs_insert(CbmdosFs_vfs(d->fs), newFile, at.row() - 1);
+    }
+    else
+    {
+	beginInsertRows(QModelIndex(), rowCount() - 1, rowCount() - 1);
+	CbmdosVfs_append(CbmdosFs_vfs(d->fs), newFile);
     }
 }
 

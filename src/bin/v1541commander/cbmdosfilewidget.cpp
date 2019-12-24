@@ -138,8 +138,9 @@ void CbmdosFileWidget::typeChanged(int typeIndex)
 	    if (size)
 	    {
 		QMessageBox::StandardButton reply = QMessageBox::question(
-			this, "Erase file contents?", "Changing the file type "
-			"to DEL will erase all file contents. Proceed anyways?",
+			this, tr("Erase file contents?"), tr("Changing the "
+			"file type to DEL will erase all file contents. "
+			"Proceed anyways?"),
 			QMessageBox::Ok|QMessageBox::Cancel);
 		if (reply != QMessageBox::Ok)
 		{

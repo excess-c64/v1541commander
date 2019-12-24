@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QItemSelectionModel>
 
+struct CbmdosFile;
 struct CbmdosFs;
 struct CbmdosVfsEventArgs;
 
@@ -23,6 +24,8 @@ class CbmdosFsModel: public QAbstractListModel
 	~CbmdosFsModel();
 	CbmdosFs *fs() const;
 	void setFs(CbmdosFs *fs);
+	void deleteAt(const QModelIndex &at);
+	void addFile(const QModelIndex &at, CbmdosFile *newFile);
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index,
 		int role = Qt::DisplayRole) const;

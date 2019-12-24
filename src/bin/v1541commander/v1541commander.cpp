@@ -26,6 +26,8 @@ class V1541Commander::priv
         QAction exitAction;
         QAction petsciiWindowAction;
 	QAction logWindowAction;
+	QAction newFileAction;
+	QAction deleteFileAction;
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
         PetsciiWindow *petsciiWindow;
@@ -33,6 +35,7 @@ class V1541Commander::priv
         
         MainWindow *addWindow();
         void removeWindow(MainWindow *w);
+	void updateActions(MainWindow *w);
 };
 
 V1541Commander::priv::priv(V1541Commander *commander) :
@@ -46,6 +49,8 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     exitAction(tr("E&xit")),
     petsciiWindowAction(tr("&PETSCII Input")),
     logWindowAction(tr("lib1541img &log")),
+    newFileAction(tr("&New")),
+    deleteFileAction(tr("&Delete")),
     allWindows(),
     lastActiveWindow(0),
     petsciiWindow(0),
@@ -67,6 +72,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     petsciiWindowAction.setStatusTip(tr("Show PETSCII input window"));
     logWindowAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_L));
     logWindowAction.setStatusTip(tr("Show lib1541img log messages"));
+    newFileAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Period));
+    newFileAction.setStatusTip(tr("Create new file at selection"));
+    deleteFileAction.setShortcut(QKeySequence::Delete);
+    deleteFileAction.setStatusTip(tr("Delete selected file"));
 }
 
 MainWindow *V1541Commander::priv::addWindow()
@@ -80,6 +89,8 @@ MainWindow *V1541Commander::priv::addWindow()
             commander, &V1541Commander::windowClosed);
     connect(lastActiveWindow, &MainWindow::contentChanged,
             commander, &V1541Commander::windowContentChanged);
+    connect(lastActiveWindow, &MainWindow::selectionChanged,
+            commander, &V1541Commander::windowSelectionChanged);
     return lastActiveWindow;
 }
 
@@ -90,6 +101,17 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
     w->close();
     w->deleteLater();
     if (allWindows.count() == 0) closeAllWindows();
+}
+
+void V1541Commander::priv::updateActions(MainWindow *w)
+{
+    closeAction.setEnabled(w->content() != MainWindow::Content::None);
+    saveAction.setEnabled(w->hasValidContent() && !w->filename().isEmpty());
+    saveAsAction.setEnabled(w->hasValidContent());
+    newFileAction.setEnabled(w->content() == MainWindow::Content::Image
+	    && w->hasValidContent());
+    deleteFileAction.setEnabled(w->content() == MainWindow::Content::Image
+	    && w->hasValidContent() && w->hasValidSelection());
 }
 
 V1541Commander::V1541Commander(int &argc, char **argv)
@@ -117,6 +139,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::showPetsciiWindow);
     connect(&d->logWindowAction, &QAction::triggered,
             this, &V1541Commander::showLogWindow);
+    connect(&d->newFileAction, &QAction::triggered,
+            this, &V1541Commander::newFile);
+    connect(&d->deleteFileAction, &QAction::triggered,
+            this, &V1541Commander::deleteFile);
 }
 
 V1541Commander::~V1541Commander()
@@ -217,9 +243,7 @@ void V1541Commander::windowActivated()
 {
     MainWindow *w = static_cast<MainWindow *>(sender());
     d->lastActiveWindow = w;
-    d->closeAction.setEnabled(w->content() != MainWindow::Content::None);
-    d->saveAction.setEnabled(!w->filename().isEmpty());
-    d->saveAsAction.setEnabled(w->content() != MainWindow::Content::None);
+    d->updateActions(w);
 }
 
 void V1541Commander::windowClosed()
@@ -230,12 +254,13 @@ void V1541Commander::windowClosed()
 void V1541Commander::windowContentChanged()
 {
     MainWindow *w = static_cast<MainWindow*>(sender());
-    if (w == d->lastActiveWindow)
-    {
-        d->closeAction.setEnabled(w->content() != MainWindow::Content::None);
-	d->saveAction.setEnabled(!w->filename().isEmpty());
-        d->saveAsAction.setEnabled(w->content() != MainWindow::Content::None);
-    }
+    if (w == d->lastActiveWindow) d->updateActions(w);
+}
+
+void V1541Commander::windowSelectionChanged()
+{
+    MainWindow *w = static_cast<MainWindow*>(sender());
+    if (w == d->lastActiveWindow) d->updateActions(w);
 }
 
 void V1541Commander::showPetsciiWindow()
@@ -252,6 +277,22 @@ void V1541Commander::showPetsciiWindow()
 void V1541Commander::showLogWindow()
 {
     d->logWindow.show();
+}
+
+void V1541Commander::newFile()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->newFile();
+}
+
+void V1541Commander::deleteFile()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->deleteFile();
 }
 
 void V1541Commander::petsciiInput(ushort val)
@@ -303,6 +344,16 @@ QAction &V1541Commander::petsciiWindowAction()
 QAction &V1541Commander::logWindowAction()
 {
     return d->logWindowAction;
+}
+
+QAction &V1541Commander::newFileAction()
+{
+    return d->newFileAction;
+}
+
+QAction &V1541Commander::deleteFileAction()
+{
+    return d->deleteFileAction;
 }
 
 V1541Commander &V1541Commander::instance()

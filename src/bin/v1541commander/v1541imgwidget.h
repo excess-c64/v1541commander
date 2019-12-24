@@ -19,11 +19,17 @@ class V1541ImgWidget: public QWidget
     public slots:
 	void open(const QString& filename);
 	void save(const QString& filename);
+	void newFile();
+	void deleteFile();
 
     public:
 	V1541ImgWidget();
 	~V1541ImgWidget();
 	bool hasValidImage() const;
+	bool hasValidSelection() const;
+
+    signals:
+	void selectionChanged();
 };
 
 #endif

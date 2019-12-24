@@ -25,9 +25,12 @@ class V1541Commander: public QApplication
         void windowActivated();
         void windowClosed();
         void windowContentChanged();
+	void windowSelectionChanged();
         void showPetsciiWindow();
 	void showLogWindow();
 	void petsciiInput(ushort val);
+	void newFile();
+	void deleteFile();
         
     public:
         V1541Commander(int &argc, char **argv);
@@ -41,6 +44,8 @@ class V1541Commander: public QApplication
         QAction &exitAction();
         QAction &petsciiWindowAction();
 	QAction &logWindowAction();
+	QAction &newFileAction();
+	QAction &deleteFileAction();
 
         static V1541Commander &instance();
 };

@@ -1,4 +1,5 @@
 #include "v1541imgwidget.h"
+#include "v1541commander.h"
 #include "cbmdosfsmodel.h"
 #include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
@@ -12,6 +13,7 @@
 #include <1541img/d64.h>
 #include <1541img/d64reader.h>
 #include <1541img/d64writer.h>
+#include <1541img/cbmdosfile.h>
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
 
@@ -47,6 +49,9 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
     d->dirList.setDragEnabled(true);
     d->dirList.setAcceptDrops(true);
     d->dirList.setDragDropMode(QAbstractItemView::InternalMove);
+    d->dirList.addAction(&app.newFileAction());
+    d->dirList.addAction(&app.deleteFileAction());
+    d->dirList.setContextMenuPolicy(Qt::ActionsContextMenu);
     layout->addWidget(&d->dirList);
     propLayout->addWidget(&d->fsprop);
     propLayout->addWidget(&d->file);
@@ -93,6 +98,7 @@ void V1541ImgWidget::selected(const QModelIndex &current,
 	}
     }
     d->file.setFile(file);
+    emit selectionChanged();
 }
 
 void V1541ImgWidget::open(const QString& filename)
@@ -160,8 +166,36 @@ void V1541ImgWidget::save(const QString& filename)
     }
 }
 
+void V1541ImgWidget::newFile()
+{
+    if (!hasValidImage()) return;
+    CbmdosFile *newFile = CbmdosFile_create();
+    const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
+    d->model.addFile(index, newFile);
+}
+
+void V1541ImgWidget::deleteFile()
+{
+    if (!hasValidImage() || !hasValidSelection()) return;
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+	    tr("Delete this file?"), tr("A deleted file cannot be restored. "
+	    "Are you sure you want to delete this file now?"),
+	    QMessageBox::Ok|QMessageBox::Cancel);
+    if (reply == QMessageBox::Ok)
+    {
+	const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
+	d->model.deleteAt(index);
+    }
+}
+
 bool V1541ImgWidget::hasValidImage() const
 {
     return d->fs || d->d64;
 }
 
+bool V1541ImgWidget::hasValidSelection() const
+{
+    const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
+    if (!index.isValid()) return false;
+    return (index.row() > 0 && index.row() < d->model.rowCount() - 1);
+}

@@ -14,6 +14,9 @@ class MainWindow: public QMainWindow
         class priv;
         priv *d;
 
+    private slots:
+	void contentSelectionChanged();
+
     public:
         enum Content
         {
@@ -23,8 +26,10 @@ class MainWindow: public QMainWindow
 
 	MainWindow();
         ~MainWindow();
-        Content content();
-	const QString &filename();
+        Content content() const;
+	const QString &filename() const;
+	bool hasValidContent() const;
+	bool hasValidSelection() const;
         virtual bool event(QEvent *e);
         virtual void closeEvent(QCloseEvent *e);
         virtual QSize sizeHint() const;
@@ -33,11 +38,14 @@ class MainWindow: public QMainWindow
         void activated();
         void closed();
         void contentChanged();
+	void selectionChanged();
 
     public slots:
         void openImage(const QString &imgFile);
 	void save(const QString &imgFile = QString());
         void closeDocument();
+	void newFile();
+	void deleteFile();
 };
 
 #endif

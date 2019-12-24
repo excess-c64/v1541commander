@@ -30,9 +30,13 @@ MainWindow::MainWindow()
     fileMenu->addAction(&app.closeAction());
     fileMenu->addSeparator();
     fileMenu->addAction(&app.exitAction());
+    QMenu *cbmdosMenu = menuBar()->addMenu(tr("CBM &DOS"));
+    cbmdosMenu->addAction(&app.newFileAction());
+    cbmdosMenu->addAction(&app.deleteFileAction());
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
     windowsMenu->addAction(&app.petsciiWindowAction());
     windowsMenu->addAction(&app.logWindowAction());
+    (void) statusBar();
 
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
 }
@@ -42,14 +46,49 @@ MainWindow::~MainWindow()
     delete d;
 }
 
-MainWindow::Content MainWindow::content()
+void MainWindow::contentSelectionChanged()
+{
+    emit selectionChanged();
+}
+
+MainWindow::Content MainWindow::content() const 
 {
     return d->content;
 }
 
-const QString &MainWindow::filename()
+const QString &MainWindow::filename() const
 {
     return d->filename;
+}
+
+bool MainWindow::hasValidContent() const
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    return imgWidget->hasValidImage();
+
+	default:
+	    return false;
+    }
+}
+
+bool MainWindow::hasValidSelection() const
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    return imgWidget->hasValidSelection();
+
+	default:
+	    return false;
+    }
 }
 
 bool MainWindow::event(QEvent *e)
@@ -94,6 +133,8 @@ void MainWindow::openImage(const QString &imgFile)
             setWindowTitle(imgWidget->windowTitle());
             d->content = Content::Image;
 	    d->filename = imgFile;
+	    connect(imgWidget, &V1541ImgWidget::selectionChanged,
+		    this, &MainWindow::contentSelectionChanged);
             emit contentChanged();
             adjustSize();
 	}
@@ -129,5 +170,17 @@ void MainWindow::closeDocument()
     d->content = Content::None;
     emit contentChanged();
     adjustSize();
+}
+
+void MainWindow::newFile()
+{
+    if (d->content != Content::Image) return;
+    static_cast<V1541ImgWidget *>(centralWidget())->newFile();
+}
+
+void MainWindow::deleteFile()
+{
+    if (d->content != Content::Image) return;
+    static_cast<V1541ImgWidget *>(centralWidget())->deleteFile();
 }
 
