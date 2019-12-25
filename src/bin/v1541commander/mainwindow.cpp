@@ -5,6 +5,7 @@
 #include <QEvent>
 #include <QMenu>
 #include <QMenuBar>
+#include <QStatusBar>
 
 class MainWindow::priv
 {
@@ -205,3 +206,7 @@ void MainWindow::deleteFile()
     static_cast<V1541ImgWidget *>(centralWidget())->deleteFile();
 }
 
+void MainWindow::showStatusLine(const QString &line)
+{
+    statusBar()->showMessage(line);
+}

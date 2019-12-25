@@ -15,7 +15,9 @@ static const QString levels[] = {
 static void appendlog(LogLevel level, const char *message, void *data)
 {
     LogWindow *logWindow = static_cast<LogWindow *>(data);
-    logWindow->appendPlainText(levels[level].arg(message));
+    QString logmsg = levels[level].arg(message);
+    logWindow->appendPlainText(logmsg);
+    emit logWindow->logLineAppended(logmsg);
 }
 
 LogWindow::LogWindow(QWidget *parent) :

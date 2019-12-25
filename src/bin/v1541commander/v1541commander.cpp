@@ -143,6 +143,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::newFile);
     connect(&d->deleteFileAction, &QAction::triggered,
             this, &V1541Commander::deleteFile);
+    connect(&d->logWindow, &LogWindow::logLineAppended,
+	    this, &V1541Commander::logLineAppended);
 }
 
 V1541Commander::~V1541Commander()
@@ -297,6 +299,14 @@ void V1541Commander::deleteFile()
     if (!w) return;
 
     w->deleteFile();
+}
+
+void V1541Commander::logLineAppended(const QString &line)
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->showStatusLine(line);
 }
 
 void V1541Commander::petsciiInput(ushort val)

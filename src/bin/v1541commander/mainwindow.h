@@ -47,6 +47,7 @@ class MainWindow: public QMainWindow
         void closeDocument();
 	void newFile();
 	void deleteFile();
+	void showStatusLine(const QString &line);
 };
 
 #endif

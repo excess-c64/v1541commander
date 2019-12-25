@@ -9,6 +9,9 @@ class LogWindow : public QPlainTextEdit
 
     public:
 	LogWindow(QWidget *parent = 0);
+
+    signals:
+	void logLineAppended(const QString &line);
 };
 
 #endif

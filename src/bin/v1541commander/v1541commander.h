@@ -31,6 +31,7 @@ class V1541Commander: public QApplication
 	void petsciiInput(ushort val);
 	void newFile();
 	void deleteFile();
+	void logLineAppended(const QString &line);
         
     public:
         V1541Commander(int &argc, char **argv);
