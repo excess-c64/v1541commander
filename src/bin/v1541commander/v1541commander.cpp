@@ -8,6 +8,9 @@
 #include <QFileDialog>
 #include <QFont>
 #include <QFontDatabase>
+#ifndef _WIN32
+#include <QIcon>
+#endif
 #include <QMessageBox>
 
 #include <1541img/log.h>
@@ -18,6 +21,9 @@ class V1541Commander::priv
         priv(V1541Commander *commander);
         V1541Commander *commander;
         QFont c64font;
+#ifndef _WIN32
+	QIcon appIcon;
+#endif
         QAction newAction;
         QAction openAction;
 	QAction saveAction;
@@ -41,6 +47,9 @@ class V1541Commander::priv
 V1541Commander::priv::priv(V1541Commander *commander) :
     commander(commander),
     c64font("C64 Pro Mono"),
+#ifndef _WIN32
+    appIcon(),
+#endif
     newAction(tr("&New")),
     openAction(tr("&Open")),
     saveAction(tr("&Save")),
@@ -76,11 +85,21 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     newFileAction.setStatusTip(tr("Create new file at selection"));
     deleteFileAction.setShortcut(QKeySequence::Delete);
     deleteFileAction.setStatusTip(tr("Delete selected file"));
+#ifndef _WIN32
+    appIcon.addPixmap(QPixmap(":/gfx/icon_256.png"));
+    appIcon.addPixmap(QPixmap(":/gfx/icon_48.png"));
+    appIcon.addPixmap(QPixmap(":/gfx/icon_32.png"));
+    appIcon.addPixmap(QPixmap(":/gfx/icon_16.png"));
+    logWindow.setWindowIcon(appIcon);
+#endif
 }
 
 MainWindow *V1541Commander::priv::addWindow()
 {
     lastActiveWindow = new MainWindow();
+#ifndef _WIN32
+    lastActiveWindow->setWindowIcon(appIcon);
+#endif
     lastActiveWindow->show();
     allWindows.append(lastActiveWindow);
     connect(lastActiveWindow, &MainWindow::activated,
@@ -274,6 +293,9 @@ void V1541Commander::showPetsciiWindow()
     if (!d->petsciiWindow)
     {
         d->petsciiWindow = new PetsciiWindow();
+#ifndef _WIN32
+	d->petsciiWindow->setWindowIcon(d->appIcon);
+#endif
 	connect(d->petsciiWindow, &PetsciiWindow::petsciiInput,
 		this, &V1541Commander::petsciiInput);
     }

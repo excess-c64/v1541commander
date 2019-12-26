@@ -1,0 +1,25 @@
+1 VERSIONINFO
+FILEVERSION	0,1,0,0
+PRODUCTVERSION	0,1,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "ExCeSs"
+      VALUE "FileDescription", "V1541Commander: virtual 1541 disk commander"
+      VALUE "FileVersion", "0.1.0"
+      VALUE "InternalName", "v1541commander"
+      VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
+      VALUE "OriginalFilename", "v1541commander.exe"
+      VALUE "ProductName", "v1541commander"
+      VALUE "ProductVersion", "0.1.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+IDI_ICON1	ICON	DISCARDABLE	"gfx/icon.ico"
+
