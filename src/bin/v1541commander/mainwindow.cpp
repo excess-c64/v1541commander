@@ -30,6 +30,7 @@ MainWindow::MainWindow()
     fileMenu->addAction(&app.saveAsAction());
     fileMenu->addAction(&app.closeAction());
     fileMenu->addSeparator();
+    fileMenu->addAction(&app.aboutAction());
     fileMenu->addAction(&app.exitAction());
     QMenu *cbmdosMenu = menuBar()->addMenu(tr("CBM &DOS"));
     cbmdosMenu->addAction(&app.newFileAction());

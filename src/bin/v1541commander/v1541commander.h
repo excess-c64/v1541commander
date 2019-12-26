@@ -21,6 +21,7 @@ class V1541Commander: public QApplication
 	void save();
 	void saveAs();
         void close();
+	void about();
         void exit();
         void windowActivated();
         void windowClosed();
@@ -42,6 +43,7 @@ class V1541Commander: public QApplication
 	QAction &saveAction();
 	QAction &saveAsAction();
         QAction &closeAction();
+	QAction &aboutAction();
         QAction &exitAction();
         QAction &petsciiWindowAction();
 	QAction &logWindowAction();

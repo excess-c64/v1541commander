@@ -1,6 +1,6 @@
 v1541commander_PREPROCMODULES:= v1541commander mainwindow v1541imgwidget \
 	cbmdosfsmodel cbmdosfswidget cbmdosfilewidget \
-	petsciiedit petsciibutton petsciiwindow logwindow
+	petsciiedit petsciibutton petsciiwindow logwindow aboutbox
 v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr \
 	petsciiconvert
 v1541commander_QRC:= resources

@@ -1,4 +1,5 @@
 #include "v1541commander.h"
+#include "aboutbox.h"
 #include "logwindow.h"
 #include "mainwindow.h"
 #include "petsciiwindow.h"
@@ -29,6 +30,7 @@ class V1541Commander::priv
 	QAction saveAction;
 	QAction saveAsAction;
         QAction closeAction;
+	QAction aboutAction;
         QAction exitAction;
         QAction petsciiWindowAction;
 	QAction logWindowAction;
@@ -37,6 +39,7 @@ class V1541Commander::priv
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
         PetsciiWindow *petsciiWindow;
+	AboutBox aboutBox;
 	LogWindow logWindow;
         
         MainWindow *addWindow();
@@ -55,6 +58,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     saveAction(tr("&Save")),
     saveAsAction(tr("Save &As")),
     closeAction(tr("&Close")),
+    aboutAction(tr("&About")),
     exitAction(tr("E&xit")),
     petsciiWindowAction(tr("&PETSCII Input")),
     logWindowAction(tr("lib1541img &log")),
@@ -63,6 +67,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     allWindows(),
     lastActiveWindow(0),
     petsciiWindow(0),
+    aboutBox(c64font),
     logWindow()
 {
     newAction.setShortcuts(QKeySequence::New);
@@ -91,6 +96,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     appIcon.addPixmap(QPixmap(":/gfx/icon_32.png"));
     appIcon.addPixmap(QPixmap(":/gfx/icon_16.png"));
     logWindow.setWindowIcon(appIcon);
+    aboutBox.setWindowIcon(appIcon);
 #endif
 }
 
@@ -152,6 +158,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::saveAs);
     connect(&d->closeAction, &QAction::triggered,
 	    this, &V1541Commander::close);
+    connect(&d->aboutAction, &QAction::triggered,
+	    this, &V1541Commander::about);
     connect(&d->exitAction, &QAction::triggered,
 	    this, &V1541Commander::exit);
     connect(&d->petsciiWindowAction, &QAction::triggered,
@@ -257,6 +265,19 @@ void V1541Commander::close()
     {
         d->removeWindow(w);
     }
+}
+
+void V1541Commander::about()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    d->aboutBox.show();
+    d->aboutBox.activateWindow();
+    d->aboutBox.raise();
+    QRect aboutBoxRect = d->aboutBox.geometry();
+    aboutBoxRect.moveCenter(w->frameGeometry().center());
+    d->aboutBox.setGeometry(aboutBoxRect);
 }
 
 void V1541Commander::exit()
@@ -365,6 +386,11 @@ QAction &V1541Commander::saveAsAction()
 QAction &V1541Commander::closeAction()
 {
     return d->closeAction;
+}
+
+QAction &V1541Commander::aboutAction()
+{
+    return d->aboutAction;
 }
 
 QAction &V1541Commander::exitAction()
