@@ -172,6 +172,19 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::deleteFile);
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
+    if (argc > 1)
+    {
+	MainWindow *w = d->lastActiveWindow;
+        w->openImage(QString(argv[1]));
+        if (w->content() == MainWindow::Content::None)
+        {
+	    QMessageBox::critical(w, tr("Error reading file"),
+		    tr("<p>The file you selected couldn't be read.</p>"
+			"<p>This means you either haven't permission to read "
+			"it or it doesn't contain a valid 1541 disc "
+			"image.</p>"));
+        }
+    }
 }
 
 V1541Commander::~V1541Commander()
