@@ -150,8 +150,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
     d->addWindow();
     connect(&d->newAction, &QAction::triggered,
 	    this, &V1541Commander::newImage);
-    connect(&d->openAction, &QAction::triggered,
-	    this, &V1541Commander::open);
+    connect(&d->openAction, SIGNAL(triggered()),
+	    this, SLOT(open()));
     connect(&d->saveAction, &QAction::triggered,
 	    this, &V1541Commander::save);
     connect(&d->saveAsAction, &QAction::triggered,
@@ -172,19 +172,6 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::deleteFile);
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
-    if (argc > 1)
-    {
-	MainWindow *w = d->lastActiveWindow;
-        w->openImage(QString(argv[1]));
-        if (w->content() == MainWindow::Content::None)
-        {
-	    QMessageBox::critical(w, tr("Error reading file"),
-		    tr("<p>The file you selected couldn't be read.</p>"
-			"<p>This means you either haven't permission to read "
-			"it or it doesn't contain a valid 1541 disc "
-			"image.</p>"));
-        }
-    }
 }
 
 V1541Commander::~V1541Commander()
@@ -205,6 +192,31 @@ void V1541Commander::newImage()
     w->newImage();
 }
 
+void V1541Commander::open(const QString &filename)
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    if (w->content() != MainWindow::Content::None)
+    {
+	w = d->addWindow();
+    }
+
+    w->openImage(filename);
+    if (w->content() == MainWindow::Content::None)
+    {
+	QMessageBox::critical(w, tr("Error reading file"),
+		tr("<p>The file you selected couldn't be read.</p>"
+		    "<p>This means you either haven't permission to read "
+		    "it or it doesn't contain a valid 1541 disc "
+		    "image.</p>"));
+	if (d->allWindows.count() > 1)
+	{
+	    d->removeWindow(w);
+	}
+    }
+}
+
 void V1541Commander::open()
 {
     MainWindow *w = d->lastActiveWindow;
@@ -214,24 +226,7 @@ void V1541Commander::open()
 	    QString(), tr("1541 disk images (*.d64);;all files (*)"));
     if (!imgFile.isEmpty())
     {
-        if (w->content() != MainWindow::Content::None)
-        {
-            w = d->addWindow();
-        }
-
-        w->openImage(imgFile);
-        if (w->content() == MainWindow::Content::None)
-        {
-	    QMessageBox::critical(w, tr("Error reading file"),
-		    tr("<p>The file you selected couldn't be read.</p>"
-			"<p>This means you either haven't permission to read "
-			"it or it doesn't contain a valid 1541 disc "
-			"image.</p>"));
-            if (d->allWindows.count() > 1)
-            {
-                d->removeWindow(w);
-            }
-        }
+	open(imgFile);
     }
 }
 

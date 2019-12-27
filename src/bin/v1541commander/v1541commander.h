@@ -5,7 +5,7 @@
 
 class QAction;
 
-#define app (V1541Commander::instance())
+#define cmdr (V1541Commander::instance())
 
 class V1541Commander: public QApplication
 {
@@ -51,6 +51,9 @@ class V1541Commander: public QApplication
 	QAction &deleteFileAction();
 
         static V1541Commander &instance();
+
+    public slots:
+	void open(const QString &filename);
 };
 
 #endif

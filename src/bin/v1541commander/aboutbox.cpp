@@ -1,5 +1,6 @@
 #include "aboutbox.h"
 
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -30,9 +31,9 @@ AboutBox::priv::priv() :
 	    "\n"
 	    "\n"
 	    ""),
-    aboutText("v1541commander v0.1\n"
+    aboutText(QString("v1541commander v%1\n"
 	    "virtual 1541 disk commander\n\n"
-	    "by Zirias/Excess"),
+	    "by Zirias/Excess").arg(QCoreApplication::applicationVersion())),
     okButton(tr("Ok"))
 {
     appLogo.setPixmap(QPixmap(":/gfx/icon_256.png"));

@@ -1,5 +1,7 @@
 #include "v1541commander.h"
 
+#include <QCommandLineParser>
+
 #ifdef QT_STATICPLUGIN
 #include <QtPlugin>
 #endif
@@ -14,7 +16,26 @@ int main(int argc, char **argv)
     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #endif
 #endif
+    QCoreApplication::setApplicationVersion("0.1");
+
     V1541Commander commander(argc, argv);
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("virtual 1541 disk image commander");
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument("d64file",
+	    QCoreApplication::translate("main", "D64 disk image(s) to open."),
+	    "[d64file ...]");
+    parser.process(commander);
+
+    const QStringList &positionalArgs = parser.positionalArguments();
+    for (QStringList::const_iterator i = positionalArgs.constBegin();
+	    i != positionalArgs.constEnd(); ++i)
+    {
+	commander.open(*i);
+    }
+
     return commander.exec();
 }
 

@@ -8,7 +8,7 @@
 PetsciiEdit::PetsciiEdit(QWidget *parent) :
     QLineEdit(QString(), parent)
 {
-    setFont(app.c64font());
+    setFont(cmdr.c64font());
     connect(this, &QLineEdit::textEdited, this, &PetsciiEdit::editText);
 }
 
@@ -43,6 +43,6 @@ void PetsciiEdit::setMaxLength(int length)
 {
     QFontMetricsF fm(font());
     setMinimumWidth((length+1) * fm.averageCharWidth()
-	    + 2 * app.style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+	    + 2 * cmdr.style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
     QLineEdit::setMaxLength(length);
 }

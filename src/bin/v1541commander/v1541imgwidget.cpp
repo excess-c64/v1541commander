@@ -49,8 +49,8 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
     d->dirList.setDragEnabled(true);
     d->dirList.setAcceptDrops(true);
     d->dirList.setDragDropMode(QAbstractItemView::InternalMove);
-    d->dirList.addAction(&app.newFileAction());
-    d->dirList.addAction(&app.deleteFileAction());
+    d->dirList.addAction(&cmdr.newFileAction());
+    d->dirList.addAction(&cmdr.deleteFileAction());
     d->dirList.setContextMenuPolicy(Qt::ActionsContextMenu);
     layout->addWidget(&d->dirList);
     propLayout->addWidget(&d->fsprop);

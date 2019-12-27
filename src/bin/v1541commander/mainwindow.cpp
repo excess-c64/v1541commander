@@ -24,20 +24,20 @@ MainWindow::MainWindow()
 {
     d = new priv();
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(&app.newAction());
-    fileMenu->addAction(&app.openAction());
-    fileMenu->addAction(&app.saveAction());
-    fileMenu->addAction(&app.saveAsAction());
-    fileMenu->addAction(&app.closeAction());
+    fileMenu->addAction(&cmdr.newAction());
+    fileMenu->addAction(&cmdr.openAction());
+    fileMenu->addAction(&cmdr.saveAction());
+    fileMenu->addAction(&cmdr.saveAsAction());
+    fileMenu->addAction(&cmdr.closeAction());
     fileMenu->addSeparator();
-    fileMenu->addAction(&app.aboutAction());
-    fileMenu->addAction(&app.exitAction());
+    fileMenu->addAction(&cmdr.aboutAction());
+    fileMenu->addAction(&cmdr.exitAction());
     QMenu *cbmdosMenu = menuBar()->addMenu(tr("CBM &DOS"));
-    cbmdosMenu->addAction(&app.newFileAction());
-    cbmdosMenu->addAction(&app.deleteFileAction());
+    cbmdosMenu->addAction(&cmdr.newFileAction());
+    cbmdosMenu->addAction(&cmdr.deleteFileAction());
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
-    windowsMenu->addAction(&app.petsciiWindowAction());
-    windowsMenu->addAction(&app.logWindowAction());
+    windowsMenu->addAction(&cmdr.petsciiWindowAction());
+    windowsMenu->addAction(&cmdr.logWindowAction());
     (void) statusBar();
 
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));

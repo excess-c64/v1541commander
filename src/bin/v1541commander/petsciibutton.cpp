@@ -4,7 +4,7 @@
 PetsciiButton::PetsciiButton(ushort petscii, QWidget *parent) :
     QLabel(parent)
 {
-    setFont(app.c64font());
+    setFont(cmdr.c64font());
     setText(QString(petscii));
     setStyleSheet("QLabel { padding: 4px 2px; background-color: white; }");
 }

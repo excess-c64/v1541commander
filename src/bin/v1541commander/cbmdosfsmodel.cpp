@@ -176,14 +176,14 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::FontRole)
     {
-	return app.c64font();
+	return cmdr.c64font();
     }
 
     if (role == Qt::SizeHintRole)
     {
-	QFontMetricsF fm(app.c64font());
+	QFontMetricsF fm(cmdr.c64font());
 	return QSizeF(fm.ascent() * 29 * 13 / 14
-		+ app.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
+		+ cmdr.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
 		fm.ascent() * 13 / 14);
     }
 
