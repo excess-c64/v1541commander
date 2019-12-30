@@ -1,6 +1,7 @@
 #include "v1541commander.h"
 
 #include <QCommandLineParser>
+#include <QFileInfo>
 
 #ifdef QT_STATICPLUGIN
 #include <QtPlugin>
@@ -33,7 +34,8 @@ int main(int argc, char **argv)
     for (QStringList::const_iterator i = positionalArgs.constBegin();
 	    i != positionalArgs.constEnd(); ++i)
     {
-	commander.open(*i);
+	const QString &path = QFileInfo(*i).canonicalFilePath();
+	if (!path.isEmpty()) commander.open(path);
     }
 
     return commander.exec();

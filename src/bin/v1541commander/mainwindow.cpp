@@ -53,6 +53,16 @@ void MainWindow::contentSelectionChanged()
     emit selectionChanged();
 }
 
+void MainWindow::contentModified()
+{
+    setWindowModified(true);
+}
+
+void MainWindow::contentSaved()
+{
+    setWindowModified(false);
+}
+
 MainWindow::Content MainWindow::content() const 
 {
     return d->content;
@@ -128,11 +138,16 @@ void MainWindow::newImage()
     setCentralWidget(imgWidget);
     delete current;
     imgWidget->setParent(this);
-    setWindowTitle(tr("<new disk image>"));
+    setWindowTitle(tr("<new disk image>[*]"));
     d->content = Content::Image;
     connect(imgWidget, &V1541ImgWidget::selectionChanged,
 	    this, &MainWindow::contentSelectionChanged);
+    connect(imgWidget, &V1541ImgWidget::modified,
+	    this, &MainWindow::contentModified);
+    connect(imgWidget, &V1541ImgWidget::saved,
+	    this, &MainWindow::contentSaved);
     emit contentChanged();
+    setWindowModified(false);
     adjustSize();
 }
 
@@ -150,10 +165,15 @@ void MainWindow::openImage(const QString &imgFile)
             imgWidget->setParent(this);
             d->content = Content::Image;
 	    d->filename = imgFile;
-            setWindowTitle(d->filename);
+            setWindowTitle(QString(imgFile).append("[*]"));
 	    connect(imgWidget, &V1541ImgWidget::selectionChanged,
 		    this, &MainWindow::contentSelectionChanged);
+	    connect(imgWidget, &V1541ImgWidget::modified,
+		    this, &MainWindow::contentModified);
+	    connect(imgWidget, &V1541ImgWidget::saved,
+		    this, &MainWindow::contentSaved);
             emit contentChanged();
+	    setWindowModified(false);
             adjustSize();
 	}
 	else
@@ -175,7 +195,7 @@ void MainWindow::save(const QString &imgFile)
 	    if (d->filename.isEmpty())
 	    {
 		d->filename = imgFile;
-		setWindowTitle(d->filename);
+		setWindowTitle(QString(imgFile).append("[*]"));
 	    }
 	    break;
 

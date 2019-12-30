@@ -39,6 +39,7 @@ class CbmdosFsModel: public QAbstractListModel
     signals:
 	void selectedIndexChanged(const QModelIndex &to,
 		QItemSelectionModel::SelectionFlags command);
+	void modified();
 };
 
 #endif

@@ -16,6 +16,8 @@ class MainWindow: public QMainWindow
 
     private slots:
 	void contentSelectionChanged();
+	void contentModified();
+	void contentSaved();
 
     public:
         enum Content

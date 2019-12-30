@@ -65,6 +65,8 @@ V1541ImgWidget::V1541ImgWidget() : QWidget()
 	    d->dirList.selectionModel(),
 	    SLOT(setCurrentIndex(const QModelIndex &,
 		    QItemSelectionModel::SelectionFlags)));
+    connect(&d->model, &CbmdosFsModel::modified,
+	    this, &V1541ImgWidget::modelModified);
 }
 
 V1541ImgWidget::~V1541ImgWidget()
@@ -99,6 +101,11 @@ void V1541ImgWidget::selected(const QModelIndex &current,
     }
     d->file.setFile(file);
     emit selectionChanged();
+}
+
+void V1541ImgWidget::modelModified()
+{
+    emit modified();
 }
 
 void V1541ImgWidget::newImage()
@@ -180,6 +187,10 @@ void V1541ImgWidget::save(const QString& filename)
 	    {
 		QMessageBox::critical(this, tr("Error writing file"),
 			tr("The selected file couldn't be written."));
+	    }
+	    else
+	    {
+		emit saved();
 	    }
 	    fclose(d64file);
 	}

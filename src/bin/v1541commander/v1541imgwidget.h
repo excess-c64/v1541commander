@@ -15,6 +15,7 @@ class V1541ImgWidget: public QWidget
 
     private slots:
 	void selected(const QModelIndex &current, const QModelIndex &previous);
+	void modelModified();
 
     public slots:
 	void newImage();
@@ -31,6 +32,8 @@ class V1541ImgWidget: public QWidget
 
     signals:
 	void selectionChanged();
+	void modified();
+	void saved();
 };
 
 #endif

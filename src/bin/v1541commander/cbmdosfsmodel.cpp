@@ -54,6 +54,7 @@ CbmdosFsModel::~CbmdosFsModel()
 
 void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
 {
+    emit modified();
     switch (args->what)
     {
 	case CbmdosVfsEventArgs::CVE_FILECHANGED:
