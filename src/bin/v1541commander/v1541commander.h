@@ -19,7 +19,6 @@ class V1541Commander: public QApplication
         void newImage();
         void open();
 	void save();
-	void saveAs();
         void close();
 	void about();
         void exit();
@@ -54,6 +53,7 @@ class V1541Commander: public QApplication
 
     public slots:
 	void open(const QString &filename);
+	void saveAs();
 };
 
 #endif

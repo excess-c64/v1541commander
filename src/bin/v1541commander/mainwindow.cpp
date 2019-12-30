@@ -2,9 +2,10 @@
 #include "v1541commander.h"
 #include "v1541imgwidget.h"
 
-#include <QEvent>
+#include <QCloseEvent>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QStatusBar>
 
 class MainWindow::priv
@@ -114,8 +115,9 @@ bool MainWindow::event(QEvent *e)
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    (void) e;
-    emit closed();
+    closeDocument();
+    if (isWindowModified()) e->ignore();
+    else emit closed();
 }
 
 QSize MainWindow::sizeHint() const
@@ -206,11 +208,34 @@ void MainWindow::save(const QString &imgFile)
 
 void MainWindow::closeDocument()
 {
+    if (isWindowModified())
+    {
+	QMessageBox::StandardButton btn = QMessageBox::question(this,
+		tr("Discard unsaved changes?"), QString(tr("%1 has unsaved "
+			"changes. \nDo you want to save now?"))
+		.arg(d->filename.isEmpty() ? "<new disk image>" : d->filename),
+		QMessageBox::Save|QMessageBox::Cancel|QMessageBox::Discard,
+		QMessageBox::Save);
+	if (btn == QMessageBox::Cancel) return;
+	if (btn == QMessageBox::Save)
+	{
+	    if (d->filename.isEmpty())
+	    {
+		emit activated();
+		cmdr.saveAs();
+	    }
+	    else
+	    {
+		save(QString());
+	    }
+	}
+    }
     QWidget *current = centralWidget();
     setCentralWidget(0);
     delete current;
     d->content = Content::None;
     emit contentChanged();
+    setWindowModified(false);
     adjustSize();
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
 }
