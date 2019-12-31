@@ -54,6 +54,7 @@ class V1541Commander: public QApplication
     public slots:
 	void open(const QString &filename);
 	void saveAs();
+	void show();
 };
 
 #endif

@@ -42,7 +42,7 @@ class V1541Commander::priv
 	AboutBox aboutBox;
 	LogWindow logWindow;
         
-        MainWindow *addWindow();
+        MainWindow *addWindow(bool show = true);
         void removeWindow(MainWindow *w);
 	void updateActions(MainWindow *w);
 };
@@ -104,13 +104,13 @@ V1541Commander::priv::priv(V1541Commander *commander) :
 #endif
 }
 
-MainWindow *V1541Commander::priv::addWindow()
+MainWindow *V1541Commander::priv::addWindow(bool show)
 {
     lastActiveWindow = new MainWindow();
 #ifndef _WIN32
     lastActiveWindow->setWindowIcon(appIcon);
 #endif
-    lastActiveWindow->show();
+    if (show) lastActiveWindow->show();
     allWindows.append(lastActiveWindow);
     connect(lastActiveWindow, &MainWindow::activated,
             commander, &V1541Commander::windowActivated);
@@ -151,7 +151,7 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 #endif
     QFontDatabase::addApplicationFont(":/C64_Pro_Mono-STYLE.ttf");
     d = new priv(this);
-    d->addWindow();
+    d->addWindow(false);
     connect(&d->newAction, &QAction::triggered,
 	    this, &V1541Commander::newImage);
     connect(&d->openAction, SIGNAL(triggered()),
@@ -182,6 +182,14 @@ V1541Commander::~V1541Commander()
 {
     delete d->petsciiWindow;
     delete d;
+}
+
+void V1541Commander::show()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->show();
 }
 
 void V1541Commander::newImage()

@@ -230,7 +230,7 @@ static QString getFilterForType(CbmdosFileType type)
 	case CbmdosFileType::CFT_SEQ:
 	    return QString(QT_TR_NOOP("SEQ files (*.seq);;all files (*)"));
 	case CbmdosFileType::CFT_USR:
-	    return QString(QT_TR_NOOP("USR files (*.use);;all files (*)"));
+	    return QString(QT_TR_NOOP("USR files (*.usr);;all files (*)"));
 	default:
 	    return QString(QT_TR_NOOP("all files (*)"));
     }

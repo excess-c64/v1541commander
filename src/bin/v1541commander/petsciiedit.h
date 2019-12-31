@@ -4,6 +4,7 @@
 #include <QLineEdit>
 
 class PetsciiStr;
+class QKeyEvent;
 
 class PetsciiEdit : public QLineEdit
 {
@@ -21,6 +22,10 @@ class PetsciiEdit : public QLineEdit
     public:
 	PetsciiEdit(QWidget *parent = 0);
 	virtual void setMaxLength(int length);
+
+    protected:
+	virtual void keyPressEvent(QKeyEvent *event);
+	virtual bool event(QEvent *event);
 };
 
 #endif

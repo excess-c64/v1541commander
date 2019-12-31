@@ -7,12 +7,23 @@
 #include <QtPlugin>
 #endif
 
+#ifdef _WIN32
+#ifdef DEBUG
+#include <windows.h>
+#endif
+#endif
+
 int main(int argc, char **argv)
 {
 #ifdef QT_STATICPLUGIN
 #ifdef _WIN32
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
     Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin);
+#ifdef DEBUG
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+#endif
 #else
     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #endif
@@ -29,6 +40,8 @@ int main(int argc, char **argv)
 	    QCoreApplication::translate("main", "D64 disk image(s) to open."),
 	    "[d64file ...]");
     parser.process(commander);
+
+    commander.show();
 
     const QStringList &positionalArgs = parser.positionalArguments();
     for (QStringList::const_iterator i = positionalArgs.constBegin();
