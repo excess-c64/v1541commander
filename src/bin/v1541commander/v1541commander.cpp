@@ -76,7 +76,11 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     openAction.setStatusTip(tr("Open a disk image"));
     saveAction.setShortcuts(QKeySequence::Save);
     saveAction.setStatusTip(tr("Save disk image"));
+#ifdef _WIN32
+    saveAsAction.setShortcut(QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_S));
+#else
     saveAsAction.setShortcuts(QKeySequence::SaveAs);
+#endif
     saveAsAction.setStatusTip(tr("Save disk image as new file"));
     closeAction.setShortcuts(QKeySequence::Close);
     closeAction.setStatusTip(tr("Close current file"));
