@@ -1,6 +1,7 @@
 #include "v1541imgwidget.h"
 #include "v1541commander.h"
 #include "cbmdosfsmodel.h"
+#include "cbmdosfsoptionsdialog.h"
 #include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
 #include "utils.h"
@@ -16,6 +17,7 @@
 #include <1541img/cbmdosfile.h>
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
+#include <1541img/cbmdosvfsreader.h>
 
 class V1541ImgWidget::priv
 {
@@ -38,7 +40,7 @@ V1541ImgWidget::priv::priv() :
     file()
 {}
 
-V1541ImgWidget::V1541ImgWidget() : QWidget()
+V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 {
     d = new priv();
     QHBoxLayout *layout = new QHBoxLayout(this);
@@ -121,15 +123,21 @@ void V1541ImgWidget::newImage()
 	D64_destroy(d->d64);
 	d->d64 = 0;
     }
-    d->fs = CbmdosFs_create(CFO_DEFAULT);
-    d->model.setFs(d->fs);
-    d->fsprop.setFs(d->fs);
-    d->dirList.setMinimumWidth(
-	    d->dirList.sizeHintForColumn(0)
-	    + 2 * d->dirList.frameWidth());
-    d->dirList.setMinimumHeight(
-	    d->dirList.sizeHintForRow(0) * 10
-	    + 2 * d->dirList.frameWidth());
+    CbmdosFsOptions opts = CFO_DEFAULT;
+    CbmdosFsOptionsDialog optDlg(&opts, parentWidget());
+    optDlg.setWindowTitle(QString(tr("Options for new image")));
+    if (optDlg.exec() == QDialog::Accepted)
+    {
+	d->fs = CbmdosFs_create(opts);
+	d->model.setFs(d->fs);
+	d->fsprop.setFs(d->fs);
+	d->dirList.setMinimumWidth(
+		d->dirList.sizeHintForColumn(0)
+		+ 2 * d->dirList.frameWidth());
+	d->dirList.setMinimumHeight(
+		d->dirList.sizeHintForRow(0) * 10
+		+ 2 * d->dirList.frameWidth());
+    }
 }
 
 void V1541ImgWidget::open(const QString& filename)
@@ -153,22 +161,62 @@ void V1541ImgWidget::open(const QString& filename)
 
 	if (d->d64)
 	{
-	    CbmdosFsOptions opts = CFO_DEFAULT;
-	    if (D64_type(d->d64) == D64_40TRACK) opts.flags = CFF_40TRACK;
-	    d->fs = CbmdosFs_fromImage(d->d64, opts);
-	    if (d->fs)
+	    CbmdosFsOptions opts;
+	    if (probeCbmdosFsOptions(&opts, d->d64) == 0)
 	    {
-		d->model.setFs(d->fs);
-		d->fsprop.setFs(d->fs);
-                d->dirList.setMinimumWidth(
-                        d->dirList.sizeHintForColumn(0)
-                        + 2 * d->dirList.frameWidth());
-                int minItems = d->model.rowCount();
-                if (minItems < 10) minItems = 10;
-                if (minItems > 40) minItems = 40;
-                d->dirList.setMinimumHeight(
-                        d->dirList.sizeHintForRow(0) * minItems
-                        + 2 * d->dirList.frameWidth());
+		CbmdosFsOptionsDialog optDlg(&opts, parentWidget(), false);
+		optDlg.setWindowTitle(QString(tr("Options for "))
+			.append(filename));
+		if (D64_type(d->d64) == D64Type::D64_STANDARD)
+		{
+		    optDlg.disable42Tracks();
+		    optDlg.disable40Tracks();
+		}
+		else if (D64_type(d->d64) == D64Type::D64_40TRACK)
+		{
+		    optDlg.disable42Tracks();
+		}
+		if (opts.flags & CFF_42TRACK)
+		{
+		    optDlg.disable35Tracks();
+		    optDlg.disable40Tracks();
+		}
+		else if (opts.flags & CFF_40TRACK)
+		{
+		    optDlg.disable35Tracks();
+		}
+		if ((D64_type(d->d64) != D64Type::D64_STANDARD)
+			&& (opts.flags & (CFF_PROLOGICDOSBAM
+				|CFF_SPEEDDOSBAM|CFF_DOLPHINDOSBAM))
+			&& !(opts.flags & (CFF_40TRACK|CFF_42TRACK)))
+		{
+		    opts.flags = (CbmdosFsFlags)
+			(opts.flags | CFF_40TRACK);
+		    optDlg.reset();
+		}
+		if (optDlg.exec() == QDialog::Accepted)
+		{
+		    d->fs = CbmdosFs_fromImage(d->d64, opts);
+		    if (d->fs)
+		    {
+			d->model.setFs(d->fs);
+			d->fsprop.setFs(d->fs);
+			d->dirList.setMinimumWidth(
+				d->dirList.sizeHintForColumn(0)
+				+ 2 * d->dirList.frameWidth());
+			int minItems = d->model.rowCount();
+			if (minItems < 10) minItems = 10;
+			if (minItems > 40) minItems = 40;
+			d->dirList.setMinimumHeight(
+				d->dirList.sizeHintForRow(0) * minItems
+				+ 2 * d->dirList.frameWidth());
+		    }
+		}
+	    }
+	    if (!d->fs)
+	    {
+		D64_destroy(d->d64);
+		d->d64 = 0;
 	    }
 	}
     }

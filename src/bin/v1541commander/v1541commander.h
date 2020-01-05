@@ -4,6 +4,9 @@
 #include <QApplication>
 
 class QAction;
+#ifdef _WIN32
+class QIcon;
+#endif
 
 #define cmdr (V1541Commander::instance())
 
@@ -36,7 +39,7 @@ class V1541Commander: public QApplication
     public:
         V1541Commander(int &argc, char **argv);
         ~V1541Commander();
-        QFont &c64font();
+        const QFont &c64font() const;
         QAction &newAction();
         QAction &openAction();
 	QAction &saveAction();

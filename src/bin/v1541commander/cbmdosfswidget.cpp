@@ -96,11 +96,21 @@ void CbmdosFsWidget::idChanged(const PetsciiStr &id)
     }
 }
 
+static uint8_t defaultDosVer(const CbmdosFs *fs)
+{
+    if (!fs) return 0x41;
+    if (CbmdosFs_options(fs).flags & CbmdosFsFlags::CFF_PROLOGICDOSBAM)
+    {
+	return 0x50;
+    }
+    else return 0x41;
+}
+
 void CbmdosFsWidget::dosVerChanged(int val)
 {
     if (d->fs)
     {
-	d->dosVerReset.setEnabled(val != 0x41);
+	d->dosVerReset.setEnabled(val != defaultDosVer(d->fs));
 	CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
 	CbmdosVfs_setDosver(vfs, val);
     }
@@ -108,7 +118,7 @@ void CbmdosFsWidget::dosVerChanged(int val)
 
 void CbmdosFsWidget::dosVerReset()
 {
-    d->dosVer.setValue(0x41);
+    d->dosVer.setValue(defaultDosVer(d->fs));
 }
 
 CbmdosFs *CbmdosFsWidget::fs() const
@@ -132,7 +142,7 @@ void CbmdosFsWidget::setFs(CbmdosFs *fs)
 	d->id.setText(id.toString());
 	uint8_t dosver = CbmdosVfs_dosver(vfs);
 	d->dosVer.setValue(dosver);
-	d->dosVerReset.setEnabled(dosver != 0x41);
+	d->dosVerReset.setEnabled(dosver != defaultDosVer(fs));
     }
     else
     {

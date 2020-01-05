@@ -85,6 +85,7 @@ void CbmdosFsModel::fsChanged(const CbmdosVfsEventArgs *args)
 
 	case CbmdosVfsEventArgs::CVE_NAMECHANGED:
 	case CbmdosVfsEventArgs::CVE_IDCHANGED:
+	case CbmdosVfsEventArgs::CVE_DOSVERCHANGED:
 	    {
 		QModelIndex pos = createIndex(0, 0);
 		emit dataChanged(pos, pos, QVector<int>(Qt::DisplayRole));

@@ -202,6 +202,13 @@ void V1541Commander::newImage()
 	w = d->addWindow();
     }
     w->newImage();
+    if (w->content() == MainWindow::Content::None)
+    {
+	if (d->allWindows.count() > 1)
+	{
+	    d->removeWindow(w);
+	}
+    }
 }
 
 void V1541Commander::open(const QString &filename)
@@ -378,7 +385,7 @@ void V1541Commander::petsciiInput(ushort val)
     if (pe) pe->petsciiInput(val);
 }
 
-QFont &V1541Commander::c64font()
+const QFont &V1541Commander::c64font() const
 {
     return d->c64font;
 }

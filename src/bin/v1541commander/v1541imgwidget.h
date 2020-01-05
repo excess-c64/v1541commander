@@ -25,7 +25,7 @@ class V1541ImgWidget: public QWidget
 	void deleteFile();
 
     public:
-	V1541ImgWidget();
+	V1541ImgWidget(QWidget *parent = nullptr);
 	~V1541ImgWidget();
 	bool hasValidImage() const;
 	bool hasValidSelection() const;
