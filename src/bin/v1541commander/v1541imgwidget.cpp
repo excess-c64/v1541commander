@@ -23,7 +23,6 @@ class V1541ImgWidget::priv
 {
     public:
 	priv();
-	D64 *d64;
 	CbmdosFs *fs;
 	CbmdosFsModel model;
 	QListView dirList;
@@ -32,7 +31,6 @@ class V1541ImgWidget::priv
 };
 
 V1541ImgWidget::priv::priv() :
-    d64(0),
     fs(0),
     model(),
     dirList(),
@@ -73,18 +71,8 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 
 V1541ImgWidget::~V1541ImgWidget()
 {
-    CbmdosFs *fs = d->fs;
-    D64 *d64 = d->d64;
+    CbmdosFs_destroy(d->fs);
     delete d;
-
-    if (fs)
-    {
-	CbmdosFs_destroy(fs);
-    }
-    else if (d64)
-    {
-	D64_destroy(d64);
-    }
 }
 
 void V1541ImgWidget::selected(const QModelIndex &current,
@@ -112,17 +100,8 @@ void V1541ImgWidget::modelModified()
 
 void V1541ImgWidget::newImage()
 {
-    if (d->fs)
-    {
-	CbmdosFs_destroy(d->fs);
-	d->fs = 0;
-	d->d64 = 0;
-    }
-    if (d->d64)
-    {
-	D64_destroy(d->d64);
-	d->d64 = 0;
-    }
+    CbmdosFs_destroy(d->fs);
+    d->fs = 0;
     CbmdosFsOptions opts = CFO_DEFAULT;
     CbmdosFsOptionsDialog optDlg(&opts, parentWidget());
     optDlg.setWindowTitle(QString(tr("Options for new image")));
@@ -142,37 +121,28 @@ void V1541ImgWidget::newImage()
 
 void V1541ImgWidget::open(const QString& filename)
 {
-    if (d->fs)
-    {
-	CbmdosFs_destroy(d->fs);
-	d->fs = 0;
-	d->d64 = 0;
-    }
-    if (d->d64)
-    {
-	D64_destroy(d->d64);
-	d->d64 = 0;
-    }
+    CbmdosFs_destroy(d->fs);
+    d->fs = 0;
     FILE *d64file = qfopen(filename, "rb");
     if (d64file)
     {
-	d->d64 = readD64(d64file);
+	D64 *d64 = readD64(d64file);
 	fclose(d64file);
 
-	if (d->d64)
+	if (d64)
 	{
 	    CbmdosFsOptions opts;
-	    if (probeCbmdosFsOptions(&opts, d->d64) == 0)
+	    if (probeCbmdosFsOptions(&opts, d64) == 0)
 	    {
 		CbmdosFsOptionsDialog optDlg(&opts, parentWidget(), false);
 		optDlg.setWindowTitle(QString(tr("Options for "))
 			.append(filename));
-		if (D64_type(d->d64) == D64Type::D64_STANDARD)
+		if (D64_type(d64) == D64Type::D64_STANDARD)
 		{
 		    optDlg.disable42Tracks();
 		    optDlg.disable40Tracks();
 		}
-		else if (D64_type(d->d64) == D64Type::D64_40TRACK)
+		else if (D64_type(d64) == D64Type::D64_40TRACK)
 		{
 		    optDlg.disable42Tracks();
 		}
@@ -185,18 +155,17 @@ void V1541ImgWidget::open(const QString& filename)
 		{
 		    optDlg.disable35Tracks();
 		}
-		if ((D64_type(d->d64) != D64Type::D64_STANDARD)
-			&& (opts.flags & (CFF_PROLOGICDOSBAM
-				|CFF_SPEEDDOSBAM|CFF_DOLPHINDOSBAM))
+		if ((D64_type(d64) != D64Type::D64_STANDARD)
 			&& !(opts.flags & (CFF_40TRACK|CFF_42TRACK)))
 		{
 		    opts.flags = (CbmdosFsFlags)
 			(opts.flags | CFF_40TRACK);
 		    optDlg.reset();
 		}
+		optDlg.disableZeroFree();
 		if (optDlg.exec() == QDialog::Accepted)
 		{
-		    d->fs = CbmdosFs_fromImage(d->d64, opts);
+		    d->fs = CbmdosFs_fromImage(d64, opts);
 		    if (d->fs)
 		    {
 			d->model.setFs(d->fs);
@@ -215,8 +184,7 @@ void V1541ImgWidget::open(const QString& filename)
 	    }
 	    if (!d->fs)
 	    {
-		D64_destroy(d->d64);
-		d->d64 = 0;
+		D64_destroy(d64);
 	    }
 	}
     }
@@ -224,29 +192,52 @@ void V1541ImgWidget::open(const QString& filename)
 
 void V1541ImgWidget::save(const QString& filename)
 {
-    const D64 *d64 = d->d64;
-    if (!d64 && d->fs) d64 = CbmdosFs_image(d->fs);
-    if (d64)
+    if (!hasValidImage()) return;
+    FILE *d64file = qfopen(filename, "wb");
+    if (d64file)
     {
-	FILE *d64file = qfopen(filename, "wb");
-	if (d64file)
+	if (writeD64(d64file, CbmdosFs_image(d->fs)) < 0)
 	{
-	    if (writeD64(d64file, d64) < 0)
-	    {
-		QMessageBox::critical(this, tr("Error writing file"),
-			tr("The selected file couldn't be written."));
-	    }
-	    else
-	    {
-		emit saved();
-	    }
-	    fclose(d64file);
+	    QMessageBox::critical(this, tr("Error writing file"),
+		    tr("The selected file couldn't be written."));
 	}
 	else
 	{
-	    QMessageBox::critical(this, tr("Error opening file"),
-		    tr("The selected file couldn't be opened for writing."));
+	    emit saved();
 	}
+	fclose(d64file);
+    }
+    else
+    {
+	QMessageBox::critical(this, tr("Error opening file"),
+		tr("The selected file couldn't be opened for writing."));
+    }
+}
+
+void V1541ImgWidget::fsOptions()
+{
+    if (!hasValidImage()) return;
+    CbmdosFsOptions opts = CbmdosFs_options(d->fs);
+    CbmdosFsOptionsDialog optDlg(&opts, parentWidget());
+    if (optDlg.exec() == QDialog::Accepted)
+    {
+	CbmdosFs_setOptions(d->fs, opts);
+    }
+}
+
+void V1541ImgWidget::rewriteImage()
+{
+    if (!hasValidImage()) return;
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+	    tr("Rewrite the image?"), tr("When rewriting an image from "
+		"scratch, you might lose data that isn't stored in standard "
+		"CBM DOS format on the disk, like for example raw sectors in "
+		"demos or games. Are you sure you want to proceed?"),
+	    QMessageBox::Ok|QMessageBox::Cancel);
+    if (reply == QMessageBox::Ok)
+    {
+	CbmdosFs_rewrite(d->fs);
+	emit modified();
     }
 }
 
@@ -274,7 +265,7 @@ void V1541ImgWidget::deleteFile()
 
 bool V1541ImgWidget::hasValidImage() const
 {
-    return d->fs || d->d64;
+    return d->fs;
 }
 
 bool V1541ImgWidget::hasValidSelection() const

@@ -350,6 +350,11 @@ void CbmdosFsOptionsDialog::disable42Tracks()
     d->tracks42Button.setEnabled(false);
 }
 
+void CbmdosFsOptionsDialog::disableZeroFree()
+{
+    d->zeroFreeCheckBox.setEnabled(false);
+}
+
 void CbmdosFsOptionsDialog::reset()
 {
     d->reset();

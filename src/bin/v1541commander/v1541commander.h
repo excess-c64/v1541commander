@@ -32,6 +32,8 @@ class V1541Commander: public QApplication
         void showPetsciiWindow();
 	void showLogWindow();
 	void petsciiInput(ushort val);
+	void fsOptions();
+	void rewriteImage();
 	void newFile();
 	void deleteFile();
 	void logLineAppended(const QString &line);
@@ -49,6 +51,8 @@ class V1541Commander: public QApplication
         QAction &exitAction();
         QAction &petsciiWindowAction();
 	QAction &logWindowAction();
+	QAction &fsOptionsAction();
+	QAction &rewriteImageAction();
 	QAction &newFileAction();
 	QAction &deleteFileAction();
 

@@ -47,6 +47,8 @@ class MainWindow: public QMainWindow
         void openImage(const QString &imgFile);
 	void save(const QString &imgFile = QString());
         void closeDocument();
+	void fsOptions();
+	void rewriteImage();
 	void newFile();
 	void deleteFile();
 	void showStatusLine(const QString &line);

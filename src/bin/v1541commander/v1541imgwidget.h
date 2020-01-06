@@ -21,6 +21,8 @@ class V1541ImgWidget: public QWidget
 	void newImage();
 	void open(const QString& filename);
 	void save(const QString& filename);
+	void fsOptions();
+	void rewriteImage();
 	void newFile();
 	void deleteFile();
 

@@ -34,6 +34,8 @@ class V1541Commander::priv
         QAction exitAction;
         QAction petsciiWindowAction;
 	QAction logWindowAction;
+	QAction fsOptionsAction;
+	QAction rewriteImageAction;
 	QAction newFileAction;
 	QAction deleteFileAction;
         QVector<MainWindow *> allWindows;
@@ -62,8 +64,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     exitAction(tr("E&xit")),
     petsciiWindowAction(tr("&PETSCII Input")),
     logWindowAction(tr("lib1541img &log")),
-    newFileAction(tr("&New")),
-    deleteFileAction(tr("&Delete")),
+    fsOptionsAction(tr("Filesystem &Options")),
+    rewriteImageAction(tr("&Rewrite Image")),
+    newFileAction(tr("&New File")),
+    deleteFileAction(tr("&Delete File")),
     allWindows(),
     lastActiveWindow(0),
     petsciiWindow(0),
@@ -90,6 +94,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     petsciiWindowAction.setStatusTip(tr("Show PETSCII input window"));
     logWindowAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_L));
     logWindowAction.setStatusTip(tr("Show lib1541img log messages"));
+    fsOptionsAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_F));
+    fsOptionsAction.setStatusTip(tr("Change filesystem options"));
+    rewriteImageAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_R));
+    rewriteImageAction.setStatusTip(tr("Rewrite disk image from scratch"));
     newFileAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Period));
     newFileAction.setStatusTip(tr("Create new file at selection"));
     deleteFileAction.setShortcut(QKeySequence::Delete);
@@ -135,8 +143,13 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
 void V1541Commander::priv::updateActions(MainWindow *w)
 {
     closeAction.setEnabled(w->content() != MainWindow::Content::None);
-    saveAction.setEnabled(w->hasValidContent() && !w->filename().isEmpty());
+    saveAction.setEnabled(w->hasValidContent() &&
+	    (w->isWindowModified() || w->filename().isEmpty()));
     saveAsAction.setEnabled(w->hasValidContent());
+    fsOptionsAction.setEnabled(w->content() == MainWindow::Content::Image
+	    && w->hasValidContent());
+    rewriteImageAction.setEnabled(w->content() == MainWindow::Content::Image
+	    && w->hasValidContent());
     newFileAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && w->hasValidContent());
     deleteFileAction.setEnabled(w->content() == MainWindow::Content::Image
@@ -170,6 +183,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::showPetsciiWindow);
     connect(&d->logWindowAction, &QAction::triggered,
             this, &V1541Commander::showLogWindow);
+    connect(&d->fsOptionsAction, &QAction::triggered,
+            this, &V1541Commander::fsOptions);
+    connect(&d->rewriteImageAction, &QAction::triggered,
+            this, &V1541Commander::rewriteImage);
     connect(&d->newFileAction, &QAction::triggered,
             this, &V1541Commander::newFile);
     connect(&d->deleteFileAction, &QAction::triggered,
@@ -266,7 +283,8 @@ void V1541Commander::save()
     MainWindow *w = d->lastActiveWindow;
     if (!w) return;
 
-    w->save();
+    if (w->filename().isEmpty()) saveAs();
+    else w->save();
 }
 
 void V1541Commander::saveAs()
@@ -355,6 +373,22 @@ void V1541Commander::showLogWindow()
     d->logWindow.show();
 }
 
+void V1541Commander::fsOptions()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->fsOptions();
+}
+
+void V1541Commander::rewriteImage()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->rewriteImage();
+}
+
 void V1541Commander::newFile()
 {
     MainWindow *w = d->lastActiveWindow;
@@ -433,6 +467,16 @@ QAction &V1541Commander::petsciiWindowAction()
 QAction &V1541Commander::logWindowAction()
 {
     return d->logWindowAction;
+}
+
+QAction &V1541Commander::fsOptionsAction()
+{
+    return d->fsOptionsAction;
+}
+
+QAction &V1541Commander::rewriteImageAction()
+{
+    return d->rewriteImageAction;
 }
 
 QAction &V1541Commander::newFileAction()

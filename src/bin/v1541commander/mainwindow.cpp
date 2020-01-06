@@ -34,6 +34,9 @@ MainWindow::MainWindow()
     fileMenu->addAction(&cmdr.aboutAction());
     fileMenu->addAction(&cmdr.exitAction());
     QMenu *cbmdosMenu = menuBar()->addMenu(tr("CBM &DOS"));
+    cbmdosMenu->addAction(&cmdr.fsOptionsAction());
+    cbmdosMenu->addAction(&cmdr.rewriteImageAction());
+    cbmdosMenu->addSeparator();
     cbmdosMenu->addAction(&cmdr.newFileAction());
     cbmdosMenu->addAction(&cmdr.deleteFileAction());
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
@@ -199,7 +202,7 @@ void MainWindow::save(const QString &imgFile)
 	case Content::Image:
 	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
 	    imgWidget->save(imgFile.isEmpty() ? d->filename : imgFile);
-	    if (d->filename.isEmpty())
+	    if (!imgFile.isEmpty())
 	    {
 		d->filename = imgFile;
 		setWindowTitle(QString(imgFile).append("[*]"));
@@ -243,6 +246,18 @@ void MainWindow::closeDocument()
     setWindowModified(false);
     adjustSize();
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
+}
+
+void MainWindow::fsOptions()
+{
+    if (d->content != Content::Image) return;
+    static_cast<V1541ImgWidget *>(centralWidget())->fsOptions();
+}
+
+void MainWindow::rewriteImage()
+{
+    if (d->content != Content::Image) return;
+    static_cast<V1541ImgWidget *>(centralWidget())->rewriteImage();
 }
 
 void MainWindow::newFile()

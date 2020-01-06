@@ -22,6 +22,7 @@ class CbmdosFsOptionsDialog: public QDialog
 	void disable35Tracks();
 	void disable40Tracks();
 	void disable42Tracks();
+	void disableZeroFree();
 	void reset();
 
     protected:
