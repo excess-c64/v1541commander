@@ -28,7 +28,8 @@ int main(int argc, char **argv)
     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #endif
 #endif
-    QCoreApplication::setOrganizationName("ExCeSs");
+    QCoreApplication::setOrganizationName("Excess");
+    QCoreApplication::setApplicationName("V1541Commander");
     QCoreApplication::setApplicationVersion("0.1");
 
     V1541Commander commander(argc, argv);
