@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QStyle>
 #include <QVBoxLayout>
 
 #include <1541img/cbmdosfsoptions.h>
@@ -255,7 +256,8 @@ void CbmdosFsOptionsDialog::priv::changed(QObject *sender, int value)
 
 CbmdosFsOptionsDialog::CbmdosFsOptionsDialog(CbmdosFsOptions *options,
 	QWidget *parent, bool canCancel) :
-    QDialog(parent)
+    QDialog(parent, Qt::WindowSystemMenuHint
+            | Qt::WindowTitleHint | Qt::WindowCloseButtonHint)
 {
     d = new priv(options, canCancel);
     d->optionsLayout.addWidget(&d->tracks35Button, 0, 0, 1, 2);
@@ -364,5 +366,9 @@ void CbmdosFsOptionsDialog::showEvent(QShowEvent *event)
 {
     (void)event;
     QCoreApplication::processEvents();
+    QRect parentRect(parentWidget()->mapToGlobal(QPoint( 0, 0 )),
+            parentWidget()->size());
+    move(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(),
+                parentRect).topLeft());
 }
 
