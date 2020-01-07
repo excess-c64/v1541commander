@@ -23,6 +23,7 @@ class V1541ImgWidget::priv
 {
     public:
 	priv();
+        ~priv();
 	CbmdosFs *fs;
 	CbmdosFsModel model;
 	QListView dirList;
@@ -37,6 +38,11 @@ V1541ImgWidget::priv::priv() :
     fsprop(),
     file()
 {}
+
+V1541ImgWidget::priv::~priv()
+{
+    CbmdosFs_destroy(fs);
+}
 
 V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 {
@@ -71,7 +77,6 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 
 V1541ImgWidget::~V1541ImgWidget()
 {
-    CbmdosFs_destroy(d->fs);
     delete d;
 }
 
