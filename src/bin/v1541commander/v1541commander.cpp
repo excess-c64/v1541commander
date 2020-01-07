@@ -13,6 +13,7 @@
 #include <QIcon>
 #endif
 #include <QMessageBox>
+#include <QSettings>
 
 #include <1541img/log.h>
 
@@ -114,8 +115,37 @@ V1541Commander::priv::priv(V1541Commander *commander) :
 
 MainWindow *V1541Commander::priv::addWindow(bool show)
 {
+#ifdef _WIN32
+    MainWindow *newWin = new MainWindow();
+    MainWindow *lastWin = lastActiveWindow;
+    if (!lastWin && allWindows.count() > 0) lastWin = allWindows.first();
+    if (lastWin)
+    {
+        QPoint pos = lastWin->pos();
+        pos.setX(pos.x() + 64);
+        pos.setY(pos.y() + 32);
+        bool posOk = false;
+        for (int i = 0; i < 20; ++i)
+        {
+            posOk = true;
+            for (QVector<MainWindow *>::const_iterator w = allWindows.cbegin();
+                    w != allWindows.cend(); ++w)
+            {
+                if (pos == (*w)->pos())
+                {
+                    posOk = false;
+                    break;
+                }
+            }
+            if (posOk) break;
+            pos.setX(pos.x() + 64);
+            pos.setY(pos.y() + 32);
+        }
+        newWin->move(pos);
+    }
+    lastActiveWindow = newWin;
+#else
     lastActiveWindow = new MainWindow();
-#ifndef _WIN32
     lastActiveWindow->setWindowIcon(appIcon);
 #endif
     if (show) lastActiveWindow->show();
@@ -136,8 +166,14 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
     if (w == lastActiveWindow) lastActiveWindow = 0;
     allWindows.removeAll(w);
     w->close();
+    if (allWindows.count() == 0)
+    {
+        QSettings settings(QCoreApplication::organizationName(),
+                QCoreApplication::applicationName());
+        settings.setValue("geometry", w->saveGeometry());
+        closeAllWindows();
+    }
     w->deleteLater();
-    if (allWindows.count() == 0) closeAllWindows();
 }
 
 void V1541Commander::priv::updateActions(MainWindow *w)
@@ -165,6 +201,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
     QFontDatabase::addApplicationFont(":/C64_Pro_Mono-STYLE.ttf");
     d = new priv(this);
     d->addWindow(false);
+    QSettings settings(QCoreApplication::organizationName(),
+            QCoreApplication::applicationName());
+    d->lastActiveWindow->restoreGeometry(
+            settings.value("geometry").toByteArray());
     connect(&d->newAction, &QAction::triggered,
 	    this, &V1541Commander::newImage);
     connect(&d->openAction, SIGNAL(triggered()),
