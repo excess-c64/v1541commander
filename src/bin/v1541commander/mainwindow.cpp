@@ -142,6 +142,7 @@ void MainWindow::newImage()
     if (imgWidget->hasValidImage())
     {
 	QWidget *current = centralWidget();
+        if (current) current->setParent(0);
 	setCentralWidget(imgWidget);
 	delete current;
 	setWindowTitle(tr("<new disk image>[*]"));
@@ -171,6 +172,7 @@ void MainWindow::openImage(const QString &imgFile)
 	if (imgWidget->hasValidImage())
 	{
             QWidget *current = centralWidget();
+            if (current) current->setParent(0);
             setCentralWidget(imgWidget);
             delete current;
             d->content = Content::Image;
@@ -239,6 +241,7 @@ void MainWindow::closeDocument()
 	}
     }
     QWidget *current = centralWidget();
+    if (current) current->setParent(0);
     setCentralWidget(0);
     delete current;
     d->content = Content::None;

@@ -25,7 +25,7 @@ PetsciiStr::PetsciiStr(const QString &str, bool reverse)
 
 PetsciiStr::~PetsciiStr()
 {
-    delete raw;
+    delete[] raw;
 }
 
 QString PetsciiStr::toString(bool reverse)
