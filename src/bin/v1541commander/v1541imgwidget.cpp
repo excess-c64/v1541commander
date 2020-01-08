@@ -132,8 +132,15 @@ void V1541ImgWidget::open(const QString& filename)
 
 	if (d64)
 	{
-	    CbmdosFsOptions opts;
-	    if (probeCbmdosFsOptions(&opts, d64) == 0)
+	    CbmdosFsOptions opts = CFO_DEFAULT;
+	    int proberc = probeCbmdosFsOptions(&opts, d64);
+	    if (proberc < 0)
+	    {
+		opts.flags = (CbmdosFsFlags)
+		    (opts.flags | CbmdosFsFlags::CFF_RECOVER);
+		proberc = probeCbmdosFsOptions(&opts, d64);
+	    }
+	    if (proberc == 0)
 	    {
 		CbmdosFsOptionsDialog optDlg(&opts, parentWidget(), false);
 		optDlg.setWindowTitle(QString(tr("Options for "))
@@ -164,22 +171,25 @@ void V1541ImgWidget::open(const QString& filename)
 		    optDlg.reset();
 		}
 		optDlg.disableZeroFree();
-		if (optDlg.exec() == QDialog::Accepted)
+		optDlg.exec();
+		d->fs = CbmdosFs_fromImage(d64, opts);
+		if (d->fs)
 		{
-		    d->fs = CbmdosFs_fromImage(d64, opts);
-		    if (d->fs)
+		    d->model.setFs(d->fs);
+		    d->fsprop.setFs(d->fs);
+		    d->dirList.setMinimumWidth(
+			    d->dirList.sizeHintForColumn(0)
+			    + 2 * d->dirList.frameWidth());
+		    int minItems = d->model.rowCount();
+		    if (minItems < 10) minItems = 10;
+		    if (minItems > 40) minItems = 40;
+		    d->dirList.setMinimumHeight(
+			    d->dirList.sizeHintForRow(0) * minItems
+			    + 2 * d->dirList.frameWidth());
+		    if (opts.flags & CFF_RECOVER)
 		    {
-			d->model.setFs(d->fs);
-			d->fsprop.setFs(d->fs);
-			d->dirList.setMinimumWidth(
-				d->dirList.sizeHintForColumn(0)
-				+ 2 * d->dirList.frameWidth());
-			int minItems = d->model.rowCount();
-			if (minItems < 10) minItems = 10;
-			if (minItems > 40) minItems = 40;
-			d->dirList.setMinimumHeight(
-				d->dirList.sizeHintForRow(0) * minItems
-				+ 2 * d->dirList.frameWidth());
+			CbmdosFs_rewrite(d->fs);
+			emit modified();
 		    }
 		}
 	    }

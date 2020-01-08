@@ -156,6 +156,8 @@ MainWindow *V1541Commander::priv::addWindow(bool show)
             commander, &V1541Commander::windowClosed);
     connect(lastActiveWindow, &MainWindow::contentChanged,
             commander, &V1541Commander::windowContentChanged);
+    connect(lastActiveWindow, &MainWindow::modifiedChanged,
+            commander, &V1541Commander::windowContentChanged);
     connect(lastActiveWindow, &MainWindow::selectionChanged,
             commander, &V1541Commander::windowSelectionChanged);
     return lastActiveWindow;

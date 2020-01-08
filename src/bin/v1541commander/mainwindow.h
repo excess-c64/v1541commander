@@ -40,6 +40,7 @@ class MainWindow: public QMainWindow
         void activated();
         void closed();
         void contentChanged();
+	void modifiedChanged();
 	void selectionChanged();
 
     public slots:

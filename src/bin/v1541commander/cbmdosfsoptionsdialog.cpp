@@ -34,6 +34,7 @@ class CbmdosFsOptionsDialog::priv
 	QSpinBox dirInterleaveSpinBox;
 	QLabel fileInterleaveLabel;
 	QSpinBox fileInterleaveSpinBox;
+	QLabel recoverWarningLabel;
 	QDialogButtonBox buttons;
 
 	void reset();
@@ -59,6 +60,10 @@ CbmdosFsOptionsDialog::priv::priv(CbmdosFsOptions *options, bool canCancel) :
     dirInterleaveSpinBox(),
     fileInterleaveLabel(tr("default file interleave: ")),
     fileInterleaveSpinBox(),
+    recoverWarningLabel(tr("WARNING: this disk image is broken, trying to "
+		"recover data from it. It will be recreated after opening, "
+		"but data could be lost. It is therefore treated like a new "
+		"disk image.")),
     buttons(canCancel ?
 	    QDialogButtonBox::Ok|QDialogButtonBox::Cancel
 	    |QDialogButtonBox::Reset
@@ -68,6 +73,7 @@ CbmdosFsOptionsDialog::priv::priv(CbmdosFsOptions *options, bool canCancel) :
     dirInterleaveSpinBox.setMaximum(20);
     fileInterleaveSpinBox.setMinimum(1);
     fileInterleaveSpinBox.setMaximum(20);
+    recoverWarningLabel.setWordWrap(true);
     reset();
 }
 
@@ -273,6 +279,10 @@ CbmdosFsOptionsDialog::CbmdosFsOptionsDialog(CbmdosFsOptions *options,
     d->optionsLayout.addWidget(&d->allowLongDirCheckBox, 3, 2);
     d->optionsLayout.addWidget(&d->filesOnDirTrackCheckBox, 4, 2);
     d->optionsLayout.addWidget(&d->zeroFreeCheckBox, 5, 2);
+    if (options->flags & CbmdosFsFlags::CFF_RECOVER)
+    {
+	d->optionsLayout.addWidget(&d->recoverWarningLabel, 6, 0, 1, 3);
+    }
     d->mainLayout.addLayout(&d->optionsLayout);
     d->mainLayout.addWidget(&d->buttons);
     setLayout(&d->mainLayout);

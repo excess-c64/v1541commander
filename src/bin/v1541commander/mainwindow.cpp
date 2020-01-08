@@ -44,7 +44,7 @@ MainWindow::MainWindow()
     windowsMenu->addAction(&cmdr.logWindowAction());
     (void) statusBar();
 
-    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
+    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander[*]"));
 }
 
 MainWindow::~MainWindow()
@@ -60,11 +60,13 @@ void MainWindow::contentSelectionChanged()
 void MainWindow::contentModified()
 {
     setWindowModified(true);
+    emit modifiedChanged();
 }
 
 void MainWindow::contentSaved()
 {
     setWindowModified(false);
+    emit modifiedChanged();
 }
 
 MainWindow::Content MainWindow::content() const 
@@ -145,6 +147,7 @@ void MainWindow::newImage()
         if (current) current->setParent(0);
 	setCentralWidget(imgWidget);
 	delete current;
+	d->filename = QString();
 	setWindowTitle(tr("<new disk image>[*]"));
 	d->content = Content::Image;
 	connect(imgWidget, &V1541ImgWidget::selectionChanged,
@@ -155,6 +158,7 @@ void MainWindow::newImage()
 		this, &MainWindow::contentSaved);
 	emit contentChanged();
 	setWindowModified(false);
+	emit modifiedChanged();
 	adjustSize();
     }
     else
@@ -167,7 +171,11 @@ void MainWindow::openImage(const QString &imgFile)
 {
     if (!imgFile.isEmpty())
     {
+	bool modified = isWindowModified();
+	setWindowModified(false);
 	V1541ImgWidget *imgWidget = new V1541ImgWidget(this);
+	connect(imgWidget, &V1541ImgWidget::modified,
+		this, &MainWindow::contentModified);
 	imgWidget->open(imgFile);
 	if (imgWidget->hasValidImage())
 	{
@@ -176,21 +184,27 @@ void MainWindow::openImage(const QString &imgFile)
             setCentralWidget(imgWidget);
             delete current;
             d->content = Content::Image;
-	    d->filename = imgFile;
-            setWindowTitle(QString(imgFile).append("[*]"));
+	    if (isWindowModified())
+	    {
+		d->filename = QString();
+		setWindowTitle(tr("<new disk image>[*]"));
+	    }
+	    else
+	    {
+		d->filename = imgFile;
+		setWindowTitle(QString(imgFile).append("[*]"));
+	    }
 	    connect(imgWidget, &V1541ImgWidget::selectionChanged,
 		    this, &MainWindow::contentSelectionChanged);
-	    connect(imgWidget, &V1541ImgWidget::modified,
-		    this, &MainWindow::contentModified);
 	    connect(imgWidget, &V1541ImgWidget::saved,
 		    this, &MainWindow::contentSaved);
             emit contentChanged();
-	    setWindowModified(false);
             adjustSize();
 	}
 	else
 	{
             delete imgWidget;
+	    setWindowModified(modified);
 	}
     }
 }
@@ -245,10 +259,12 @@ void MainWindow::closeDocument()
     setCentralWidget(0);
     delete current;
     d->content = Content::None;
+    d->filename = QString();
     emit contentChanged();
     setWindowModified(false);
+    emit modifiedChanged();
     adjustSize();
-    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander"));
+    setWindowTitle(tr("V1541Commander: virtual 1541 disk commander[*]"));
 }
 
 void MainWindow::fsOptions()
