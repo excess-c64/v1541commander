@@ -6,6 +6,8 @@
 class QWidget;
 class QEvent;
 
+struct CbmdosVfs;
+
 class MainWindow: public QMainWindow
 {
     Q_OBJECT
@@ -32,6 +34,7 @@ class MainWindow: public QMainWindow
 	const QString &filename() const;
 	bool hasValidContent() const;
 	bool hasValidSelection() const;
+	CbmdosVfs *exportZipcodeVfs();
         virtual bool event(QEvent *e);
         virtual void closeEvent(QCloseEvent *e);
         virtual QSize sizeHint() const;
@@ -46,7 +49,9 @@ class MainWindow: public QMainWindow
     public slots:
 	void newImage();
         void openImage(const QString &imgFile);
+	void openVfs(CbmdosVfs *vfs);
 	void save(const QString &imgFile = QString());
+	void exportZipcode(const QString &zcFile);
         void closeDocument();
 	void fsOptions();
 	void rewriteImage();

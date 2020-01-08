@@ -5,6 +5,8 @@
 
 class QModelIndex;
 
+struct CbmdosVfs;
+
 class V1541ImgWidget: public QWidget
 {
     Q_OBJECT
@@ -20,7 +22,9 @@ class V1541ImgWidget: public QWidget
     public slots:
 	void newImage();
 	void open(const QString& filename);
+	void openVfs(CbmdosVfs *vfs);
 	void save(const QString& filename);
+	void exportZipcode(const QString &filename);
 	void fsOptions();
 	void rewriteImage();
 	void newFile();
@@ -31,6 +35,7 @@ class V1541ImgWidget: public QWidget
 	~V1541ImgWidget();
 	bool hasValidImage() const;
 	bool hasValidSelection() const;
+	CbmdosVfs *exportZipcodeVfs();
 
     signals:
 	void selectionChanged();

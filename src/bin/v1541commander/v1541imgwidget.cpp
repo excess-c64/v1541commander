@@ -6,6 +6,7 @@
 #include "cbmdosfilewidget.h"
 #include "utils.h"
 
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QListView>
 #include <QMessageBox>
@@ -18,6 +19,9 @@
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
 #include <1541img/cbmdosvfsreader.h>
+#include <1541img/zc45compressor.h>
+#include <1541img/zc45extractor.h>
+#include <1541img/zcfileset.h>
 
 class V1541ImgWidget::priv
 {
@@ -124,80 +128,142 @@ void V1541ImgWidget::open(const QString& filename)
 {
     CbmdosFs_destroy(d->fs);
     d->fs = 0;
-    FILE *d64file = qfopen(filename, "rb");
-    if (d64file)
-    {
-	D64 *d64 = readD64(d64file);
-	fclose(d64file);
 
-	if (d64)
+    D64 *d64 = 0;
+    bool zipcode = false;
+
+    QFileInfo fileInfo(filename);
+    if (fileInfo.baseName().indexOf('!') == 1 &&
+	    !(fileInfo.suffix().toUpper() == "D64"))
+    {
+	ZcFileSet *fileset = ZcFileSet_fromFile(qfname(filename));
+	if (fileset)
 	{
-	    CbmdosFsOptions opts = CFO_DEFAULT;
-	    int proberc = probeCbmdosFsOptions(&opts, d64);
-	    if (proberc < 0)
+	    d64 = extractZc45(fileset);
+	    ZcFileSet_destroy(fileset);
+	}
+	zipcode = true;
+    }
+    else
+    {
+	ZcFileSet *fileset = ZcFileSet_fromFile(qfname(filename));
+	if (fileset)
+	{
+	    if (QMessageBox::question(window(),
+			tr("Extract Zipcode?"),
+			tr("This image seems to contain a set of Zipcode "
+			    "files. Do you want to extract them instead?"),
+			QMessageBox::Yes|QMessageBox::No)
+		    == QMessageBox::Yes)
 	    {
-		opts.flags = (CbmdosFsFlags)
-		    (opts.flags | CbmdosFsFlags::CFF_RECOVER);
-		proberc = probeCbmdosFsOptions(&opts, d64);
+		d64 = extractZc45(fileset);
+		zipcode = true;
 	    }
-	    if (proberc == 0)
+	    ZcFileSet_destroy(fileset);
+	}
+	if (!zipcode)
+	{
+	    FILE *d64file = qfopen(filename, "rb");
+	    if (d64file)
 	    {
-		CbmdosFsOptionsDialog optDlg(&opts, parentWidget(), false);
-		optDlg.setWindowTitle(QString(tr("Options for "))
-			.append(filename));
-		if (D64_type(d64) == D64Type::D64_STANDARD)
-		{
-		    optDlg.disable42Tracks();
-		    optDlg.disable40Tracks();
-		}
-		else if (D64_type(d64) == D64Type::D64_40TRACK)
-		{
-		    optDlg.disable42Tracks();
-		}
-		if (opts.flags & CFF_42TRACK)
-		{
-		    optDlg.disable35Tracks();
-		    optDlg.disable40Tracks();
-		}
-		else if (opts.flags & CFF_40TRACK)
-		{
-		    optDlg.disable35Tracks();
-		}
-		if ((D64_type(d64) != D64Type::D64_STANDARD)
-			&& !(opts.flags & (CFF_40TRACK|CFF_42TRACK)))
-		{
-		    opts.flags = (CbmdosFsFlags)
-			(opts.flags | CFF_40TRACK);
-		    optDlg.reset();
-		}
-		optDlg.disableZeroFree();
-		optDlg.exec();
-		d->fs = CbmdosFs_fromImage(d64, opts);
-		if (d->fs)
-		{
-		    d->model.setFs(d->fs);
-		    d->fsprop.setFs(d->fs);
-		    d->dirList.setMinimumWidth(
-			    d->dirList.sizeHintForColumn(0)
-			    + 2 * d->dirList.frameWidth());
-		    int minItems = d->model.rowCount();
-		    if (minItems < 10) minItems = 10;
-		    if (minItems > 40) minItems = 40;
-		    d->dirList.setMinimumHeight(
-			    d->dirList.sizeHintForRow(0) * minItems
-			    + 2 * d->dirList.frameWidth());
-		    if (opts.flags & CFF_RECOVER)
-		    {
-			CbmdosFs_rewrite(d->fs);
-			emit modified();
-		    }
-		}
-	    }
-	    if (!d->fs)
-	    {
-		D64_destroy(d64);
+		d64 = readD64(d64file);
+		fclose(d64file);
 	    }
 	}
+    }
+
+    if (d64)
+    {
+	CbmdosFsOptions opts = CFO_DEFAULT;
+	int proberc = probeCbmdosFsOptions(&opts, d64);
+	if (proberc < 0)
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags | CbmdosFsFlags::CFF_RECOVER);
+	    proberc = probeCbmdosFsOptions(&opts, d64);
+	}
+	if (proberc == 0)
+	{
+	    CbmdosFsOptionsDialog optDlg(&opts, parentWidget(), false);
+	    optDlg.setWindowTitle(QString(tr("Options for "))
+		    .append(filename));
+	    if (D64_type(d64) == D64Type::D64_STANDARD)
+	    {
+		optDlg.disable42Tracks();
+		optDlg.disable40Tracks();
+	    }
+	    else if (D64_type(d64) == D64Type::D64_40TRACK)
+	    {
+		optDlg.disable42Tracks();
+	    }
+	    if (opts.flags & CFF_42TRACK)
+	    {
+		optDlg.disable35Tracks();
+		optDlg.disable40Tracks();
+	    }
+	    else if (opts.flags & CFF_40TRACK)
+	    {
+		optDlg.disable35Tracks();
+	    }
+	    if ((D64_type(d64) != D64Type::D64_STANDARD)
+		    && !(opts.flags & (CFF_40TRACK|CFF_42TRACK)))
+	    {
+		opts.flags = (CbmdosFsFlags)
+		    (opts.flags | CFF_40TRACK);
+		optDlg.reset();
+	    }
+	    optDlg.disableZeroFree();
+	    optDlg.exec();
+	    d->fs = CbmdosFs_fromImage(d64, opts);
+	    if (d->fs)
+	    {
+		d->model.setFs(d->fs);
+		d->fsprop.setFs(d->fs);
+		d->dirList.setMinimumWidth(
+			d->dirList.sizeHintForColumn(0)
+			+ 2 * d->dirList.frameWidth());
+		int minItems = d->model.rowCount();
+		if (minItems < 10) minItems = 10;
+		if (minItems > 40) minItems = 40;
+		d->dirList.setMinimumHeight(
+			d->dirList.sizeHintForRow(0) * minItems
+			+ 2 * d->dirList.frameWidth());
+		if (opts.flags & CFF_RECOVER)
+		{
+		    CbmdosFs_rewrite(d->fs);
+		    emit modified();
+		}
+		if (zipcode) emit modified();
+	    }
+	}
+	if (!d->fs)
+	{
+	    D64_destroy(d64);
+	}
+    }
+}
+
+void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
+{
+    CbmdosFs_destroy(d->fs);
+    d->fs = CbmdosFs_fromVfs(vfs, CFO_DEFAULT);
+    if (d->fs)
+    {
+	d->model.setFs(d->fs);
+	d->fsprop.setFs(d->fs);
+	d->dirList.setMinimumWidth(
+		d->dirList.sizeHintForColumn(0)
+		+ 2 * d->dirList.frameWidth());
+	int minItems = d->model.rowCount();
+	if (minItems < 10) minItems = 10;
+	if (minItems > 40) minItems = 40;
+	d->dirList.setMinimumHeight(
+		d->dirList.sizeHintForRow(0) * minItems
+		+ 2 * d->dirList.frameWidth());
+    }
+    else
+    {
+	CbmdosVfs_destroy(vfs);
     }
 }
 
@@ -222,6 +288,52 @@ void V1541ImgWidget::save(const QString& filename)
     {
 	QMessageBox::critical(this, tr("Error opening file"),
 		tr("The selected file couldn't be opened for writing."));
+    }
+}
+
+void V1541ImgWidget::exportZipcode(const QString& filename)
+{
+    if (!hasValidImage()) return;
+    ZcFileSet *fileset = compressZc45(CbmdosFs_image(d->fs));
+    if (fileset)
+    {
+	if (ZcFileSet_save(fileset, qfname(filename)) < 0)
+	{
+	    QMessageBox::critical(this, tr("Error saving zipcode files"),
+		    tr("The compressed files couldn't be written."));
+	}
+	ZcFileSet_destroy(fileset);
+    }
+    else
+    {
+	QMessageBox::critical(this, tr("Error compressing to Zipcode"),
+		tr("compressing the image as Zipcode failed."));
+    }
+}
+
+CbmdosVfs *V1541ImgWidget::exportZipcodeVfs()
+{
+    if (!hasValidImage()) return 0;
+    ZcFileSet *fileset = compressZc45(CbmdosFs_image(d->fs));
+    if (fileset)
+    {
+	CbmdosVfs *vfs = CbmdosVfs_create();
+	if (ZcFileSet_saveVfs(fileset, vfs) < 0)
+	{
+	    QMessageBox::critical(this, tr("Error writing zipcode files"),
+		    tr("The compressed files couldn't be written."));
+	    ZcFileSet_destroy(fileset);
+	    CbmdosVfs_destroy(vfs);
+	    return 0;
+	}
+	ZcFileSet_destroy(fileset);
+	return vfs;
+    }
+    else
+    {
+	QMessageBox::critical(this, tr("Error compressing to Zipcode"),
+		tr("compressing the image as Zipcode failed."));
+	return 0;
     }
 }
 

@@ -31,9 +31,11 @@ AboutBox::priv::priv() :
 	    "\n"
 	    "\n"
 	    ""),
-    aboutText(QString("v1541commander v%1\n"
+    aboutText(QString("%1 v%2\n"
 	    "virtual 1541 disk commander\n\n"
-	    "by Zirias/Excess").arg(QCoreApplication::applicationVersion())),
+	    "by Zirias/Excess")
+	    .arg(QCoreApplication::applicationName())
+	    .arg(QCoreApplication::applicationVersion())),
     okButton(tr("Ok"))
 {
     appLogo.setPixmap(QPixmap(":/gfx/icon_256.png"));

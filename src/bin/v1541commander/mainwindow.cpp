@@ -29,6 +29,9 @@ MainWindow::MainWindow()
     fileMenu->addAction(&cmdr.openAction());
     fileMenu->addAction(&cmdr.saveAction());
     fileMenu->addAction(&cmdr.saveAsAction());
+    QMenu *exportMenu = fileMenu->addMenu(tr("&Export"));
+    exportMenu->addAction(&cmdr.exportZipcodeAction());
+    exportMenu->addAction(&cmdr.exportZipcodeD64Action());
     fileMenu->addAction(&cmdr.closeAction());
     fileMenu->addSeparator();
     fileMenu->addAction(&cmdr.aboutAction());
@@ -209,6 +212,35 @@ void MainWindow::openImage(const QString &imgFile)
     }
 }
 
+void MainWindow::openVfs(CbmdosVfs *vfs)
+{
+    V1541ImgWidget *imgWidget = new V1541ImgWidget(this);
+    imgWidget->openVfs(vfs);
+    if (imgWidget->hasValidImage())
+    {
+	QWidget *current = centralWidget();
+	if (current) current->setParent(0);
+	setCentralWidget(imgWidget);
+	delete current;
+	d->content = Content::Image;
+	d->filename = QString();
+	setWindowTitle(tr("<new disk image>[*]"));
+	connect(imgWidget, &V1541ImgWidget::selectionChanged,
+		this, &MainWindow::contentSelectionChanged);
+	connect(imgWidget, &V1541ImgWidget::modified,
+		this, &MainWindow::contentModified);
+	connect(imgWidget, &V1541ImgWidget::saved,
+		this, &MainWindow::contentSaved);
+	setWindowModified(true);
+	emit contentChanged();
+	adjustSize();
+    }
+    else
+    {
+	delete imgWidget;
+    }
+}
+
 void MainWindow::save(const QString &imgFile)
 {
     switch (d->content)
@@ -227,6 +259,37 @@ void MainWindow::save(const QString &imgFile)
 
 	default:
 	    break;
+    }
+}
+
+void MainWindow::exportZipcode(const QString &zcFile)
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    imgWidget->exportZipcode(zcFile);
+	    break;
+
+	default:
+	    break;
+    }
+}
+
+CbmdosVfs *MainWindow::exportZipcodeVfs()
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    return imgWidget->exportZipcodeVfs();
+
+	default:
+	    return 0;
     }
 }
 

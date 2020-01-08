@@ -30,6 +30,8 @@ class V1541Commander::priv
         QAction openAction;
 	QAction saveAction;
 	QAction saveAsAction;
+	QAction exportZipcodeAction;
+	QAction exportZipcodeD64Action;
         QAction closeAction;
 	QAction aboutAction;
         QAction exitAction;
@@ -60,6 +62,8 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     openAction(tr("&Open")),
     saveAction(tr("&Save")),
     saveAsAction(tr("Save &As")),
+    exportZipcodeAction(tr("&Zipcode")),
+    exportZipcodeD64Action(tr("Zipcode (&D64)")),
     closeAction(tr("&Close")),
     aboutAction(tr("&About")),
     exitAction(tr("E&xit")),
@@ -87,6 +91,12 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     saveAsAction.setShortcuts(QKeySequence::SaveAs);
 #endif
     saveAsAction.setStatusTip(tr("Save disk image as new file"));
+    exportZipcodeAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Z));
+    exportZipcodeAction.setStatusTip(tr("Export as a set of Zipcode files"));
+    exportZipcodeD64Action.setShortcut(
+	    QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_Z));
+    exportZipcodeD64Action.setStatusTip(
+	    tr("Export as Zipcode files on a new D64 image"));
     closeAction.setShortcuts(QKeySequence::Close);
     closeAction.setStatusTip(tr("Close current file"));
     exitAction.setShortcuts(QKeySequence::Quit);
@@ -184,6 +194,8 @@ void V1541Commander::priv::updateActions(MainWindow *w)
     saveAction.setEnabled(w->hasValidContent() &&
 	    (w->isWindowModified() || w->filename().isEmpty()));
     saveAsAction.setEnabled(w->hasValidContent());
+    exportZipcodeAction.setEnabled(w->hasValidContent());
+    exportZipcodeD64Action.setEnabled(w->hasValidContent());
     fsOptionsAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && w->hasValidContent());
     rewriteImageAction.setEnabled(w->content() == MainWindow::Content::Image
@@ -215,6 +227,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::save);
     connect(&d->saveAsAction, &QAction::triggered,
 	    this, &V1541Commander::saveAs);
+    connect(&d->exportZipcodeAction, &QAction::triggered,
+	    this, &V1541Commander::exportZipcode);
+    connect(&d->exportZipcodeD64Action, &QAction::triggered,
+	    this, &V1541Commander::exportZipcodeD64);
     connect(&d->closeAction, &QAction::triggered,
 	    this, &V1541Commander::close);
     connect(&d->aboutAction, &QAction::triggered,
@@ -301,7 +317,8 @@ void V1541Commander::open()
     if (!w) return;
 
     QString imgFile = QFileDialog::getOpenFileName(w, tr("Open disk image"),
-	    QString(), tr("1541 disk images (*.d64);;all files (*)"));
+	    QString(), tr("1541 disk images (*.d64);;"
+		"Zipcode files (*!*.prg);;all files (*)"));
     if (!imgFile.isEmpty())
     {
 	open(imgFile);
@@ -339,6 +356,33 @@ void V1541Commander::saveAs()
     if (!imgFile.isEmpty())
     {
 	w->save(imgFile);
+    }
+}
+
+void V1541Commander::exportZipcode()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    QString zcFile = QFileDialog::getSaveFileName(w, tr("Export as ..."),
+	    QString(), QString(QT_TR_NOOP(
+		    "Zipcode files (*.prg);;all files (*)")));
+
+    if (!zcFile.isEmpty())
+    {
+	w->exportZipcode(zcFile);
+    }
+}
+
+void V1541Commander::exportZipcodeD64()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+    CbmdosVfs *vfs = w->exportZipcodeVfs();
+    if (vfs)
+    {
+	w = d->addWindow();
+	w->openVfs(vfs);
     }
 }
 
@@ -484,6 +528,16 @@ QAction &V1541Commander::saveAction()
 QAction &V1541Commander::saveAsAction()
 {
     return d->saveAsAction;
+}
+
+QAction &V1541Commander::exportZipcodeAction()
+{
+    return d->exportZipcodeAction;
+}
+
+QAction &V1541Commander::exportZipcodeD64Action()
+{
+    return d->exportZipcodeD64Action;
 }
 
 QAction &V1541Commander::closeAction()

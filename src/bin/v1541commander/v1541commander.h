@@ -22,6 +22,8 @@ class V1541Commander: public QApplication
         void newImage();
         void open();
 	void save();
+	void exportZipcode();
+	void exportZipcodeD64();
         void close();
 	void about();
         void exit();
@@ -46,6 +48,8 @@ class V1541Commander: public QApplication
         QAction &openAction();
 	QAction &saveAction();
 	QAction &saveAsAction();
+	QAction &exportZipcodeAction();
+	QAction &exportZipcodeD64Action();
         QAction &closeAction();
 	QAction &aboutAction();
         QAction &exitAction();

@@ -8,8 +8,10 @@
 #ifdef _WIN32
 #define qfopen(n,m) _wfopen(reinterpret_cast<const wchar_t *>((n).utf16()), \
         reinterpret_cast<const wchar_t *>(QString((m)).utf16()))
+#define qfname(n) ((n).toUtf8().data())
 #else
 #define qfopen(n,m) fopen((n).toLocal8Bit().data(), m)
+#define qfname(n) ((n).toLocal8Bit().data())
 #endif
 
 #endif
