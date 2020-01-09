@@ -19,6 +19,7 @@ class CbmdosFileWidget: public QGroupBox
 	void typeChanged(int typeIndex);
 	void lockedChanged(int lockedState);
 	void closedChanged(int closedState);
+	void recordLengthChanged(int value);
 	void forcedBlocksActiveChanged(int activeState);
 	void forcedBlocksValueChanged(int value);
 	void importFile();

@@ -32,6 +32,9 @@ class CbmdosFileWidget::priv
 	QComboBox type;
 	QCheckBox locked;
 	QCheckBox closed;
+	QHBoxLayout recordLengthLayout;
+	QLabel recordLengthLabel;
+	QSpinBox recordLength;
 	QHBoxLayout forcedBlocksLayout;
 	QCheckBox forcedBlocksActive;
 	QSpinBox forcedBlocks;
@@ -53,6 +56,9 @@ CbmdosFileWidget::priv::priv() :
     type(),
     locked(tr("locked")),
     closed(tr("closed")),
+    recordLengthLayout(),
+    recordLengthLabel(tr("record length (for REL files): ")),
+    recordLength(),
     forcedBlocksLayout(),
     forcedBlocksActive(tr("forced block size: ")),
     forcedBlocks(),
@@ -75,10 +81,16 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
     d->type.addItem("SEQ", CbmdosFileType::CFT_SEQ);
     d->type.addItem("PRG", CbmdosFileType::CFT_PRG);
     d->type.addItem("USR", CbmdosFileType::CFT_USR);
+    d->type.addItem("REL", CbmdosFileType::CFT_REL);
     d->optionsLayout.addWidget(&d->typeLabel);
     d->optionsLayout.addWidget(&d->type);
     d->optionsLayout.addWidget(&d->locked);
     d->optionsLayout.addWidget(&d->closed);
+    d->recordLength.setMinimum(1);
+    d->recordLength.setMaximum(254);
+    d->recordLength.setValue(254);
+    d->recordLengthLayout.addWidget(&d->recordLengthLabel);
+    d->recordLengthLayout.addWidget(&d->recordLength);
     d->forcedBlocks.setMinimum(0);
     d->forcedBlocks.setMaximum(0xfffe);
     d->forcedBlocks.setValue(0);
@@ -91,6 +103,7 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
     d->dataLayout.addWidget(&d->exportButton);
     d->layout.addLayout(&d->nameLayout);
     d->layout.addLayout(&d->optionsLayout);
+    d->layout.addLayout(&d->recordLengthLayout);
     d->layout.addLayout(&d->forcedBlocksLayout);
     d->layout.addLayout(&d->dataLayout);
     setLayout(&d->layout);
@@ -103,6 +116,8 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 	    this, &CbmdosFileWidget::lockedChanged);
     connect(&d->closed, &QCheckBox::stateChanged,
 	    this, &CbmdosFileWidget::closedChanged);
+    connect(&d->recordLength, SIGNAL(valueChanged(int)),
+	    this, SLOT(recordLengthChanged(int)));
     connect(&d->forcedBlocksActive, &QCheckBox::stateChanged,
 	    this, &CbmdosFileWidget::forcedBlocksActiveChanged);
     connect(&d->forcedBlocks, SIGNAL(valueChanged(int)),
@@ -191,6 +206,14 @@ void CbmdosFileWidget::closedChanged(int closedState)
     if (d->file)
     {
 	CbmdosFile_setClosed(d->file, !!closedState);
+    }
+}
+
+void CbmdosFileWidget::recordLengthChanged(int value)
+{
+    if (d->file)
+    {
+	CbmdosFile_setRecordLength(d->file, value);
     }
 }
 
@@ -315,6 +338,7 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	d->type.setCurrentIndex(d->type.findData(type));
 	d->locked.setChecked(CbmdosFile_locked(file));
 	d->closed.setChecked(CbmdosFile_closed(file));
+	d->recordLength.setValue(CbmdosFile_recordLength(file));
 	uint16_t forcedBlocks = CbmdosFile_forcedBlocks(file);
 	if (forcedBlocks == 0xffff)
 	{
