@@ -7,16 +7,18 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFileDialog>
+#ifdef _WIN32
+#include <QFileInfo>
+#endif
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QRegExp>
 #include <QSpinBox>
 #include <QVBoxLayout>
 
 #include <1541img/cbmdosfile.h>
 #include <1541img/filedata.h>
-#include <1541img/hostfilereader.h>
-#include <1541img/hostfilewriter.h>
 
 class CbmdosFileWidget::priv
 {
@@ -249,11 +251,37 @@ static QString getFilterForType(CbmdosFileType type)
     switch (type)
     {
 	case CbmdosFileType::CFT_PRG:
-	    return QString(QT_TR_NOOP("PRG files (*.prg);;all files (*)"));
+#ifdef _WIN32
+	    return QString(QT_TR_NOOP("PRG files (*.prg);;"
+			"P00 files (*.p00);;all files (*)"));
+#else
+	    return QString(QT_TR_NOOP("PRG files (*.prg);;"
+			"P00 files (*.p[0-9][0-9]);;all files (*)"));
+#endif
 	case CbmdosFileType::CFT_SEQ:
-	    return QString(QT_TR_NOOP("SEQ files (*.seq);;all files (*)"));
+#ifdef _WIN32
+	    return QString(QT_TR_NOOP("SEQ files (*.seq);;"
+			"S00 files (*.s00);;all files (*)"));
+#else
+	    return QString(QT_TR_NOOP("SEQ files (*.seq);;"
+			"S00 files (*.s[0-9][0-9]);;all files (*)"));
+#endif
 	case CbmdosFileType::CFT_USR:
-	    return QString(QT_TR_NOOP("USR files (*.usr);;all files (*)"));
+#ifdef _WIN32
+	    return QString(QT_TR_NOOP("USR files (*.usr);;"
+			"U00 files (*.u00);;all files (*)"));
+#else
+	    return QString(QT_TR_NOOP("USR files (*.usr);;"
+			"U00 files (*.u[0-9][0-9]);;all files (*)"));
+#endif
+	case CbmdosFileType::CFT_REL:
+#ifdef _WIN32
+	    return QString(
+		    QT_TR_NOOP("R00 files (*.r00);;all files (*)"));
+#else
+	    return QString(
+		    QT_TR_NOOP("R00 files (*.r[0-9][0-9]);;all files (*)"));
+#endif
 	default:
 	    return QString(QT_TR_NOOP("all files (*)"));
     }
@@ -269,20 +297,24 @@ void CbmdosFileWidget::importFile()
 	FILE *f = qfopen(hostFile, "rb");
 	if (f)
 	{
-	    FileData *data = readHostFile(f);
-	    fclose(f);
-	    if (data)
+	    if (CbmdosFile_import(d->file, f) >= 0)
 	    {
-		CbmdosFile_setData(d->file, data);
 		d->dataSizeLabel.setText(QString("%1 KiB")
-			.arg(FileData_size(data)/1024.0, 5, 'f', 3));
+			.arg(FileData_size(
+				CbmdosFile_rdata(d->file))/1024.0, 5, 'f', 3));
 		d->exportButton.setEnabled(true);
+		uint8_t nameLength;
+		const char *name = CbmdosFile_name(d->file, &nameLength);
+		PetsciiStr str(name, nameLength);
+		d->name.setText(str.toString());
+		d->recordLength.setValue(CbmdosFile_recordLength(d->file));
 	    }
 	    else
 	    {
 		QMessageBox::critical(this, tr("Error reading file"),
 			tr("The selected file couldn't be read."));
 	    }
+	    fclose(f);
 	}
 	else
 	{
@@ -301,15 +333,41 @@ void CbmdosFileWidget::exportFile()
 	    QString(), getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
+#ifdef _WIN32
+	QFileInfo fileInfo(hostFile);
+	if (fileInfo.completeSuffix() != fileInfo.suffix())
+	{
+	    QFileInfo corrected(fileInfo.dir(), fileInfo.completeBaseName());
+	    hostFile = corrected.filePath();
+	}
+#endif
+	QRegExp pc64pat("\\.[PpSsUuRr]\\d{2}");
+	bool ispc64 = pc64pat.indexIn(hostFile, -4) > 0;
+	if (!ispc64 && CbmdosFile_type(d->file) == CbmdosFileType::CFT_REL
+		&& QMessageBox::question(this,
+		    tr("Export REL file as raw data?"),
+		    tr("You are about to export a REL file as raw data. To "
+			"export it as PC64 R00 file instead, specify a "
+			"matching file extension (like .R00, .R01, .R02, "
+			"etc.)\n"
+			"Exporting as raw data will lose the record length. "
+			"Do you still want to export it as raw data?"),
+		    QMessageBox::Yes|QMessageBox::No) != QMessageBox::Yes)
+	{
+	    return;
+	}
 	FILE *f = qfopen(hostFile, "wb");
 	if (f)
 	{
-	    if (writeHostFile(data, f) < 0)
+	    int rc = 0;
+	    if (ispc64) rc = CbmdosFile_exportPC64(d->file, f);
+	    else rc = CbmdosFile_exportRaw(d->file, f);
+	    fclose(f);
+	    if (rc < 0)
 	    {
 		QMessageBox::critical(this, tr("Error writing file"),
 			tr("The selected file couldn't be written."));
 	    }
-	    fclose(f);
 	}
 	else
 	{
