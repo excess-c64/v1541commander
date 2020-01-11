@@ -36,6 +36,8 @@ class V1541ImgWidget::priv
 	QListView dirList;
 	CbmdosFsWidget fsprop;
 	CbmdosFileWidget file;
+
+	bool canSaveImage(V1541ImgWidget *w);
 };
 
 V1541ImgWidget::priv::priv() :
@@ -45,6 +47,61 @@ V1541ImgWidget::priv::priv() :
     fsprop(),
     file()
 {}
+
+bool V1541ImgWidget::priv::canSaveImage(V1541ImgWidget *w)
+{
+    if (!fs) return false;
+    CbmdosFsStatus status = CbmdosFs_status(fs);
+    if (status & CbmdosFsStatus::CFS_DISKFULL)
+    {
+	QMessageBox::critical(w->window(), tr("Unable to save"),
+		tr("<p>The virtual disk is full. This means not all files you "
+		    "added could be entirely written. Therefore you can't "
+		    "save the disk in this state.</p>"
+		    "<p>You can either remove some files or try to change the "
+		    "filesystem options (e.g. allow to store files on the "
+		    "directory track or switch to a larger number of tracks) "
+		    "and rewrite the disk, then try again.</p>"));
+	return false;
+    }
+    if (status & CbmdosFsStatus::CFS_DIRFULL)
+    {
+	QMessageBox::critical(w->window(), tr("Unable to save"),
+		tr("<p>The directory on the virtual disk is full. This means "
+		    "not all files you added could be written to the "
+		    "directory. Therefore you can't save the disk in this "
+		    "state.</p>"
+		    "<p>You can either remove some files or you can set the "
+		    "filesystem option to allow long directories, rewrite the "
+		    "disk, then try again.</p>"));
+	return false;
+    }
+    if (status & CbmdosFsStatus::CFS_BROKEN)
+    {
+	QMessageBox::critical(w->window(), tr("Unable to save"),
+		tr("<p>The filesystem on the virtual disk is broken for "
+		    "unknown reasons. You can try to change some filesystem "
+		    "options and rewrite the disk."));
+	return false;
+    }
+    if (status & CbmdosFsStatus::CFS_INVALIDBAM)
+    {
+	if (QMessageBox::question(w->window(), tr("Save with invalid BAM?"),
+		    tr("<p>The BAM on the virtual disk is currently invalid. "
+			"You can fix this by rewriting the disk first.</p>"
+			"<p>Do you want to save the disk in the current "
+			"state?</p>"),
+		    QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+	{
+	    return true;
+	}
+	else
+	{
+	    return false;
+	}
+    }
+    return true;
+}
 
 V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 {
@@ -287,6 +344,7 @@ void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
 void V1541ImgWidget::save(const QString& filename)
 {
     if (!hasValidImage()) return;
+    if (!d->canSaveImage(this)) return;
     FILE *d64file = qfopen(filename, "wb");
     if (d64file)
     {
@@ -311,6 +369,7 @@ void V1541ImgWidget::save(const QString& filename)
 void V1541ImgWidget::exportZipcode(const QString& filename)
 {
     if (!hasValidImage()) return;
+    if (!d->canSaveImage(this)) return;
     ZcFileSet *fileset = compressZc45(CbmdosFs_image(d->fs));
     if (fileset)
     {
@@ -331,6 +390,7 @@ void V1541ImgWidget::exportZipcode(const QString& filename)
 CbmdosVfs *V1541ImgWidget::exportZipcodeVfs()
 {
     if (!hasValidImage()) return 0;
+    if (!d->canSaveImage(this)) return 0;
     ZcFileSet *fileset = compressZc45(CbmdosFs_image(d->fs));
     if (fileset)
     {

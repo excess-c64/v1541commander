@@ -332,6 +332,7 @@ void MainWindow::closeDocument()
 	    {
 		save(QString());
 	    }
+	    if (isWindowModified()) return;
 	}
     }
     QWidget *current = centralWidget();
