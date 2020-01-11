@@ -32,6 +32,7 @@ MainWindow::MainWindow()
     QMenu *exportMenu = fileMenu->addMenu(tr("&Export"));
     exportMenu->addAction(&cmdr.exportZipcodeAction());
     exportMenu->addAction(&cmdr.exportZipcodeD64Action());
+    exportMenu->addAction(&cmdr.exportLynxAction());
     fileMenu->addAction(&cmdr.closeAction());
     fileMenu->addSeparator();
     fileMenu->addAction(&cmdr.aboutAction());
@@ -290,6 +291,22 @@ CbmdosVfs *MainWindow::exportZipcodeVfs()
 
 	default:
 	    return 0;
+    }
+}
+
+void MainWindow::exportLynx(const QString &lynxFile)
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    imgWidget->exportLynx(lynxFile);
+	    break;
+
+	default:
+	    break;
     }
 }
 

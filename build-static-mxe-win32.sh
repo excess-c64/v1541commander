@@ -6,7 +6,7 @@ MAKE=gmake
 
 PATH=${MXE}/usr/bin:${PATH} ${MAKE} \
 	CROSS_COMPILE=${TARGET}- \
-	DEFINES=-DQT_STATICPLUGIN \
+	DEFINES="-DQT_STATICPLUGIN -DSTATIC_1541IMG" \
 	CC=gcc CXX=g++ \
 	PKGCONFIG=${TARGET}-pkg-config \
 	RCC=${MXE}/usr/${TARGET}/qt5/bin/rcc \

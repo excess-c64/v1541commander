@@ -32,6 +32,7 @@ class V1541Commander::priv
 	QAction saveAsAction;
 	QAction exportZipcodeAction;
 	QAction exportZipcodeD64Action;
+	QAction exportLynxAction;
         QAction closeAction;
 	QAction aboutAction;
         QAction exitAction;
@@ -64,6 +65,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     saveAsAction(tr("Save &As")),
     exportZipcodeAction(tr("&Zipcode")),
     exportZipcodeD64Action(tr("Zipcode (&D64)")),
+    exportLynxAction(tr("&LyNX")),
     closeAction(tr("&Close")),
     aboutAction(tr("&About")),
     exitAction(tr("E&xit")),
@@ -97,6 +99,8 @@ V1541Commander::priv::priv(V1541Commander *commander) :
 	    QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_Z));
     exportZipcodeD64Action.setStatusTip(
 	    tr("Export as Zipcode files on a new D64 image"));
+    exportLynxAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Y));
+    exportLynxAction.setStatusTip(tr("Export as a LyNX file"));
     closeAction.setShortcuts(QKeySequence::Close);
     closeAction.setStatusTip(tr("Close current file"));
     exitAction.setShortcuts(QKeySequence::Quit);
@@ -196,6 +200,7 @@ void V1541Commander::priv::updateActions(MainWindow *w)
     saveAsAction.setEnabled(w->hasValidContent());
     exportZipcodeAction.setEnabled(w->hasValidContent());
     exportZipcodeD64Action.setEnabled(w->hasValidContent());
+    exportLynxAction.setEnabled(w->hasValidContent());
     fsOptionsAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && w->hasValidContent());
     rewriteImageAction.setEnabled(w->content() == MainWindow::Content::Image
@@ -231,6 +236,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
 	    this, &V1541Commander::exportZipcode);
     connect(&d->exportZipcodeD64Action, &QAction::triggered,
 	    this, &V1541Commander::exportZipcodeD64);
+    connect(&d->exportLynxAction, &QAction::triggered,
+	    this, &V1541Commander::exportLynx);
     connect(&d->closeAction, &QAction::triggered,
 	    this, &V1541Commander::close);
     connect(&d->aboutAction, &QAction::triggered,
@@ -318,7 +325,7 @@ void V1541Commander::open()
 
     QString imgFile = QFileDialog::getOpenFileName(w, tr("Open disk image"),
 	    QString(), tr("1541 disk images (*.d64);;"
-		"Zipcode files (*!*.prg);;all files (*)"));
+		"Zipcode files (*!*.prg);;LyNX files (*.lnx);;all files (*)"));
     if (!imgFile.isEmpty())
     {
 	open(imgFile);
@@ -383,6 +390,21 @@ void V1541Commander::exportZipcodeD64()
     {
 	w = d->addWindow();
 	w->openVfs(vfs);
+    }
+}
+
+void V1541Commander::exportLynx()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    QString lynxFile = QFileDialog::getSaveFileName(w, tr("Export as ..."),
+	    QString(), QString(QT_TR_NOOP(
+		    "LyNX files (*.lnx);;all files (*)")));
+
+    if (!lynxFile.isEmpty())
+    {
+	w->exportLynx(lynxFile);
     }
 }
 
@@ -538,6 +560,11 @@ QAction &V1541Commander::exportZipcodeAction()
 QAction &V1541Commander::exportZipcodeD64Action()
 {
     return d->exportZipcodeD64Action;
+}
+
+QAction &V1541Commander::exportLynxAction()
+{
+    return d->exportLynxAction;
 }
 
 QAction &V1541Commander::closeAction()

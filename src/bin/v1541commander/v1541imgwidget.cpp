@@ -19,6 +19,10 @@
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
 #include <1541img/cbmdosvfsreader.h>
+#include <1541img/filedata.h>
+#include <1541img/hostfilereader.h>
+#include <1541img/hostfilewriter.h>
+#include <1541img/lynx.h>
 #include <1541img/zc45compressor.h>
 #include <1541img/zc45extractor.h>
 #include <1541img/zcfileset.h>
@@ -130,7 +134,7 @@ void V1541ImgWidget::open(const QString& filename)
     d->fs = 0;
 
     D64 *d64 = 0;
-    bool zipcode = false;
+    bool extracted = false;
 
     QFileInfo fileInfo(filename);
     if (fileInfo.baseName().indexOf('!') == 1 &&
@@ -142,33 +146,46 @@ void V1541ImgWidget::open(const QString& filename)
 	    d64 = extractZc45(fileset);
 	    ZcFileSet_destroy(fileset);
 	}
-	zipcode = true;
+	extracted = true;
     }
     else
     {
-	ZcFileSet *fileset = ZcFileSet_fromFile(qfname(filename));
-	if (fileset)
+	FILE *file = qfopen(filename, "rb");
+	if (file)
 	{
-	    if (QMessageBox::question(window(),
-			tr("Extract Zipcode?"),
-			tr("This image seems to contain a set of Zipcode "
-			    "files. Do you want to extract them instead?"),
-			QMessageBox::Yes|QMessageBox::No)
-		    == QMessageBox::Yes)
+	    FileData *data = readHostFile(file);
+	    fclose(file);
+	    if (isLynx(data))
 	    {
-		d64 = extractZc45(fileset);
-		zipcode = true;
+		CbmdosVfs *vfs = CbmdosVfs_create();
+		if (extractLynx(vfs, data) >= 0)
+		{
+		    openVfs(vfs);
+		    emit modified();
+		}
+		FileData_destroy(data);
+		return;
 	    }
-	    ZcFileSet_destroy(fileset);
-	}
-	if (!zipcode)
-	{
-	    FILE *d64file = qfopen(filename, "rb");
-	    if (d64file)
+	    ZcFileSet *fileset = ZcFileSet_fromFileData(data);
+	    if (fileset)
 	    {
-		d64 = readD64(d64file);
-		fclose(d64file);
+		if (QMessageBox::question(window(),
+			    tr("Extract Zipcode?"),
+			    tr("This image seems to contain a set of Zipcode "
+				"files. Do you want to extract them instead?"),
+			    QMessageBox::Yes|QMessageBox::No)
+			== QMessageBox::Yes)
+		{
+		    d64 = extractZc45(fileset);
+		    extracted = true;
+		}
+		ZcFileSet_destroy(fileset);
 	    }
+	    if (!extracted)
+	    {
+		d64 = readD64FromFileData(data);
+	    }
+	    FileData_destroy(data);
 	}
     }
 
@@ -233,7 +250,7 @@ void V1541ImgWidget::open(const QString& filename)
 		    CbmdosFs_rewrite(d->fs);
 		    emit modified();
 		}
-		if (zipcode) emit modified();
+		if (extracted) emit modified();
 	    }
 	}
 	if (!d->fs)
@@ -334,6 +351,36 @@ CbmdosVfs *V1541ImgWidget::exportZipcodeVfs()
 	QMessageBox::critical(this, tr("Error compressing to Zipcode"),
 		tr("compressing the image as Zipcode failed."));
 	return 0;
+    }
+}
+
+void V1541ImgWidget::exportLynx(const QString& filename)
+{
+    if (!hasValidImage()) return;
+    FileData *lynx = archiveLynx(CbmdosFs_vfs(d->fs));
+    if (lynx)
+    {
+	FILE *lynxFile = qfopen(filename, "wb");
+	if (lynxFile)
+	{
+	    if (writeHostFile(lynx, lynxFile) < 0)
+	    {
+		QMessageBox::critical(this, tr("Error saving LyNX file"),
+			tr("The LyNX archive couldn't be written."));
+	    }
+	    fclose(lynxFile);
+	}
+	else
+	{
+	    QMessageBox::critical(this, tr("Error opening LyNX file"),
+		    tr("Couldn't open the selected file for writing."));
+	}
+	FileData_destroy(lynx);
+    }
+    else
+    {
+	QMessageBox::critical(this, tr("Error archiving as LyNX"),
+		tr("Archiving as LyNX failed."));
     }
 }
 

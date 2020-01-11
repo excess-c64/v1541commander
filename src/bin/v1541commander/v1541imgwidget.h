@@ -25,6 +25,7 @@ class V1541ImgWidget: public QWidget
 	void openVfs(CbmdosVfs *vfs);
 	void save(const QString& filename);
 	void exportZipcode(const QString &filename);
+	void exportLynx(const QString &filename);
 	void fsOptions();
 	void rewriteImage();
 	void newFile();

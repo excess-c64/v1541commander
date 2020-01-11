@@ -24,6 +24,7 @@ class V1541Commander: public QApplication
 	void save();
 	void exportZipcode();
 	void exportZipcodeD64();
+	void exportLynx();
         void close();
 	void about();
         void exit();
@@ -50,6 +51,7 @@ class V1541Commander: public QApplication
 	QAction &saveAsAction();
 	QAction &exportZipcodeAction();
 	QAction &exportZipcodeD64Action();
+	QAction &exportLynxAction();
         QAction &closeAction();
 	QAction &aboutAction();
         QAction &exitAction();

@@ -52,6 +52,7 @@ class MainWindow: public QMainWindow
 	void openVfs(CbmdosVfs *vfs);
 	void save(const QString &imgFile = QString());
 	void exportZipcode(const QString &zcFile);
+	void exportLynx(const QString &lynxFile);
         void closeDocument();
 	void fsOptions();
 	void rewriteImage();
