@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 #endif
     QCoreApplication::setOrganizationName("Excess");
     QCoreApplication::setApplicationName("V1541Commander");
-    QCoreApplication::setApplicationVersion("0.1");
+    QCoreApplication::setApplicationVersion("1.0");
 
     V1541Commander commander(argc, argv);
 
@@ -38,9 +38,10 @@ int main(int argc, char **argv)
     parser.setApplicationDescription("virtual 1541 disk image commander");
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument("d64file",
-	    QCoreApplication::translate("main", "D64 disk image(s) to open."),
-	    "[d64file ...]");
+    parser.addPositionalArgument("file",
+	    QCoreApplication::translate("main", "file(s) to open (D64 disk "
+		"images) or import (ZipCode, LyNX)."),
+	    "[file ...]");
     parser.process(commander);
 
     const QStringList &positionalArgs = parser.positionalArguments();
@@ -89,6 +90,7 @@ int main(int argc, char **argv)
 	    sock.flush();
 	    sock.disconnectFromServer();
 	}
+	return 0;
     }
 }
 

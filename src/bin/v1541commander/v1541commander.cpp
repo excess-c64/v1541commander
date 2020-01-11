@@ -192,7 +192,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
 	QLocalSocket sock;
 	sock.connectToServer(instanceServerName, QIODevice::WriteOnly);
 	if (sock.state() != QLocalSocket::ConnectedState &&
-		!sock.waitForConnected(500))
+		!sock.waitForConnected(2000))
 	{
 	    QLocalServer::removeServer(instanceServerName);
 	    listening = instanceServer.listen(instanceServerName);
