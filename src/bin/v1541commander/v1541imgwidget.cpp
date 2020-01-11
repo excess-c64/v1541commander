@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QListView>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QVBoxLayout>
 
 #include <1541img/d64.h>
@@ -132,6 +133,36 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 		    QItemSelectionModel::SelectionFlags)));
     connect(&d->model, &CbmdosFsModel::modified,
 	    this, &V1541ImgWidget::modelModified);
+    QShortcut *f3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
+    connect(f3, SIGNAL(activated()), &d->dirList, SLOT(setFocus()));
+    QShortcut *sup = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_Up), this);
+    connect(sup, &QShortcut::activated, this, [this](){
+	    if (!d->fs) return;
+	    QModelIndexList selected =
+		    d->dirList.selectionModel()->selectedIndexes();
+	    if (selected.count() == 0) return;
+	    QModelIndex current = selected.first();
+	    if (current.row() < 2) return;
+	    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+	    if ((unsigned)current.row() > CbmdosVfs_fileCount(vfs)) return;
+	    CbmdosVfs_move(vfs, current.row()-2, current.row()-1);
+	    });
+    QShortcut *sdn = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_Down), this);
+    connect(sdn, &QShortcut::activated, this, [this](){
+	    if (!d->fs) return;
+	    QModelIndexList selected =
+		    d->dirList.selectionModel()->selectedIndexes();
+	    if (selected.count() == 0) return;
+	    QModelIndex current = selected.first();
+	    if (current.row() < 1) return;
+	    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+	    if ((unsigned)current.row() >= CbmdosVfs_fileCount(vfs)) return;
+	    CbmdosVfs_move(vfs, current.row(), current.row()-1);
+	    });
+    d->dirList.setToolTip(tr("The directory listing\n"
+		"use F3 to activate\n"
+		"change selection with cursor up/down\n"
+		"move selected file with Shift + cursor up/down"));
 }
 
 V1541ImgWidget::~V1541ImgWidget()

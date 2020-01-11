@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QShortcut>
 #include <QSpinBox>
 #include <QVBoxLayout>
 
@@ -71,6 +72,30 @@ CbmdosFsWidget::CbmdosFsWidget(QWidget *parent)
 	    this, SLOT(dosVerChanged(int)));
     connect(&d->dosVerReset, &QPushButton::clicked,
 	    this, &CbmdosFsWidget::dosVerReset);
+
+    QShortcut *sf2 = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F2), this);
+    connect(sf2, &QShortcut::activated, this, [this](){
+	    d->name.selectAll();
+	    d->name.setFocus();
+	    });
+    d->name.setToolTip(tr("The name of the disk (Shift+F2)"));
+    QShortcut *sf3 = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F3), this);
+    connect(sf3, &QShortcut::activated, this, [this](){
+	    d->id.selectAll();
+	    d->id.setFocus();
+	    });
+    d->id.setToolTip(tr("The ID of the disk (Shift+F3)"));
+    QShortcut *f4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
+    connect(f4, &QShortcut::activated, this, [this](){
+	    d->dosVer.selectAll();
+	    d->dosVer.setFocus();
+	    });
+    d->dosVer.setToolTip(tr("DOS version, non-default value is \"soft write "
+		"protection\" (F4)"));
+    QShortcut *sf4 = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F4), this);
+    connect(sf4, &QShortcut::activated, &d->dosVerReset, &QPushButton::click);
+    d->dosVerReset.setToolTip(tr("Reset DOS version to default value "
+		"(Shift+F4)"));
 }
 
 CbmdosFsWidget::~CbmdosFsWidget()
