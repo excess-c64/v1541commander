@@ -31,9 +31,20 @@ AboutBox::priv::priv() :
 	    "\n"
 	    "\n"
 	    ""),
-    aboutText(QString("%1 v%2\n"
-	    "virtual 1541 disk commander\n\n"
-	    "by Zirias/Excess")
+    aboutText(QString("<p>%1 v%2<br />"
+	    "virtual 1541 disk commander<br />"
+	    "by Zirias/Excess</p>"
+	    "<p>This is free software provided under BSD 2clause license, "
+	    "with no warranties whatsoever, see LICENSE.txt included with the "
+	    "package.</p>"
+	    "<p>About the C64 font used, see LICENSE-font.txt, also "
+	    "included with the package.</p>"
+	    "<p>The UI is driven by Qt, using LGPL licensing.</p>"
+	    "<p>If you received a statically linked package, see "
+	    "<a href=\"https://github.com/excess-c64/v1541commander\">"
+	    "https://github.com/excess-c64/v1541commander</a> for "
+	    "instructions to build your own executable, possibly linking "
+	    "different library versions.</p>")
 	    .arg(QCoreApplication::applicationName())
 	    .arg(QCoreApplication::applicationVersion())),
     okButton(tr("Ok"))
@@ -47,6 +58,7 @@ AboutBox::AboutBox(const QFont &c64font) :
 {
     d = new priv();
     d->excessLogo.setFont(c64font);
+    d->aboutText.setWordWrap(true);
     d->textLayout.addWidget(&d->excessLogo);
     d->textLayout.addWidget(&d->aboutText);
     d->contentLayout.addWidget(&d->appLogo);
