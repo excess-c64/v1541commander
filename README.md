@@ -26,6 +26,17 @@ For downloads of the latest binaries for Windows or Linux, search
 * raw GCR images (.g64)
 * GEOS files
 * any trackloading mechanisms used in many games and demos
+* C128 boot sectors
+* D64 error info
+
+### Warnings
+
+If you use this tool on a disk that has any of the unsupported features, you
+might lose data. If you aren't sure, better work on a copy of your disk image
+file.
+
+Especially, error information appended to a D64 is silently ignored and won't
+be included when you save the image.
 
 ## Commandline
 
