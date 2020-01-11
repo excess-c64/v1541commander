@@ -1,16 +1,16 @@
 #include "v1541commander.h"
 
 #include <QCommandLineParser>
+#include <QDataStream>
 #include <QFileInfo>
+#include <QLocalSocket>
 
 #ifdef QT_STATICPLUGIN
 #include <QtPlugin>
 #endif
 
 #ifdef _WIN32
-#ifdef DEBUG
 #include <windows.h>
-#endif
 #endif
 
 int main(int argc, char **argv)
@@ -43,16 +43,52 @@ int main(int argc, char **argv)
 	    "[d64file ...]");
     parser.process(commander);
 
-    commander.show();
-
     const QStringList &positionalArgs = parser.positionalArguments();
-    for (QStringList::const_iterator i = positionalArgs.constBegin();
-	    i != positionalArgs.constEnd(); ++i)
-    {
-	const QString &path = QFileInfo(*i).canonicalFilePath();
-	if (!path.isEmpty()) commander.open(path);
-    }
 
-    return commander.exec();
+    if (commander.isPrimaryInstance())
+    {
+	commander.show();
+
+	for (QStringList::const_iterator i = positionalArgs.constBegin();
+		i != positionalArgs.constEnd(); ++i)
+	{
+	    const QString &path = QFileInfo(*i).canonicalFilePath();
+	    if (!path.isEmpty()) commander.open(path);
+	}
+
+	return commander.exec();
+    }
+    else
+    {
+	QLocalSocket sock;
+	sock.connectToServer(commander.instanceServerName());
+	if (sock.state() == QLocalSocket::ConnectedState
+		|| sock.waitForConnected(5000))
+	{
+	    QDataStream stream(&sock);
+	    if (sock.waitForReadyRead(5000))
+	    {
+		qint64 mainpid;
+		stream.startTransaction();
+		stream >> mainpid;
+#ifdef _WIN32
+		if (stream.commitTransaction())
+		{
+		    AllowSetForegroundWindow(DWORD(mainpid));
+		}
+#else
+		stream.commitTransaction();
+#endif
+	    }
+	    for (QStringList::const_iterator i = positionalArgs.constBegin();
+		    i != positionalArgs.constEnd(); ++i)
+	    {
+		const QString &path = QFileInfo(*i).canonicalFilePath();
+		if (!path.isEmpty()) stream << path;
+	    }
+	    sock.flush();
+	    sock.disconnectFromServer();
+	}
+    }
 }
 

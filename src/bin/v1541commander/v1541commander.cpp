@@ -6,14 +6,26 @@
 #include "petsciiedit.h"
 
 #include <QAction>
+#include <QCryptographicHash>
 #include <QFileDialog>
 #include <QFont>
 #include <QFontDatabase>
 #ifndef _WIN32
 #include <QIcon>
 #endif
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QMessageBox>
+#include <QSet>
 #include <QSettings>
+#ifdef _WIN32
+#include <windows.h>
+#include <lmcons.h>
+#else
+#include <sys/types.h>
+#include <pwd.h>
+#include <unistd.h>
+#endif
 
 #include <1541img/log.h>
 
@@ -47,6 +59,10 @@ class V1541Commander::priv
         PetsciiWindow *petsciiWindow;
 	AboutBox aboutBox;
 	LogWindow logWindow;
+	QString instanceServerName;
+	QLocalServer instanceServer;
+	bool isPrimaryInstance;
+	QSet<QLocalSocket *> activeClients;
         
         MainWindow *addWindow(bool show = true);
         void removeWindow(MainWindow *w);
@@ -79,7 +95,11 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     lastActiveWindow(0),
     petsciiWindow(0),
     aboutBox(c64font),
-    logWindow()
+    logWindow(),
+    instanceServerName(),
+    instanceServer(),
+    isPrimaryInstance(false),
+    activeClients()
 {
     newAction.setShortcuts(QKeySequence::New);
     newAction.setStatusTip(tr("Create a new disk image"));
@@ -125,6 +145,65 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     logWindow.setWindowIcon(appIcon);
     aboutBox.setWindowIcon(appIcon);
 #endif
+    QCryptographicHash appData(QCryptographicHash::Sha256);
+    appData.addData(QCoreApplication::organizationName().toUtf8());
+    appData.addData(QCoreApplication::applicationName().toUtf8());
+#ifdef _WIN32
+    wchar_t username[UNLEN + 1];
+    DWORD usernameLen = UNLEN + 1;
+    if (GetUserNameW(username, &usernameLen))
+    {
+	appData.addData(QString::fromWCharArray(username).toUtf8());
+    }
+    else
+    {
+	appData.addData(qgetenv("USERNAME"));
+    }
+#else
+    QByteArray username;
+    uid_t uid = geteuid();
+    struct passwd *pw = getpwuid(uid);
+    if (pw)
+    {
+	username = pw->pw_name;
+    }
+    if (username.isEmpty())
+    {
+	username = qgetenv("USER");
+    }
+    appData.addData(username);
+#endif
+    instanceServerName = appData.result().toBase64().replace("/","_");
+    bool listening = instanceServer.listen(instanceServerName);
+#ifdef _WIN32
+    if (listening)
+    {
+	CreateMutexW(0, true,
+		reinterpret_cast<LPCWSTR>(instanceServerName.utf16()));
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+	    instanceServer.close();
+	    listening = false;
+	}
+    }
+#else
+    if (!listening)
+    {
+	QLocalSocket sock;
+	sock.connectToServer(instanceServerName, QIODevice::WriteOnly);
+	if (sock.state() != QLocalSocket::ConnectedState &&
+		!sock.waitForConnected(500))
+	{
+	    QLocalServer::removeServer(instanceServerName);
+	    listening = instanceServer.listen(instanceServerName);
+	}
+	else
+	{
+	    sock.disconnectFromServer();
+	}
+    }
+#endif
+    isPrimaryInstance = listening;
 }
 
 MainWindow *V1541Commander::priv::addWindow(bool show)
@@ -258,6 +337,11 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::deleteFile);
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
+    if (d->isPrimaryInstance)
+    {
+	connect(&d->instanceServer, &QLocalServer::newConnection,
+		this, &V1541Commander::newConnection);
+    }
 }
 
 V1541Commander::~V1541Commander()
@@ -296,12 +380,13 @@ void V1541Commander::newImage()
 void V1541Commander::open(const QString &filename)
 {
     MainWindow *w = d->lastActiveWindow;
-    if (!w) return;
-
-    if (w->content() != MainWindow::Content::None)
+    if (!w || w->content() != MainWindow::Content::None)
     {
 	w = d->addWindow();
     }
+    w->show();
+    w->raise();
+    w->activateWindow();
 
     w->openImage(filename);
     if (w->content() == MainWindow::Content::None)
@@ -521,6 +606,60 @@ void V1541Commander::logLineAppended(const QString &line)
     w->showStatusLine(line);
 }
 
+void V1541Commander::newConnection()
+{
+    QLocalSocket *conn = d->instanceServer.nextPendingConnection();
+    connect(conn, &QIODevice::readyRead, this, &V1541Commander::readyRead);
+    connect(conn, &QLocalSocket::disconnected,
+	    this, &V1541Commander::disconnected);
+    QDataStream sendStream(conn);
+    sendStream << applicationPid();
+    conn->flush();
+}
+
+void V1541Commander::disconnected()
+{
+    QLocalSocket *sock = dynamic_cast<QLocalSocket *>(sender());
+    if (sock)
+    {
+	if (!d->activeClients.contains(sock))
+	{
+	    MainWindow *w = d->lastActiveWindow;
+	    if (!w) w = d->allWindows.first();
+	    if (w)
+	    {
+		w->show();
+		w->raise();
+		w->activateWindow();
+	    }
+	    sock->deleteLater();
+	}
+    }
+}
+
+void V1541Commander::readyRead()
+{
+    QLocalSocket *sock = dynamic_cast<QLocalSocket *>(sender());
+    if (sock)
+    {
+	d->activeClients.insert(sock);
+	QDataStream recvStream(sock);
+	QString filename;
+	for (;;)
+	{
+	    recvStream.startTransaction();
+	    recvStream >> filename;
+	    if (!recvStream.commitTransaction()) break;
+	    open(filename);
+	}
+	d->activeClients.remove(sock);
+	if (sock->state() != QLocalSocket::ConnectedState)
+	{
+	    sock->deleteLater();
+	}
+    }
+}
+
 void V1541Commander::petsciiInput(ushort val)
 {
     PetsciiEdit *pe = dynamic_cast<PetsciiEdit *>(focusWidget());
@@ -610,6 +749,16 @@ QAction &V1541Commander::newFileAction()
 QAction &V1541Commander::deleteFileAction()
 {
     return d->deleteFileAction;
+}
+
+const QString &V1541Commander::instanceServerName() const
+{
+    return d->instanceServerName;
+}
+
+bool V1541Commander::isPrimaryInstance() const
+{
+    return d->isPrimaryInstance;
 }
 
 V1541Commander &V1541Commander::instance()

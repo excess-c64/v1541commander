@@ -40,6 +40,9 @@ class V1541Commander: public QApplication
 	void newFile();
 	void deleteFile();
 	void logLineAppended(const QString &line);
+	void newConnection();
+	void disconnected();
+	void readyRead();
         
     public:
         V1541Commander(int &argc, char **argv);
@@ -61,6 +64,8 @@ class V1541Commander: public QApplication
 	QAction &rewriteImageAction();
 	QAction &newFileAction();
 	QAction &deleteFileAction();
+	const QString &instanceServerName() const;
+	bool isPrimaryInstance() const;
 
         static V1541Commander &instance();
 
