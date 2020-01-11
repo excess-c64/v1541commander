@@ -252,3 +252,36 @@ V1541Commander uses this: When a new "log line" arrives, it is displayed in
 the status bar. To see the full log from *lib1541img*, select *lib1541img log*
 from the *Windows* menu.
 
+## Keyboard control
+
+Most actions can be triggered by a keyboard shortcut, see this table:
+
+|            Shortcut | Function                               |
+| ------------------: | :------------------------------------- |
+|                  F3 | Activate directory view                |
+|           Cursor up | Select previous file in directory view |
+|         Cursor down | Select next file in directory view     |
+|   Shift + Cursor up | Move selected file one position up     |
+| Shift + Cursor down | Move selected file one position down   |
+|                  F2 | Rename selected file                   |
+|          Shift + F2 | Rename disk                            |
+|          Shift + F3 | Change disk ID                         |
+|                  F4 | Change DOS version                     |
+|          Shift + F4 | Reset DOS version to default           |
+|                  F6 | Change forced block size               |
+|          Shift + F6 | Toggle forcing a block size            |
+|                  F7 | Change record length for REL files     |
+|                  F8 | Set type of selected file to DEL       |
+|                  F9 | Set type of selected file to SEQ       |
+|                 F10 | Set type of selected file to PRG       |
+|                 F11 | Set type of selected file to USR       |
+|                 F12 | Set type of selected file to REL       |
+|    Ctrl + Shift + L | Toggle locked flag of selected file    |
+|    Ctrl + Shift + C | Toggle closed flag of selected file    |
+|    Ctrl + Shift + I | Import content to selected file        |
+|    Ctrl + Shift + E | Export content from selected file      |
+
+For the keyboard shortcuts for actions in the menus, see the display of the
+menu items -- they might differ, depending on what operating system you are
+running V1541Commander on.
+
