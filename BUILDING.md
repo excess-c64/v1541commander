@@ -26,7 +26,7 @@ If you want a specific version, e.g. 0.9, do the following
 
 To build and install lib1541img, the following commands should be enough:
 
-    make -j4
+    make -j4 strip
     make install
 
 This will install to `/usr/local`, so for `make install`, you will need root
@@ -52,7 +52,7 @@ If you want a specific version, e.g. 1.0, do the following
 
 To build and install v1541commander, the following commands should be enough:
 
-    make -j4
+    make -j4 strip
     make install
 
 This will install to `/usr/local`, so for `make install`, you will need root
