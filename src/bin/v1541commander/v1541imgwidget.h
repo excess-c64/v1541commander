@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+class QKeyEvent;
 class QModelIndex;
 
 struct CbmdosVfs;
@@ -18,6 +19,9 @@ class V1541ImgWidget: public QWidget
     private slots:
 	void selected(const QModelIndex &current, const QModelIndex &previous);
 	void modelModified();
+
+    protected:
+	virtual void keyPressEvent(QKeyEvent *event);
 
     public slots:
 	void newImage();

@@ -8,6 +8,7 @@
 
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QListView>
 #include <QMessageBox>
 #include <QShortcut>
@@ -195,6 +196,39 @@ void V1541ImgWidget::modelModified()
     emit modified();
 }
 
+void V1541ImgWidget::keyPressEvent(QKeyEvent *event)
+{
+    Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
+    if (mods == Qt::NoModifier)
+    {
+	int key = event->key();
+	if (key == Qt::Key_Up || key == Qt::Key_Down)
+	{
+	    event->accept();
+	    if (!d->fs) return;
+	    QItemSelectionModel *ism = d->dirList.selectionModel();
+	    QModelIndexList selected = ism->selectedIndexes();
+	    if (selected.count() == 0) return;
+	    QModelIndex current = selected.first();
+	    if (key == Qt::Key_Up)
+	    {
+		if (current.row() < 2) return;
+		QModelIndex prev = d->model.index(current.row() - 1, 0);
+		ism->setCurrentIndex(prev,
+			QItemSelectionModel::ClearAndSelect);
+	    }
+	    else
+	    {
+		if (current.row() >= d->model.rowCount() - 2) return;
+		QModelIndex next = d->model.index(current.row() + 1, 0);
+		ism->setCurrentIndex(next,
+			QItemSelectionModel::ClearAndSelect);
+	    }
+	}
+    }
+    return QWidget::keyPressEvent(event);
+}
+
 void V1541ImgWidget::newImage()
 {
     CbmdosFs_destroy(d->fs);
@@ -213,6 +247,7 @@ void V1541ImgWidget::newImage()
 	d->dirList.setMinimumHeight(
 		d->dirList.sizeHintForRow(0) * 10
 		+ 2 * d->dirList.frameWidth());
+	d->dirList.setFocus();
     }
 }
 
@@ -339,6 +374,7 @@ void V1541ImgWidget::open(const QString& filename)
 		    emit modified();
 		}
 		if (extracted) emit modified();
+		d->dirList.setFocus();
 	    }
 	}
 	if (!d->fs)
@@ -365,6 +401,7 @@ void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
 	d->dirList.setMinimumHeight(
 		d->dirList.sizeHintForRow(0) * minItems
 		+ 2 * d->dirList.frameWidth());
+	d->dirList.setFocus();
     }
     else
     {
