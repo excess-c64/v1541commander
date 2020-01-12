@@ -49,7 +49,7 @@ AboutBox::priv::priv() :
 	    .arg(QCoreApplication::applicationVersion())),
     okButton(tr("Ok"))
 {
-    appLogo.setPixmap(QPixmap(":/gfx/icon_256.png"));
+    appLogo.setPixmap(QPixmap(":/icon_256.png"));
 }
 
 AboutBox::AboutBox(const QFont &c64font) :

@@ -1,7 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
 	<file>C64_Pro_Mono-STYLE.ttf</file>
-	<file>gfx/icon_256.png</file>
+	<file alias="icon_256.png">icons/256x256/v1541commander.png</file>
 </qresource>
 </RCC>
 

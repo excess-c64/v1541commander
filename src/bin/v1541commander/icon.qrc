@@ -1,7 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-	<file>gfx/icon_48.png</file>
-	<file>gfx/icon_32.png</file>
-	<file>gfx/icon_16.png</file>
+	<file alias="icon_48.png">icons/48x48/v1541commander.png</file>
+	<file alias="icon_32.png">icons/32x32/v1541commander.png</file>
+	<file alias="icon_16.png">icons/16x16/v1541commander.png</file>
 </qresource>
 </RCC>

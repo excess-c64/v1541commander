@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=V1541Commander
+GenericName=D64 Disk Image Utility
+Comment=Virtual 1541 disk commander
+Exec=v1541commander %F
+Icon=v1541commander
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Utility;Archiving;

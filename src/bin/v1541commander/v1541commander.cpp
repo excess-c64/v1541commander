@@ -138,10 +138,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     deleteFileAction.setShortcut(QKeySequence::Delete);
     deleteFileAction.setStatusTip(tr("Delete selected file"));
 #ifndef _WIN32
-    appIcon.addPixmap(QPixmap(":/gfx/icon_256.png"));
-    appIcon.addPixmap(QPixmap(":/gfx/icon_48.png"));
-    appIcon.addPixmap(QPixmap(":/gfx/icon_32.png"));
-    appIcon.addPixmap(QPixmap(":/gfx/icon_16.png"));
+    appIcon.addPixmap(QPixmap(":/icon_256.png"));
+    appIcon.addPixmap(QPixmap(":/icon_48.png"));
+    appIcon.addPixmap(QPixmap(":/icon_32.png"));
+    appIcon.addPixmap(QPixmap(":/icon_16.png"));
     logWindow.setWindowIcon(appIcon);
     aboutBox.setWindowIcon(appIcon);
 #endif

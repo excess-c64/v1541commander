@@ -12,6 +12,8 @@ v1541commander_PREPROCFLAGS:= -p.
 v1541commander_posix_CXXFLAGS?= -fPIC
 v1541commander_INCLUDES= -I$(v1541commander_PPSRCDIR)
 v1541commander_PKGDEPS:= Qt5Core Qt5Gui	Qt5Widgets Qt5Network 1541img
+v1541commander_ICONSIZES:= 16x16 32x32 48x48 256x256
+v1541commander_DESKTOPFILE:= v1541commander
 v1541commander_win32_LDFLAGS:= -mwindows
 v1541commander_win32_RES:= windres
 
