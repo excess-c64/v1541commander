@@ -79,19 +79,23 @@ CbmdosFsWidget::CbmdosFsWidget(QWidget *parent)
 	    d->name.setFocus();
 	    });
     d->name.setToolTip(tr("The name of the disk (Shift+F2)"));
+    d->nameLabel.setToolTip(tr("The name of the disk (Shift+F2)"));
     QShortcut *sf3 = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F3), this);
     connect(sf3, &QShortcut::activated, this, [this](){
 	    d->id.selectAll();
 	    d->id.setFocus();
 	    });
     d->id.setToolTip(tr("The ID of the disk (Shift+F3)"));
+    d->idLabel.setToolTip(tr("The ID of the disk (Shift+F3)"));
     QShortcut *f4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
     connect(f4, &QShortcut::activated, this, [this](){
 	    d->dosVer.selectAll();
 	    d->dosVer.setFocus();
 	    });
-    d->dosVer.setToolTip(tr("DOS version, non-default value is \"soft write "
-		"protection\" (F4)"));
+    d->dosVer.setToolTip(tr("DOS version, non-default value is \"soft "
+		"write protection\" (F4)"));
+    d->dosVerLabel.setToolTip(tr("DOS version, non-default value is \"soft "
+		"write protection\" (F4)"));
     QShortcut *sf4 = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F4), this);
     connect(sf4, &QShortcut::activated, &d->dosVerReset, &QPushButton::click);
     d->dosVerReset.setToolTip(tr("Reset DOS version to default value "

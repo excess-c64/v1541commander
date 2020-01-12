@@ -46,6 +46,8 @@ class CbmdosFileWidget::priv
 	QLabel dataSizeLabel;
 	QPushButton importButton;
 	QPushButton exportButton;
+	int lastNameCursorPos;
+	bool ignoreNameCursorPos;
 };
 
 CbmdosFileWidget::priv::priv() :
@@ -69,7 +71,9 @@ CbmdosFileWidget::priv::priv() :
     dataLabel(tr("Content: ")),
     dataSizeLabel(tr("<none>")),
     importButton(tr("import")),
-    exportButton(tr("export"))
+    exportButton(tr("export")),
+    lastNameCursorPos(0),
+    ignoreNameCursorPos(false)
 {
 }
 
@@ -132,10 +136,11 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 
     QShortcut *f2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
     connect(f2, &QShortcut::activated, this, [this](){
-	    d->name.selectAll();
-	    d->name.setFocus();
+		d->name.selectAll();
+		d->name.setFocus();
 	    });
     d->name.setToolTip(tr("The name of the file (F2)"));
+    d->nameLabel.setToolTip(tr("The name of the file (F2)"));
     QShortcut *f8 = new QShortcut(QKeySequence(Qt::Key_F8), this);
     connect(f8, &QShortcut::activated, this, [this](){
 	    d->type.setCurrentIndex(0);});
@@ -152,6 +157,7 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
     connect(f12, &QShortcut::activated, this, [this](){
 	    d->type.setCurrentIndex(4);});
     d->type.setToolTip(tr("The type of the file (F8-F12)"));
+    d->typeLabel.setToolTip(tr("The type of the file (F8-F12)"));
     QShortcut *csl = new QShortcut(
 	    QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_L), this);
     connect(csl, &QShortcut::activated, &d->locked, &QCheckBox::click);
@@ -162,10 +168,12 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
     d->closed.setToolTip(tr("File closed flag (Ctrl+Shift+C)"));
     QShortcut *f7 = new QShortcut(QKeySequence(Qt::Key_F7), this);
     connect(f7, &QShortcut::activated, this, [this](){
-	    d->recordLength.selectAll();
-	    d->recordLength.setFocus();
+		d->recordLength.selectAll();
+		d->recordLength.setFocus();
 	    });
     d->recordLength.setToolTip(
+	    tr("The length of a record in a REL file (F7)"));
+    d->recordLengthLabel.setToolTip(
 	    tr("The length of a record in a REL file (F7)"));
     QShortcut *sf6 = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F6), this);
     connect(sf6, &QShortcut::activated,
@@ -174,12 +182,12 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 	    tr("Enable fake display of block size (Shift+F6)"));
     QShortcut *f6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
     connect(f6, &QShortcut::activated, this, [this](){
-	    if (!d->forcedBlocksActive.isChecked())
-	    {
-		d->forcedBlocksActive.click();
-	    }
-	    d->forcedBlocks.selectAll();
-	    d->forcedBlocks.setFocus();
+		if (!d->forcedBlocksActive.isChecked())
+		{
+		    d->forcedBlocksActive.click();
+		}
+		d->forcedBlocks.selectAll();
+		d->forcedBlocks.setFocus();
 	    });
     d->forcedBlocks.setToolTip(tr("Fake block size to display (F6)"));
     QShortcut *csi = new QShortcut(
@@ -190,6 +198,15 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 	    QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_E), this);
     connect(cse, &QShortcut::activated, &d->exportButton, &QPushButton::click);
     d->exportButton.setToolTip(tr("Export file contents (Ctrl+Shift+E)"));
+
+    connect(&d->name, &QLineEdit::cursorPositionChanged,
+	    this, [this](int oldPos, int newPos){
+		if (!d->ignoreNameCursorPos)
+		{
+		    (void)oldPos;
+		    d->lastNameCursorPos = newPos;
+		}
+	    });
 }
 
 CbmdosFileWidget::~CbmdosFileWidget()
@@ -447,6 +464,8 @@ CbmdosFile *CbmdosFileWidget::file() const
 void CbmdosFileWidget::setFile(CbmdosFile *file)
 {
     d->file = 0;
+    bool hadSelectedText = d->name.hasSelectedText();
+    d->ignoreNameCursorPos = true;
     if (file)
     {
 	setEnabled(true);
@@ -501,4 +520,13 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	d->dataSizeLabel.setText(tr("<none>"));
     }
     d->file = file;
+    if (hadSelectedText)
+    {
+	d->name.selectAll();
+    }
+    else
+    {
+	d->name.setCursorPosition(d->lastNameCursorPos);
+    }
+    d->ignoreNameCursorPos = false;
 }
