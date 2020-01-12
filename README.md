@@ -3,12 +3,17 @@
 This application allows you to create and modify D64 disk images (for the
 Commodore 1541 floppy drive).
 
-For licensing information, see LICENSE.txt and LICENSE-font.txt.
+For licensing information, see [LICENSE.txt](LICENSE.txt) and
+[LICENSE-font.txt](LICENSE-font.txt).
 
-For instructions to build this yourself on your system, see BUILDING.md
+For instructions to build this yourself on your system, see
+[BUILDING.md](BUILDING.md).
 
-For downloads of the latest binaries for Windows or Linux, search
+For **downloads** of the latest binaries for **Windows or Linux**, search
 [CSDb](https://csdb.dk/) for "v1541commander".
+
+For Linux, it's recommended to build from source, or look out for a package
+offered for your distribution. If there is none, create one ;)
 
 ## Features
 
