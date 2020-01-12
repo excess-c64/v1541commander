@@ -3,10 +3,12 @@
 LCROSS=/mnt/storage/git/xlin
 TARGET=x86_64-unknown-linux-gnu
 MAKE=gmake
+MAKEOPTS=-j4
 QT5STATIC=${LCROSS}/${TARGET}/qt5-static
 
 PKG_CONFIG_PATH=${LCROSS}/${TARGET}/lib/pkgconfig:${QT5STATIC}/lib/pkgconfig \
-	PATH=${LCROSS}/${TARGET}/bin:${LCROSS}/bin:${PATH} ${MAKE} \
+	PATH=${LCROSS}/${TARGET}/bin:${LCROSS}/bin:${PATH} \
+	${MAKE} ${MAKEOPTS} \
 	CROSS_COMPILE=${TARGET}- \
 	DEFINES="-DQT_STATICPLUGIN -DSTATIC_1541IMG" \
 	CC=gcc CXX=g++ \

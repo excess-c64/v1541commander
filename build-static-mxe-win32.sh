@@ -3,8 +3,9 @@
 MXE=/mnt/storage/git/mxe
 TARGET=i686-w64-mingw32.static
 MAKE=gmake
+MAKEOPTS=-j4
 
-PATH=${MXE}/usr/bin:${PATH} ${MAKE} \
+PATH=${MXE}/usr/bin:${PATH} ${MAKE} ${MAKEOPTS} \
 	CROSS_COMPILE=${TARGET}- \
 	DEFINES="-DQT_STATICPLUGIN -DSTATIC_1541IMG" \
 	CC=gcc CXX=g++ \
