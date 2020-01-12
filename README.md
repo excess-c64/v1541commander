@@ -215,8 +215,10 @@ a real C64 or in an emulator.
 
 ## How it works (internally)
 
-V1541Commander uses the *lib1541img* C library, also freely available from
-Excess. This library models 3 layers when editing disk images:
+V1541Commander uses the
+[*lib1541img*](https://github.com/excess-c64/lib1541img) C library, also
+freely available from Excess. This library models 3 layers when editing
+disk images:
 
 * a "physical layer" represents a raw disk image with tracks and sectors.
 * a "virtual filesystem" has all the properties of a CBM-DOS filesystem
