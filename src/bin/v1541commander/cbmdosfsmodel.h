@@ -16,14 +16,12 @@ class CbmdosFsModel: public QAbstractListModel
 	class priv;
 	priv *d;
 
-    public slots:
-	void fsChanged(const CbmdosVfsEventArgs *args);
-
     public:
 	CbmdosFsModel(QObject *parent = nullptr);
 	~CbmdosFsModel();
 	CbmdosFs *fs() const;
 	void setFs(CbmdosFs *fs);
+	void fsChanged(const CbmdosVfsEventArgs *args);
 	void deleteAt(const QModelIndex &at);
 	void addFile(const QModelIndex &at, CbmdosFile *newFile);
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;

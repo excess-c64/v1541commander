@@ -32,6 +32,7 @@ class V1541ImgWidget: public QWidget
 	void exportLynx(const QString &filename);
 	void fsOptions();
 	void rewriteImage();
+	void mapToLc();
 	void newFile();
 	void deleteFile();
 

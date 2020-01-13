@@ -233,6 +233,20 @@ in lowercase mode.
 Toggling between the character sets is also possible by pressing
 `Shift + Space`.
 
+## Mapping gfx chars to lowercase mode
+
+Disk directories are normally designed for uppercase/graphics mode, and when
+graphical characters are used, a common element are horizontal and vertical
+bars. In the uppercase/graphics PETSCII character set, they exist multiple
+times, but only one encoding is the same as in the lowercase/uppercase
+character set. V1541Commander can make sure the code point that also works in
+lowercase/uppercase mode is used.
+
+From the *CBM DOS* menu in *Map UC Gfx to LC*, select *Map current disk* to
+replace characters in the whole directory of the currently opened disk image.
+If you check *Auto map on input* from the same menu, the mapping will always
+be done while you make changes.
+
 ## How it works (internally)
 
 V1541Commander uses the

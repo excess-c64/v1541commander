@@ -56,6 +56,7 @@ class MainWindow: public QMainWindow
         void closeDocument();
 	void fsOptions();
 	void rewriteImage();
+	void mapToLc();
 	void newFile();
 	void deleteFile();
 	void showStatusLine(const QString &line);

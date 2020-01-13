@@ -42,6 +42,9 @@ MainWindow::MainWindow()
     QMenu *cbmdosMenu = menuBar()->addMenu(tr("&CBM DOS"));
     cbmdosMenu->addAction(&cmdr.fsOptionsAction());
     cbmdosMenu->addAction(&cmdr.rewriteImageAction());
+    QMenu *petsciiMenu = cbmdosMenu->addMenu(tr("&Map UC Gfx to LC"));
+    petsciiMenu->addAction(&cmdr.autoMapLcAction());
+    petsciiMenu->addAction(&cmdr.mapLcAction());
     cbmdosMenu->addSeparator();
     cbmdosMenu->addAction(&cmdr.newFileAction());
     cbmdosMenu->addAction(&cmdr.deleteFileAction());
@@ -360,6 +363,12 @@ void MainWindow::rewriteImage()
 {
     if (d->content != Content::Image) return;
     static_cast<V1541ImgWidget *>(centralWidget())->rewriteImage();
+}
+
+void MainWindow::mapToLc()
+{
+    if (d->content != Content::Image) return;
+    static_cast<V1541ImgWidget *>(centralWidget())->mapToLc();
 }
 
 void MainWindow::newFile()

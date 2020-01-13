@@ -60,16 +60,17 @@ void PetsciiEdit::editText(const QString &text)
 	    translated.append(tc);
 	}
     }
-    setText(translated);
     setCursorPosition(pos);
     PetsciiStr petscii(translated);
     emit petsciiEdited(petscii);
 }
 
-void PetsciiEdit::setPetscii(const PetsciiStr &petscii)
+void PetsciiEdit::setPetscii(const PetsciiStr &petscii, bool keepCursorPos)
 {
+    int pos = cursorPosition();
     bool lc = cmdr.lowerCase();
     setText(petscii.toString(lc).replace(lc ? 0xe1a0 : 0xe0a0, 0xefa3));
+    if (keepCursorPos) setCursorPosition(pos);
 }
 
 void PetsciiEdit::updateCase(bool lowerCase)

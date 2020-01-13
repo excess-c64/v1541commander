@@ -52,6 +52,8 @@ class V1541Commander::priv
 	QAction logWindowAction;
 	QAction fsOptionsAction;
 	QAction rewriteImageAction;
+	QAction autoMapLcAction;
+	QAction mapLcAction;
 	QAction newFileAction;
 	QAction deleteFileAction;
         QAction lowerCaseAction;
@@ -64,6 +66,7 @@ class V1541Commander::priv
 	QLocalServer instanceServer;
 	bool isPrimaryInstance;
         bool lowerCase;
+	bool autoMapToLc;
 	QSet<QLocalSocket *> activeClients;
         
         MainWindow *addWindow(bool show = true);
@@ -91,9 +94,11 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     logWindowAction(tr("lib1541img &log")),
     fsOptionsAction(tr("Filesystem &Options")),
     rewriteImageAction(tr("&Rewrite Image")),
+    autoMapLcAction(tr("&Auto map on input")),
+    mapLcAction(tr("&Map current disk")),
     newFileAction(tr("&New File")),
     deleteFileAction(tr("&Delete File")),
-    lowerCaseAction(tr("&Lowercase mode")),
+    lowerCaseAction(tr("&Lowercase")),
     allWindows(),
     lastActiveWindow(0),
     petsciiWindow(0),
@@ -103,6 +108,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     instanceServer(),
     isPrimaryInstance(false),
     lowerCase(false),
+    autoMapToLc(false),
     activeClients()
 {
     newAction.setShortcuts(QKeySequence::New);
@@ -141,6 +147,13 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     fsOptionsAction.setStatusTip(tr("Change filesystem options"));
     rewriteImageAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_R));
     rewriteImageAction.setStatusTip(tr("Rewrite disk image from scratch"));
+    autoMapLcAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_M));
+    autoMapLcAction.setStatusTip(tr("Toggle automatic mapping of uppercase "
+		"GFX chars to lowercase compatible codes"));
+    autoMapLcAction.setCheckable(true);
+    mapLcAction.setShortcut(QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_M));
+    mapLcAction.setStatusTip(tr("Map uppercase GFX chars to lowercase "
+		"compatible codes in current disk"));
     newFileAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Period));
     newFileAction.setStatusTip(tr("Create new file at selection"));
     deleteFileAction.setShortcut(QKeySequence::Delete);
@@ -148,7 +161,6 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     lowerCaseAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
     lowerCaseAction.setStatusTip(tr("Toggle lowercase / graphics font mode"));
     lowerCaseAction.setCheckable(true);
-    lowerCaseAction.setChecked(false);
 #ifndef _WIN32
     appIcon.addPixmap(QPixmap(":/icon_256.png"));
     appIcon.addPixmap(QPixmap(":/icon_48.png"));
@@ -278,6 +290,8 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
         QSettings settings(QCoreApplication::organizationName(),
                 QCoreApplication::applicationName());
         settings.setValue("geometry", w->saveGeometry());
+	settings.setValue("lowercase", lowerCase);
+	settings.setValue("automap", autoMapToLc);
         closeAllWindows();
     }
     w->deleteLater();
@@ -298,6 +312,8 @@ void V1541Commander::priv::updateActions(MainWindow *w)
 	    && w->hasValidContent());
     newFileAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && w->hasValidContent());
+    mapLcAction.setEnabled(w->content() == MainWindow::Content::Image
+	    && w->hasValidContent());
     deleteFileAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && w->hasValidContent() && w->hasValidSelection());
 }
@@ -315,6 +331,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             QCoreApplication::applicationName());
     d->lastActiveWindow->restoreGeometry(
             settings.value("geometry").toByteArray());
+    d->lowerCase = settings.value("lowercase", false).toBool();
+    d->lowerCaseAction.setChecked(d->lowerCase);
+    d->autoMapToLc = settings.value("automap", false).toBool();
+    d->autoMapLcAction.setChecked(d->autoMapToLc);
     connect(&d->newAction, &QAction::triggered,
 	    this, &V1541Commander::newImage);
     connect(&d->openAction, SIGNAL(triggered()),
@@ -343,6 +363,8 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::fsOptions);
     connect(&d->rewriteImageAction, &QAction::triggered,
             this, &V1541Commander::rewriteImage);
+    connect(&d->mapLcAction, &QAction::triggered,
+	    this, &V1541Commander::mapToLc);
     connect(&d->newFileAction, &QAction::triggered,
             this, &V1541Commander::newFile);
     connect(&d->deleteFileAction, &QAction::triggered,
@@ -355,6 +377,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
                 d->petsciiWindow->setLowercase(d->lowerCase);
             }
         });
+    connect(&d->autoMapLcAction, &QAction::triggered, this, [this](){
+	    d->autoMapToLc = !d->autoMapToLc;
+	    emit autoMapToLcChanged(d->autoMapToLc);
+	});
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
     if (d->isPrimaryInstance)
@@ -602,6 +628,14 @@ void V1541Commander::rewriteImage()
     w->rewriteImage();
 }
 
+void V1541Commander::mapToLc()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->mapToLc();
+}
+
 void V1541Commander::newFile()
 {
     MainWindow *w = d->lastActiveWindow;
@@ -761,6 +795,16 @@ QAction &V1541Commander::rewriteImageAction()
     return d->rewriteImageAction;
 }
 
+QAction &V1541Commander::autoMapLcAction()
+{
+    return d->autoMapLcAction;
+}
+
+QAction &V1541Commander::mapLcAction()
+{
+    return d->mapLcAction;
+}
+
 QAction &V1541Commander::newFileAction()
 {
     return d->newFileAction;
@@ -789,6 +833,11 @@ bool V1541Commander::isPrimaryInstance() const
 bool V1541Commander::lowerCase() const
 {
     return d->lowerCase;
+}
+
+bool V1541Commander::autoMapToLc() const
+{
+    return d->autoMapToLc;
 }
 
 V1541Commander &V1541Commander::instance()

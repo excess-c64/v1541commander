@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 struct CbmdosFile;
+struct CbmdosFileEventArgs;
 class PetsciiStr;
 
 class CbmdosFileWidget: public QGroupBox
@@ -31,6 +32,7 @@ class CbmdosFileWidget: public QGroupBox
 
 	CbmdosFile *file() const;
 	void setFile(CbmdosFile *file);
+	void fileChanged(const CbmdosFileEventArgs *args);
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 struct CbmdosFs;
+struct CbmdosVfsEventArgs;
 class PetsciiStr;
 
 class CbmdosFsWidget : public QGroupBox
@@ -26,6 +27,7 @@ class CbmdosFsWidget : public QGroupBox
 
 	CbmdosFs *fs() const;
 	void setFs(CbmdosFs *fs);
+	void fsChanged(const CbmdosVfsEventArgs *args);
 };
 
 #endif

@@ -164,6 +164,14 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 		"use F3 to activate\n"
 		"change selection with cursor up/down\n"
 		"move selected file with Shift + cursor up/down"));
+    connect(&cmdr, &V1541Commander::autoMapToLcChanged,
+	    this, [this](bool autoMapToLc){
+		if (d->fs)
+		{
+		    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs),
+			    autoMapToLc, true);
+		}
+	    });
 }
 
 V1541ImgWidget::~V1541ImgWidget()
@@ -239,6 +247,10 @@ void V1541ImgWidget::newImage()
     if (optDlg.exec() == QDialog::Accepted)
     {
 	d->fs = CbmdosFs_create(opts);
+	if (cmdr.autoMapToLc())
+	{
+	    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs), true, true);
+	}
 	d->model.setFs(d->fs);
 	d->fsprop.setFs(d->fs);
 	d->dirList.setMinimumWidth(
@@ -357,6 +369,10 @@ void V1541ImgWidget::open(const QString& filename)
 	    d->fs = CbmdosFs_fromImage(d64, opts);
 	    if (d->fs)
 	    {
+		if (cmdr.autoMapToLc())
+		{
+		    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs), true, true);
+		}
 		d->model.setFs(d->fs);
 		d->fsprop.setFs(d->fs);
 		d->dirList.setMinimumWidth(
@@ -390,6 +406,10 @@ void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
     d->fs = CbmdosFs_fromVfs(vfs, CFO_DEFAULT);
     if (d->fs)
     {
+	if (cmdr.autoMapToLc())
+	{
+	    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs), true, true);
+	}
 	d->model.setFs(d->fs);
 	d->fsprop.setFs(d->fs);
 	d->dirList.setMinimumWidth(
@@ -539,10 +559,29 @@ void V1541ImgWidget::rewriteImage()
     }
 }
 
+void V1541ImgWidget::mapToLc()
+{
+    if (!hasValidImage()) return;
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+	    tr("Map UC gfx to LC?"), tr("This will possibly modify the disk "
+		"name, id and all the file names. Are you sure you want to "
+		"proceed?"),
+	    QMessageBox::Ok|QMessageBox::Cancel);
+    if (reply == QMessageBox::Ok)
+    {
+	CbmdosVfs_mapUpperGfxToLower(CbmdosFs_vfs(d->fs), true);
+	emit modified();
+    }
+}
+
 void V1541ImgWidget::newFile()
 {
     if (!hasValidImage()) return;
     CbmdosFile *newFile = CbmdosFile_create();
+    if (cmdr.autoMapToLc())
+    {
+	CbmdosFile_setAutoMapToLc(newFile, true);
+    }
     const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
     d->model.addFile(index, newFile);
 }

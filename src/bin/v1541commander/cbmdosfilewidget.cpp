@@ -20,7 +20,19 @@
 #include <QVBoxLayout>
 
 #include <1541img/cbmdosfile.h>
+#include <1541img/cbmdosfileeventargs.h>
+#include <1541img/event.h>
 #include <1541img/filedata.h>
+
+static void evhdl(void *receiver, int id, const void *sender, const void *args)
+{
+    (void) id;
+    (void) sender;
+
+    CbmdosFileWidget *widget = (CbmdosFileWidget *)receiver;
+    const CbmdosFileEventArgs *eventArgs = (const CbmdosFileEventArgs *)args;
+    widget->fileChanged(eventArgs);
+}
 
 class CbmdosFileWidget::priv
 {
@@ -211,10 +223,9 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 
     connect(&cmdr, &V1541Commander::lowerCaseChanged,
             this, [this](bool lowerCase){
-                bool ignore = d->ignoreNameCursorPos;
                 d->ignoreNameCursorPos = true;
                 d->name.updateCase(lowerCase);
-                d->ignoreNameCursorPos = ignore;
+                d->ignoreNameCursorPos = false;
             });
 }
 
@@ -471,6 +482,10 @@ CbmdosFile *CbmdosFileWidget::file() const
 
 void CbmdosFileWidget::setFile(CbmdosFile *file)
 {
+    if (d->file)
+    {
+	Event_unregister(CbmdosFile_changedEvent(d->file), this, evhdl);
+    }
     d->file = 0;
     bool hadSelectedText = d->name.hasSelectedText();
     d->ignoreNameCursorPos = true;
@@ -519,6 +534,7 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	    d->importButton.setEnabled(true);
 	    d->exportButton.setEnabled(true);
 	}
+	Event_register(CbmdosFile_changedEvent(file), this, evhdl);
     }
     else
     {
@@ -536,4 +552,16 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	d->name.setCursorPosition(d->lastNameCursorPos);
     }
     d->ignoreNameCursorPos = false;
+}
+
+void CbmdosFileWidget::fileChanged(const CbmdosFileEventArgs *args)
+{
+    if (args->what == CbmdosFileEventArgs::CFE_NAMECHANGED)
+    {
+	d->ignoreNameCursorPos = true;
+	uint8_t nameLength;
+	const char *name = CbmdosFile_name(d->file, &nameLength);
+	d->name.setPetscii(PetsciiStr(name, nameLength), true);
+	d->ignoreNameCursorPos = false;
+    }
 }

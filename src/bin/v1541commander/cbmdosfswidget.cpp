@@ -12,6 +12,18 @@
 
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
+#include <1541img/cbmdosvfseventargs.h>
+#include <1541img/event.h>
+
+static void evhdl(void *receiver, int id, const void *sender, const void *args)
+{
+    (void) id;
+    (void) sender;
+
+    CbmdosFsWidget *widget = (CbmdosFsWidget *)receiver;
+    const CbmdosVfsEventArgs *eventArgs = (const CbmdosVfsEventArgs *)args;
+    widget->fsChanged(eventArgs);
+}
 
 class CbmdosFsWidget::priv
 {
@@ -163,6 +175,11 @@ CbmdosFs *CbmdosFsWidget::fs() const
 
 void CbmdosFsWidget::setFs(CbmdosFs *fs)
 {
+    if (d->fs)
+    {
+	Event_unregister(
+		CbmdosVfs_changedEvent(CbmdosFs_vfs(d->fs)), this, evhdl);
+    }
     d->fs = 0;
     if (fs)
     {
@@ -176,6 +193,7 @@ void CbmdosFsWidget::setFs(CbmdosFs *fs)
 	uint8_t dosver = CbmdosVfs_dosver(vfs);
 	d->dosVer.setValue(dosver);
 	d->dosVerReset.setEnabled(dosver != defaultDosVer(fs));
+	Event_register(CbmdosVfs_changedEvent(CbmdosFs_vfs(fs)), this, evhdl);
     }
     else
     {
@@ -185,5 +203,26 @@ void CbmdosFsWidget::setFs(CbmdosFs *fs)
 	d->dosVer.setValue(0);
     }
     d->fs = fs;
+}
+
+void CbmdosFsWidget::fsChanged(const CbmdosVfsEventArgs *args)
+{
+    uint8_t len;
+    const char *str;
+    switch (args->what)
+    {
+	case CbmdosVfsEventArgs::CVE_NAMECHANGED:
+	    str = CbmdosVfs_name(CbmdosFs_rvfs(d->fs), &len);
+	    d->name.setPetscii(PetsciiStr(str, len), true);
+	    break;
+
+	case CbmdosVfsEventArgs::CVE_IDCHANGED:
+	    str = CbmdosVfs_id(CbmdosFs_rvfs(d->fs), &len);
+	    d->id.setPetscii(PetsciiStr(str, len), true);
+	    break;
+
+	default:
+	    break;
+    }
 }
 

@@ -37,6 +37,7 @@ class V1541Commander: public QApplication
 	void petsciiInput(ushort val);
 	void fsOptions();
 	void rewriteImage();
+	void mapToLc();
 	void newFile();
 	void deleteFile();
 	void logLineAppended(const QString &line);
@@ -62,12 +63,15 @@ class V1541Commander: public QApplication
 	QAction &logWindowAction();
 	QAction &fsOptionsAction();
 	QAction &rewriteImageAction();
+	QAction &autoMapLcAction();
+	QAction &mapLcAction();
 	QAction &newFileAction();
 	QAction &deleteFileAction();
         QAction &lowerCaseAction();
 	const QString &instanceServerName() const;
 	bool isPrimaryInstance() const;
         bool lowerCase() const;
+	bool autoMapToLc() const;
 
         static V1541Commander &instance();
 
@@ -78,6 +82,7 @@ class V1541Commander: public QApplication
 
     signals:
         void lowerCaseChanged(bool lowerCase);
+	void autoMapToLcChanged(bool autoMap);
 };
 
 #endif
