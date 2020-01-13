@@ -40,6 +40,14 @@ CbmdosFsModel::CbmdosFsModel(QObject *parent)
     : QAbstractListModel(parent)
 {
     d = new priv();
+
+    connect(&cmdr, &V1541Commander::lowerCaseChanged,
+            this, [this](bool lowerCase){
+                (void) lowerCase;
+                emit dataChanged(createIndex(0, 0),
+                        createIndex(rowCount()-1, 0),
+                        QVector<int>(Qt::DisplayRole));
+            });
 }
 
 CbmdosFsModel::~CbmdosFsModel()
@@ -205,7 +213,7 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 	const CbmdosFile *file = CbmdosVfs_rfile(vfs, row-1);
 	CbmdosFile_getDirLine(file, buffer);
 	PetsciiStr dirLine((char *)buffer, 28);
-	return dirLine.toString();
+	return dirLine.toString(cmdr.lowerCase());
     }
 
     if (row == 0)
@@ -213,13 +221,13 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 	QString heading("0 ");
 	CbmdosVfs_getDirHeader(vfs, buffer);
 	PetsciiStr dirHeader((char *)buffer, 24);
-	heading.append(dirHeader.toString(true));
+	heading.append(dirHeader.toString(cmdr.lowerCase(), true));
 	return heading;
     }
 
     CbmdosFs_getFreeBlocksLine(d->fs, buffer);
     PetsciiStr freeLine((char *)buffer, 16);
-    return freeLine.toString();
+    return freeLine.toString(cmdr.lowerCase());
 }
 
 Qt::ItemFlags CbmdosFsModel::flags(const QModelIndex &index) const

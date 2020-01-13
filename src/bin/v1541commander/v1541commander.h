@@ -64,8 +64,10 @@ class V1541Commander: public QApplication
 	QAction &rewriteImageAction();
 	QAction &newFileAction();
 	QAction &deleteFileAction();
+        QAction &lowerCaseAction();
 	const QString &instanceServerName() const;
 	bool isPrimaryInstance() const;
+        bool lowerCase() const;
 
         static V1541Commander &instance();
 
@@ -73,6 +75,9 @@ class V1541Commander: public QApplication
 	void open(const QString &filename);
 	void saveAs();
 	void show();
+
+    signals:
+        void lowerCaseChanged(bool lowerCase);
 };
 
 #endif

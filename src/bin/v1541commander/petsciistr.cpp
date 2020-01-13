@@ -28,12 +28,12 @@ PetsciiStr::~PetsciiStr()
     delete[] raw;
 }
 
-QString PetsciiStr::toString(bool reverse)
+QString PetsciiStr::toString(bool lc, bool reverse)
 {
     QString result;
     for (int i = 0; i < len; ++i)
     {
-	result.append(PetsciiConvert::petsciiToFont(raw[i], reverse));
+	result.append(PetsciiConvert::petsciiToFont(raw[i], lc, reverse));
     }
 
     return result;

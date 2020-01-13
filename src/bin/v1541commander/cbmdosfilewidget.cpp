@@ -2,6 +2,7 @@
 #include "petsciistr.h"
 #include "petsciiedit.h"
 #include "utils.h"
+#include "v1541commander.h"
 
 #include <QPushButton>
 #include <QCheckBox>
@@ -207,6 +208,14 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 		    d->lastNameCursorPos = newPos;
 		}
 	    });
+
+    connect(&cmdr, V1541Commander::lowerCaseChanged,
+            this, [this](bool lowerCase){
+                bool ignore = d->ignoreNameCursorPos;
+                d->ignoreNameCursorPos = true;
+                d->name.updateCase(lowerCase);
+                d->ignoreNameCursorPos = ignore;
+            });
 }
 
 CbmdosFileWidget::~CbmdosFileWidget()
@@ -385,7 +394,7 @@ void CbmdosFileWidget::importFile()
 		uint8_t nameLength;
 		const char *name = CbmdosFile_name(d->file, &nameLength);
 		PetsciiStr str(name, nameLength);
-		d->name.setText(str.toString());
+		d->name.setText(str.toString(cmdr.lowerCase()));
 		d->recordLength.setValue(CbmdosFile_recordLength(d->file));
 	    }
 	    else
@@ -472,7 +481,7 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	uint8_t nameLength;
 	const char *name = CbmdosFile_name(file, &nameLength);
 	PetsciiStr str(name, nameLength);
-	d->name.setText(str.toString());
+	d->name.setText(str.toString(cmdr.lowerCase()));
 	CbmdosFileType type = CbmdosFile_type(file);
 	d->type.setCurrentIndex(d->type.findData(type));
 	d->locked.setChecked(CbmdosFile_locked(file));

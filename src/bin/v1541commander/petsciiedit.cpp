@@ -47,9 +47,9 @@ void PetsciiEdit::editText(const QString &text)
 {
     int pos = cursorPosition();
     QString translated;
-    for (QString::const_iterator i = text.begin(); i != text.end(); ++i)
+    for (QString::const_iterator i = text.cbegin(); i != text.cend(); ++i)
     {
-	QChar tc = PetsciiConvert::unicodeToFont(*i);
+	QChar tc = PetsciiConvert::unicodeToFont(*i, cmdr.lowerCase());
 	if (tc.isNull())
 	{
 	    if (pos > 0) --pos;
@@ -63,6 +63,19 @@ void PetsciiEdit::editText(const QString &text)
     setCursorPosition(pos);
     PetsciiStr petscii(translated);
     emit petsciiEdited(petscii);
+}
+
+void PetsciiEdit::updateCase(bool lowerCase)
+{
+    int pos = cursorPosition();
+    QString translated;
+    for (QString::const_iterator i = text().cbegin(); i != text().cend(); ++i)
+    {
+	QChar tc = PetsciiConvert::unicodeToFont(*i, lowerCase);
+	translated.append(tc);
+    }
+    setText(translated);
+    setCursorPosition(pos);
 }
 
 void PetsciiEdit::petsciiInput(ushort val)

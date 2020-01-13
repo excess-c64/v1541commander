@@ -1,6 +1,7 @@
 #include "cbmdosfswidget.h"
 #include "petsciistr.h"
 #include "petsciiedit.h"
+#include "v1541commander.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -100,6 +101,11 @@ CbmdosFsWidget::CbmdosFsWidget(QWidget *parent)
     connect(sf4, &QShortcut::activated, &d->dosVerReset, &QPushButton::click);
     d->dosVerReset.setToolTip(tr("Reset DOS version to default value "
 		"(Shift+F4)"));
+
+    connect(&cmdr, V1541Commander::lowerCaseChanged,
+            &d->name, &PetsciiEdit::updateCase);
+    connect(&cmdr, V1541Commander::lowerCaseChanged,
+            &d->id, &PetsciiEdit::updateCase);
 }
 
 CbmdosFsWidget::~CbmdosFsWidget()
@@ -165,10 +171,10 @@ void CbmdosFsWidget::setFs(CbmdosFs *fs)
 	uint8_t len;
 	const char *str = CbmdosVfs_name(vfs, &len);
 	PetsciiStr name(str, len);
-	d->name.setText(name.toString());
+	d->name.setText(name.toString(cmdr.lowerCase()));
 	str = CbmdosVfs_id(vfs, &len);
 	PetsciiStr id(str, len);
-	d->id.setText(id.toString());
+	d->id.setText(id.toString(cmdr.lowerCase()));
 	uint8_t dosver = CbmdosVfs_dosver(vfs);
 	d->dosVer.setValue(dosver);
 	d->dosVerReset.setEnabled(dosver != defaultDosVer(fs));

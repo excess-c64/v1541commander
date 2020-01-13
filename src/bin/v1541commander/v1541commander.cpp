@@ -54,6 +54,7 @@ class V1541Commander::priv
 	QAction rewriteImageAction;
 	QAction newFileAction;
 	QAction deleteFileAction;
+        QAction lowerCaseAction;
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
         PetsciiWindow *petsciiWindow;
@@ -62,6 +63,7 @@ class V1541Commander::priv
 	QString instanceServerName;
 	QLocalServer instanceServer;
 	bool isPrimaryInstance;
+        bool lowerCase;
 	QSet<QLocalSocket *> activeClients;
         
         MainWindow *addWindow(bool show = true);
@@ -91,6 +93,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     rewriteImageAction(tr("&Rewrite Image")),
     newFileAction(tr("&New File")),
     deleteFileAction(tr("&Delete File")),
+    lowerCaseAction(tr("&Lowercase mode")),
     allWindows(),
     lastActiveWindow(0),
     petsciiWindow(0),
@@ -99,6 +102,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     instanceServerName(),
     instanceServer(),
     isPrimaryInstance(false),
+    lowerCase(false),
     activeClients()
 {
     newAction.setShortcuts(QKeySequence::New);
@@ -123,7 +127,11 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     exportLynxAction.setStatusTip(tr("Export as a LyNX file"));
     closeAction.setShortcuts(QKeySequence::Close);
     closeAction.setStatusTip(tr("Close current file"));
+#ifdef _WIN32
+    exitAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Q));
+#else
     exitAction.setShortcuts(QKeySequence::Quit);
+#endif
     exitAction.setStatusTip(tr("Exit the application"));
     petsciiWindowAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_P));
     petsciiWindowAction.setStatusTip(tr("Show PETSCII input window"));
@@ -137,6 +145,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     newFileAction.setStatusTip(tr("Create new file at selection"));
     deleteFileAction.setShortcut(QKeySequence::Delete);
     deleteFileAction.setStatusTip(tr("Delete selected file"));
+    lowerCaseAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
+    lowerCaseAction.setStatusTip(tr("Toggle lowercase / graphics font mode"));
+    lowerCaseAction.setCheckable(true);
+    lowerCaseAction.setChecked(false);
 #ifndef _WIN32
     appIcon.addPixmap(QPixmap(":/icon_256.png"));
     appIcon.addPixmap(QPixmap(":/icon_48.png"));
@@ -335,6 +347,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
             this, &V1541Commander::newFile);
     connect(&d->deleteFileAction, &QAction::triggered,
             this, &V1541Commander::deleteFile);
+    connect(&d->lowerCaseAction, &QAction::triggered, this, [this](){
+            d->lowerCase = !d->lowerCase;
+            emit lowerCaseChanged(d->lowerCase);
+        });
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
     if (d->isPrimaryInstance)
@@ -751,6 +767,11 @@ QAction &V1541Commander::deleteFileAction()
     return d->deleteFileAction;
 }
 
+QAction &V1541Commander::lowerCaseAction()
+{
+    return d->lowerCaseAction;
+}
+
 const QString &V1541Commander::instanceServerName() const
 {
     return d->instanceServerName;
@@ -759,6 +780,11 @@ const QString &V1541Commander::instanceServerName() const
 bool V1541Commander::isPrimaryInstance() const
 {
     return d->isPrimaryInstance;
+}
+
+bool V1541Commander::lowerCase() const
+{
+    return d->lowerCase;
 }
 
 V1541Commander &V1541Commander::instance()

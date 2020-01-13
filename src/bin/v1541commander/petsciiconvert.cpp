@@ -1,13 +1,13 @@
 #include "petsciiconvert.h"
 
-QChar PetsciiConvert::unicodeToFont(const QChar &uc, bool reverse)
+QChar PetsciiConvert::unicodeToFont(const QChar &uc, bool lc, bool reverse)
 {
     if (uc.isNull()) return QChar();
     ushort val = uc.unicode();
     if (val < 0x20) return QChar();
     if (val > 0xff && val < 0xe000) return QChar();
     if (val > 0xe3ff) return QChar();
-    val &= ~0x100;
+    val &= 0xfeff;
     if (reverse)
     {
 	if (!(val & 0x200))
@@ -32,10 +32,12 @@ QChar PetsciiConvert::unicodeToFont(const QChar &uc, bool reverse)
 	val |= 0xe000;
 	if (reverse) val |= 0x200;
     }
+    if (lc) val |= 0x100;
     return QChar(val);
 }
 
-QChar PetsciiConvert::petsciiToFont(unsigned char petscii, bool reverse)
+QChar PetsciiConvert::petsciiToFont(unsigned char petscii,
+        bool lc, bool reverse)
 {
     ushort val;
     if (petscii < 0x20 || (petscii >= 0x80 && petscii < 0xa0))
@@ -44,6 +46,7 @@ QChar PetsciiConvert::petsciiToFont(unsigned char petscii, bool reverse)
 	val = 0xe000 + petscii;
 
     if (reverse) val ^= 0x200;
+    if (lc) val |= 0x100;
     return QChar(val);
 }
 
@@ -51,7 +54,8 @@ unsigned char PetsciiConvert::fontToPetscii(const QChar &fc, bool reverse)
 {
     ushort val = fc.unicode();
     if (reverse) val ^= 0x200;
-    if (val < 0xe000 || val > 0xe2ff || val & 0x100) return '?';
+    val &= 0xfeff;
+    if (val < 0xe000 || val > 0xe2ff) return '?';
     if (val > 0xe200)
     {
 	val -= 0xe200;

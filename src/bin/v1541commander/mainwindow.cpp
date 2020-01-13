@@ -37,7 +37,9 @@ MainWindow::MainWindow()
     fileMenu->addSeparator();
     fileMenu->addAction(&cmdr.aboutAction());
     fileMenu->addAction(&cmdr.exitAction());
-    QMenu *cbmdosMenu = menuBar()->addMenu(tr("CBM &DOS"));
+    QMenu *displayMenu = menuBar()->addMenu(tr("&Display"));
+    displayMenu->addAction(&cmdr.lowerCaseAction());
+    QMenu *cbmdosMenu = menuBar()->addMenu(tr("&CBM DOS"));
     cbmdosMenu->addAction(&cmdr.fsOptionsAction());
     cbmdosMenu->addAction(&cmdr.rewriteImageAction());
     cbmdosMenu->addSeparator();

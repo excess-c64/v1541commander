@@ -10,11 +10,12 @@ class PetsciiEdit : public QLineEdit
 {
     Q_OBJECT
 
-    private slots:
-	void editText(const QString &text);
-
     public slots:
 	void petsciiInput(ushort val);
+        void updateCase(bool lowerCase);
+
+    private slots:
+	void editText(const QString &text);
 
     signals:
 	void petsciiEdited(const PetsciiStr &petscii);
