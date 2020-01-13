@@ -209,7 +209,7 @@ CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
 		}
 	    });
 
-    connect(&cmdr, V1541Commander::lowerCaseChanged,
+    connect(&cmdr, &V1541Commander::lowerCaseChanged,
             this, [this](bool lowerCase){
                 bool ignore = d->ignoreNameCursorPos;
                 d->ignoreNameCursorPos = true;

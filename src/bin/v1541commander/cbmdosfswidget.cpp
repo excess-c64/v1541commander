@@ -102,9 +102,9 @@ CbmdosFsWidget::CbmdosFsWidget(QWidget *parent)
     d->dosVerReset.setToolTip(tr("Reset DOS version to default value "
 		"(Shift+F4)"));
 
-    connect(&cmdr, V1541Commander::lowerCaseChanged,
+    connect(&cmdr, &V1541Commander::lowerCaseChanged,
             &d->name, &PetsciiEdit::updateCase);
-    connect(&cmdr, V1541Commander::lowerCaseChanged,
+    connect(&cmdr, &V1541Commander::lowerCaseChanged,
             &d->id, &PetsciiEdit::updateCase);
 }
 
