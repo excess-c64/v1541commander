@@ -218,6 +218,21 @@ probably works inside filenames, but not in other locations. Do not trust
 the directory view when using these control characters, check your result on
 a real C64 or in an emulator.
 
+When you input shifted spaces, they are shown in input fields as inverted hash
+characters, so you can easily spot them and distinguish them from regular
+spaces.
+
+## Toggling the character set
+
+V1541Commander will start in uppercase/graphics mode, which is the mode in
+which directories are displayed on a real C64 almost all the time. To switch
+to lowercase/uppercase mode, select *Lowercase mode* from the *Display* menu.
+That way, you can see how the directory would look like when someone views it
+in lowercase mode.
+
+Toggling between the character sets is also possible by pressing
+`Shift + Space`.
+
 ## How it works (internally)
 
 V1541Commander uses the
@@ -287,6 +302,7 @@ Most actions can be triggered by a keyboard shortcut, see this table:
 |    Ctrl + Shift + C | Toggle closed flag of selected file    |
 |    Ctrl + Shift + I | Import content to selected file        |
 |    Ctrl + Shift + E | Export content from selected file      |
+|       Shift + Space | Toggle character set                   |
 
 For the keyboard shortcuts for actions in the menus, see the display of the
 menu items -- they might differ, depending on what operating system you are
