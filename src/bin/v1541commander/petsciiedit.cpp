@@ -56,6 +56,7 @@ void PetsciiEdit::editText(const QString &text)
 	}
 	else
 	{
+            if (tc == 0xe0a0 || tc == 0xe1a0) tc = 0xefa3;
 	    translated.append(tc);
 	}
     }
@@ -65,6 +66,12 @@ void PetsciiEdit::editText(const QString &text)
     emit petsciiEdited(petscii);
 }
 
+void PetsciiEdit::setPetscii(const PetsciiStr &petscii)
+{
+    bool lc = cmdr.lowerCase();
+    setText(petscii.toString(lc).replace(lc ? 0xe1a0 : 0xe0a0, 0xefa3));
+}
+
 void PetsciiEdit::updateCase(bool lowerCase)
 {
     int pos = cursorPosition();
@@ -72,6 +79,7 @@ void PetsciiEdit::updateCase(bool lowerCase)
     for (QString::const_iterator i = text().cbegin(); i != text().cend(); ++i)
     {
 	QChar tc = PetsciiConvert::unicodeToFont(*i, lowerCase);
+        if (tc == 0xe0a0 || tc == 0xe1a0) tc = 0xefa3;
 	translated.append(tc);
     }
     setText(translated);
@@ -94,13 +102,17 @@ void PetsciiEdit::setMaxLength(int length)
 void PetsciiEdit::keyPressEvent(QKeyEvent *event)
 {
     Qt::KeyboardModifiers mods = QApplication::keyboardModifiers();
+    int key = event->key();
     if (mods == Qt::AltModifier)
     {
-	int key = event->key();
 	if (key >= Qt::Key_A && key <= Qt::Key_Z)
 	{
 	    petsciiInput(cbmLetterChars[key - Qt::Key_A]);
 	}
+    }
+    else if (mods == Qt::ShiftModifier && key == Qt::Key_Space)
+    {
+        petsciiInput(0xefa3);
     }
     else QLineEdit::keyPressEvent(event);
 }

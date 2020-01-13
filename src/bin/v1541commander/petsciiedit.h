@@ -22,6 +22,7 @@ class PetsciiEdit : public QLineEdit
 
     public:
 	PetsciiEdit(QWidget *parent = 0);
+        void setPetscii(const PetsciiStr &petscii);
 	virtual void setMaxLength(int length);
 
     protected:

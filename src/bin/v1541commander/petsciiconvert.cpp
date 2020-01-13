@@ -6,6 +6,7 @@ QChar PetsciiConvert::unicodeToFont(const QChar &uc, bool lc, bool reverse)
     ushort val = uc.unicode();
     if (val < 0x20) return QChar();
     if (val > 0xff && val < 0xe000) return QChar();
+    if (val == 0xefa3) val = 0xe0a0;
     if (val > 0xe3ff) return QChar();
     val &= 0xfeff;
     if (reverse)
@@ -54,6 +55,7 @@ unsigned char PetsciiConvert::fontToPetscii(const QChar &fc, bool reverse)
 {
     ushort val = fc.unicode();
     if (reverse) val ^= 0x200;
+    if (val == 0xefa3) val = 0xe0a0;
     val &= 0xfeff;
     if (val < 0xe000 || val > 0xe2ff) return '?';
     if (val > 0xe200)

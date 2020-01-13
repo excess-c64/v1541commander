@@ -170,11 +170,9 @@ void CbmdosFsWidget::setFs(CbmdosFs *fs)
 	const CbmdosVfs *vfs = CbmdosFs_rvfs(fs);
 	uint8_t len;
 	const char *str = CbmdosVfs_name(vfs, &len);
-	PetsciiStr name(str, len);
-	d->name.setText(name.toString(cmdr.lowerCase()));
+	d->name.setPetscii(PetsciiStr(str, len));
 	str = CbmdosVfs_id(vfs, &len);
-	PetsciiStr id(str, len);
-	d->id.setText(id.toString(cmdr.lowerCase()));
+	d->id.setPetscii(PetsciiStr(str, len));
 	uint8_t dosver = CbmdosVfs_dosver(vfs);
 	d->dosVer.setValue(dosver);
 	d->dosVerReset.setEnabled(dosver != defaultDosVer(fs));

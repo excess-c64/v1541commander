@@ -28,7 +28,7 @@ PetsciiStr::~PetsciiStr()
     delete[] raw;
 }
 
-QString PetsciiStr::toString(bool lc, bool reverse)
+QString PetsciiStr::toString(bool lc, bool reverse) const
 {
     QString result;
     for (int i = 0; i < len; ++i)

@@ -393,8 +393,7 @@ void CbmdosFileWidget::importFile()
 		d->exportButton.setEnabled(true);
 		uint8_t nameLength;
 		const char *name = CbmdosFile_name(d->file, &nameLength);
-		PetsciiStr str(name, nameLength);
-		d->name.setText(str.toString(cmdr.lowerCase()));
+		d->name.setPetscii(PetsciiStr(name, nameLength));
 		d->recordLength.setValue(CbmdosFile_recordLength(d->file));
 	    }
 	    else
@@ -480,8 +479,7 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	setEnabled(true);
 	uint8_t nameLength;
 	const char *name = CbmdosFile_name(file, &nameLength);
-	PetsciiStr str(name, nameLength);
-	d->name.setText(str.toString(cmdr.lowerCase()));
+	d->name.setPetscii(PetsciiStr(name, nameLength));
 	CbmdosFileType type = CbmdosFile_type(file);
 	d->type.setCurrentIndex(d->type.findData(type));
 	d->locked.setChecked(CbmdosFile_locked(file));
