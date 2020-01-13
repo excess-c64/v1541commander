@@ -3,9 +3,14 @@
 
 #include <QWidget>
 
+class PetsciiButton;
+
 class PetsciiWindow : public QWidget
 {
     Q_OBJECT
+
+    private:
+        PetsciiButton *buttons[0x100];
 
     signals:
 	void petsciiInput(ushort val);
@@ -14,7 +19,8 @@ class PetsciiWindow : public QWidget
 	void buttonClicked(ushort val);
 
     public:
-        PetsciiWindow(QWidget *parent = 0);
+        PetsciiWindow(bool lowerCase, QWidget *parent = 0);
+        void setLowercase(bool lowerCase);
 };
 
 #endif

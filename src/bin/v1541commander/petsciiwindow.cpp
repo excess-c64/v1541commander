@@ -7,7 +7,7 @@
 #include <windows.h>
 #endif
 
-PetsciiWindow::PetsciiWindow(QWidget *parent) :
+PetsciiWindow::PetsciiWindow(bool lowerCase, QWidget *parent) :
     QWidget(parent)
 {
     QGridLayout *layout = new QGridLayout(this);
@@ -26,10 +26,12 @@ PetsciiWindow::PetsciiWindow(QWidget *parent) :
             {
                 petscii += 0xe000;
             }
+            if (lowerCase) petscii |= 0x100;
             PetsciiButton *button = new PetsciiButton(petscii, this);
 	    connect(button, &PetsciiButton::clicked,
 		    this, &PetsciiWindow::buttonClicked);
             layout->addWidget(button, row, col);
+            buttons[(row<<4)|col] = button;
         }
     }
     setLayout(layout);
@@ -39,6 +41,17 @@ PetsciiWindow::PetsciiWindow(QWidget *parent) :
 #ifdef _WIN32
     SetWindowLongPtr(HWND(winId()), GWL_EXSTYLE, WS_EX_NOACTIVATE);
 #endif
+}
+
+void PetsciiWindow::setLowercase(bool lowerCase)
+{
+    for (ushort i = 0; i < 0x100; ++i)
+    {
+        ushort val = buttons[i]->text().front().unicode();
+        if (lowerCase) val |= 0x100;
+        else val &= 0xfeff;
+        buttons[i]->setText(QString(QChar(val)));
+    }
 }
 
 void PetsciiWindow::buttonClicked(ushort val)

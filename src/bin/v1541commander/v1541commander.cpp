@@ -350,6 +350,10 @@ V1541Commander::V1541Commander(int &argc, char **argv)
     connect(&d->lowerCaseAction, &QAction::triggered, this, [this](){
             d->lowerCase = !d->lowerCase;
             emit lowerCaseChanged(d->lowerCase);
+            if (d->petsciiWindow)
+            {
+                d->petsciiWindow->setLowercase(d->lowerCase);
+            }
         });
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
@@ -567,7 +571,7 @@ void V1541Commander::showPetsciiWindow()
 {
     if (!d->petsciiWindow)
     {
-        d->petsciiWindow = new PetsciiWindow();
+        d->petsciiWindow = new PetsciiWindow(d->lowerCase);
 #ifndef _WIN32
 	d->petsciiWindow->setWindowIcon(d->appIcon);
 #endif
