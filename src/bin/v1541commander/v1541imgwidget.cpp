@@ -177,6 +177,9 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 			    autoMapToLc, true);
 		}
 	    });
+    QShortcut *sdel = new QShortcut(
+            QKeySequence(Qt::SHIFT+Qt::Key_Delete), this);
+    connect(sdel, &QShortcut::activated, this, [this](){deleteFile(true);});
 }
 
 V1541ImgWidget::~V1541ImgWidget()
@@ -617,14 +620,14 @@ void V1541ImgWidget::newFile()
     d->model.addFile(index, newFile);
 }
 
-void V1541ImgWidget::deleteFile()
+void V1541ImgWidget::deleteFile(bool skipConfirmation)
 {
     if (!hasValidImage() || !hasValidSelection()) return;
-    QMessageBox::StandardButton reply = QMessageBox::question(this,
-	    tr("Delete this file?"), tr("A deleted file cannot be restored. "
-	    "Are you sure you want to delete this file now?"),
-	    QMessageBox::Ok|QMessageBox::Cancel);
-    if (reply == QMessageBox::Ok)
+    if (skipConfirmation || QMessageBox::question(window(),
+                tr("Delete this file?"),
+                tr("A deleted file cannot be restored. "
+	        "Are you sure you want to delete this file now?"),
+	        QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
     {
 	const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
 	d->model.deleteAt(index);
