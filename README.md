@@ -160,6 +160,11 @@ disk -- rewriting all files in the order they appear in the directory will put
 them in the best possible layout (think "defragment disk"). It might also fix
 issues with corrupted filesystems.
 
+As this starts with a completely empty disk, it also creates a new BAM and of
+course, you risk losing data on a disk that contains things like data for
+trackloaders, C128 boot sectors, or anything else that isn't part of a CBM DOS
+filesystem es recognized by *V1541Commander*.
+
 ## Adding, deleting and moving files on an image
 
 You can add and delete files from the *CBM DOS* menu or by right-clicking on
@@ -247,6 +252,18 @@ replace characters in the whole directory of the currently opened disk image.
 If you check *Auto map on input* from the same menu, the mapping will always
 be done while you make changes.
 
+## Status indicator
+
+While a disk image is opened, you will see a little status indicator in the
+lower right corner of the window.
+
+* A green light means the filesystem on the disw is in good shape.
+* A yellow light indicates an invalid BAM, which might be a sign that the disk
+  contains data not in CBM DOS format. You can save disks with invalid BAMs.
+* A red light means an error state. Either the disk is full, or there wasn't
+  space left to write the directory, or there's another unspecified error. You
+  will have to fix this in order to save the disk image.
+
 ## How it works (internally)
 
 V1541Commander uses the
@@ -292,33 +309,36 @@ from the *Windows* menu.
 
 Most actions can be triggered by a keyboard shortcut, see this table:
 
-|            Shortcut | Function                               |
-| ------------------: | :------------------------------------- |
-|                  F3 | Activate directory view                |
-|           Cursor up | Select previous file in directory view |
-|         Cursor down | Select next file in directory view     |
-|   Shift + Cursor up | Move selected file one position up     |
-| Shift + Cursor down | Move selected file one position down   |
-|                  F2 | Rename selected file                   |
-|          Shift + F2 | Rename disk                            |
-|          Shift + F3 | Change disk ID                         |
-|                  F4 | Change DOS version                     |
-|          Shift + F4 | Reset DOS version to default           |
-|                  F6 | Change forced block size               |
-|          Shift + F6 | Toggle forcing a block size            |
-|                  F7 | Change record length for REL files     |
-|                  F8 | Set type of selected file to DEL       |
-|                  F9 | Set type of selected file to SEQ       |
-|                 F10 | Set type of selected file to PRG       |
-|                 F11 | Set type of selected file to USR       |
-|                 F12 | Set type of selected file to REL       |
-|    Ctrl + Shift + L | Toggle locked flag of selected file    |
-|    Ctrl + Shift + C | Toggle closed flag of selected file    |
-|    Ctrl + Shift + I | Import content to selected file        |
-|    Ctrl + Shift + E | Export content from selected file      |
-|       Shift + Space | Toggle character set                   |
+|            Shortcut | Function                                  |
+| ------------------: | :---------------------------------------- |
+|                  F3 | Activate directory view                   |
+|           Cursor up | Select previous file in directory view    |
+|         Cursor down | Select next file in directory view        |
+|   Shift + Cursor up | Move selected file one position up        |
+| Shift + Cursor down | Move selected file one position down      |
+|                 DEL | Delete selected file                      |
+|         Shift + DEL | Delete selected file without confirmation |
+|            Ctrl + . | Add a new file                            |
+|                  F2 | Rename selected file                      |
+|          Shift + F2 | Rename disk                               |
+|          Shift + F3 | Change disk ID                            |
+|                  F4 | Change DOS version                        |
+|          Shift + F4 | Reset DOS version to default              |
+|                  F6 | Change forced block size                  |
+|          Shift + F6 | Toggle forcing a block size               |
+|                  F7 | Change record length for REL files        |
+|                  F8 | Set type of selected file to DEL          |
+|                  F9 | Set type of selected file to SEQ          |
+|                 F10 | Set type of selected file to PRG          |
+|                 F11 | Set type of selected file to USR          |
+|                 F12 | Set type of selected file to REL          |
+|    Ctrl + Shift + L | Toggle locked flag of selected file       |
+|    Ctrl + Shift + C | Toggle closed flag of selected file       |
+|    Ctrl + Shift + I | Import content to selected file           |
+|    Ctrl + Shift + E | Export content from selected file         |
+|       Shift + Space | Toggle character set                      |
 
-For the keyboard shortcuts for actions in the menus, see the display of the
-menu items -- they might differ, depending on what operating system you are
-running V1541Commander on.
+For the keyboard shortcuts for some other actions in the menus, see the
+display of the menu items -- they might differ, depending on what operating
+system you are running V1541Commander on.
 
