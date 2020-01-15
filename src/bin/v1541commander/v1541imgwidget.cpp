@@ -269,6 +269,7 @@ void V1541ImgWidget::newImage()
 		d->dirList.sizeHintForRow(0) * 10
 		+ 2 * d->dirList.frameWidth());
 	d->dirList.setFocus();
+        d->fsstat.setStatus(CbmdosFs_status(d->fs));
     }
 }
 
@@ -400,6 +401,7 @@ void V1541ImgWidget::open(const QString& filename)
 		}
 		if (extracted) emit modified();
 		d->dirList.setFocus();
+                d->fsstat.setStatus(CbmdosFs_status(d->fs));
 	    }
 	}
 	if (!d->fs)
@@ -431,6 +433,7 @@ void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
 		d->dirList.sizeHintForRow(0) * minItems
 		+ 2 * d->dirList.frameWidth());
 	d->dirList.setFocus();
+        d->fsstat.setStatus(CbmdosFs_status(d->fs));
     }
     else
     {
