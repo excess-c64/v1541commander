@@ -298,6 +298,13 @@ directory got too long, allow long directories).
 The filesystem options are an exception to the rule that you always work on the
 virtual filesystem, as these tell the concrete filesystem how to behave.
 
+When you make changes to the VFS, the "concrete filesystem" writes them to the
+disk image. For any change to the directory, it is rewritten completely. When
+file contents or types are changed, the affected files are rewritten. On each
+change, the BAM sector is rewritten (but the BAM is only updated). Only when
+you select *Rewrite Image* or change filesystem options that require a
+rewrite, the whole disk is recreated from scratch, which includes the BAM.
+
 ## Log messages
 
 The *lib1541img* C library can "log" all kinds of diagnostic messages.
