@@ -33,6 +33,8 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationVersion("1.0");
 
     V1541Commander commander(argc, argv);
+    // work around a QSpinBox layout bug in Qt 5.13:
+    commander.setStyleSheet("QFoo{}");
 
     QCommandLineParser parser;
     parser.setApplicationDescription("virtual 1541 disk image commander");
