@@ -39,6 +39,7 @@ class V1541ImgWidget: public QWidget
     public:
 	V1541ImgWidget(QWidget *parent = nullptr);
 	~V1541ImgWidget();
+        QWidget *statusWidget() const;
 	bool hasValidImage() const;
 	bool hasValidSelection() const;
 	CbmdosVfs *exportZipcodeVfs();

@@ -2,6 +2,9 @@
 <qresource>
 	<file>C64_Pro_Mono-STYLE.ttf</file>
 	<file alias="icon_256.png">icons/256x256/v1541commander.png</file>
+	<file alias="statusled_red.png">gfx/statusled_red.png</file>
+	<file alias="statusled_yellow.png">gfx/statusled_yellow.png</file>
+	<file alias="statusled_green.png">gfx/statusled_green.png</file>
 </qresource>
 </RCC>
 

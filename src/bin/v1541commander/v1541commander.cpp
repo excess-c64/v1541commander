@@ -16,6 +16,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QMessageBox>
+#include <QPixmap>
 #include <QSet>
 #include <QSettings>
 #ifdef _WIN32
@@ -35,6 +36,9 @@ class V1541Commander::priv
         priv(V1541Commander *commander);
         V1541Commander *commander;
         QFont c64font;
+        QPixmap statusLedRed;
+        QPixmap statusLedYellow;
+        QPixmap statusLedGreen;
 #ifndef _WIN32
 	QIcon appIcon;
 #endif
@@ -77,6 +81,9 @@ class V1541Commander::priv
 V1541Commander::priv::priv(V1541Commander *commander) :
     commander(commander),
     c64font("C64 Pro Mono"),
+    statusLedRed(":/statusled_red.png"),
+    statusLedYellow(":/statusled_yellow.png"),
+    statusLedGreen(":/statusled_green.png"),
 #ifndef _WIN32
     appIcon(),
 #endif
@@ -723,6 +730,21 @@ void V1541Commander::petsciiInput(ushort val)
 const QFont &V1541Commander::c64font() const
 {
     return d->c64font;
+}
+
+const QPixmap &V1541Commander::statusLedRed() const
+{
+    return d->statusLedRed;
+}
+
+const QPixmap &V1541Commander::statusLedYellow() const
+{
+    return d->statusLedYellow;
+}
+
+const QPixmap &V1541Commander::statusLedGreen() const
+{
+    return d->statusLedGreen;
 }
 
 QAction &V1541Commander::newAction()

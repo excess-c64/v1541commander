@@ -51,7 +51,7 @@ MainWindow::MainWindow()
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
     windowsMenu->addAction(&cmdr.petsciiWindowAction());
     windowsMenu->addAction(&cmdr.logWindowAction());
-    (void) statusBar();
+    statusBar()->setStyleSheet("QStatusBar::item {border: none;}");
 
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander[*]"));
 }
@@ -168,6 +168,7 @@ void MainWindow::newImage()
 	emit contentChanged();
 	setWindowModified(false);
 	emit modifiedChanged();
+        statusBar()->addPermanentWidget(imgWidget->statusWidget());
 	adjustSize();
     }
     else
@@ -208,6 +209,7 @@ void MainWindow::openImage(const QString &imgFile)
 	    connect(imgWidget, &V1541ImgWidget::saved,
 		    this, &MainWindow::contentSaved);
             emit contentChanged();
+            statusBar()->addPermanentWidget(imgWidget->statusWidget());
             adjustSize();
 	}
 	else
@@ -239,6 +241,7 @@ void MainWindow::openVfs(CbmdosVfs *vfs)
 		this, &MainWindow::contentSaved);
 	setWindowModified(true);
 	emit contentChanged();
+        statusBar()->addPermanentWidget(imgWidget->statusWidget());
 	adjustSize();
     }
     else
@@ -385,5 +388,5 @@ void MainWindow::deleteFile()
 
 void MainWindow::showStatusLine(const QString &line)
 {
-    statusBar()->showMessage(line);
+    statusBar()->showMessage(line, 10000);
 }

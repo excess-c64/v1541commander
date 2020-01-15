@@ -2,6 +2,7 @@
 #include "v1541commander.h"
 #include "cbmdosfsmodel.h"
 #include "cbmdosfsoptionsdialog.h"
+#include "cbmdosfsstatuswidget.h"
 #include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
 #include "utils.h"
@@ -38,6 +39,7 @@ class V1541ImgWidget::priv
 	QListView dirList;
 	CbmdosFsWidget fsprop;
 	CbmdosFileWidget file;
+        CbmdosFsStatusWidget fsstat;
 
 	bool canSaveImage(V1541ImgWidget *w);
 };
@@ -47,7 +49,8 @@ V1541ImgWidget::priv::priv() :
     model(),
     dirList(),
     fsprop(),
-    file()
+    file(),
+    fsstat()
 {}
 
 bool V1541ImgWidget::priv::canSaveImage(V1541ImgWidget *w)
@@ -181,6 +184,11 @@ V1541ImgWidget::~V1541ImgWidget()
     CbmdosFs_destroy(fs);
 }
 
+QWidget *V1541ImgWidget::statusWidget() const
+{
+    return &d->fsstat;
+}
+
 void V1541ImgWidget::selected(const QModelIndex &current,
 	const QModelIndex &previous)
 {
@@ -201,6 +209,7 @@ void V1541ImgWidget::selected(const QModelIndex &current,
 
 void V1541ImgWidget::modelModified()
 {
+    d->fsstat.setStatus(CbmdosFs_status(d->fs));
     emit modified();
 }
 
