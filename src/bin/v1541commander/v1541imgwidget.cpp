@@ -567,6 +567,7 @@ void V1541ImgWidget::rewriteImage()
     if (reply == QMessageBox::Ok)
     {
 	CbmdosFs_rewrite(d->fs);
+        d->fsstat.setStatus(CbmdosFs_status(d->fs));
 	emit modified();
     }
 }
