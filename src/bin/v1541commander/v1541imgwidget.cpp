@@ -93,7 +93,9 @@ bool V1541ImgWidget::priv::canSaveImage(V1541ImgWidget *w)
     {
 	if (QMessageBox::question(w->window(), tr("Save with invalid BAM?"),
 		    tr("<p>The BAM on the virtual disk is currently invalid. "
-			"You can fix this by rewriting the disk first.</p>"
+			"You can fix this by rewriting the disk first, but "
+                        "this could also destroy data on the disk not "
+                        "recognized by this tool.</p>"
 			"<p>Do you want to save the disk in the current "
 			"state?</p>"),
 		    QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
@@ -401,7 +403,23 @@ void V1541ImgWidget::open(const QString& filename)
 		}
 		if (extracted) emit modified();
 		d->dirList.setFocus();
-                d->fsstat.setStatus(CbmdosFs_status(d->fs));
+                CbmdosFsStatus status = CbmdosFs_status(d->fs);
+                d->fsstat.setStatus(status);
+                if (status == CbmdosFsStatus::CFS_INVALIDBAM
+                        && QMessageBox::question(window(),
+                            tr("Invalid BAM -- save as new file?"),
+                            tr("<p>This disk's BAM seems invalid. This could "
+                                "be a sign that the disk contains things "
+                                "not supported by this tool, like e.g. data "
+                                "for trackloaders or C128 boot sectors.</p>"
+                                "<p>It's therefore recommended to work on "
+                                "a copy. Do you want to treat this as a new "
+                                "image now?"),
+                            QMessageBox::Yes|QMessageBox::No)
+                        == QMessageBox::Yes)
+                {
+                    emit modified();
+                }
 	    }
 	}
 	if (!d->fs)
