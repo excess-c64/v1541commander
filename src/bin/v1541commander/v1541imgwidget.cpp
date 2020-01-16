@@ -316,7 +316,7 @@ void V1541ImgWidget::open(const QString& filename)
 		FileData_destroy(data);
 		return;
 	    }
-	    ZcFileSet *fileset = ZcFileSet_fromFileData(data);
+	    ZcFileSet *fileset = ZcFileSet_tryFromFileData(data);
 	    if (fileset)
 	    {
 		if (QMessageBox::question(window(),

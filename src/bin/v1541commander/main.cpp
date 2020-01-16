@@ -11,6 +11,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <QFont>
+#include <QtGlobal>
 #endif
 
 int main(int argc, char **argv)
@@ -33,8 +35,23 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationVersion("1.0");
 
     V1541Commander commander(argc, argv);
+#ifdef _WIN32
+#if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0) \
+    || QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     // work around a QSpinBox layout bug in Qt 5.13:
     commander.setStyleSheet("QFoo{}");
+#endif
+    // correct the default font:
+    NONCLIENTMETRICSW ncm;
+    ncm.cbSize = sizeof ncm;
+    if (SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof ncm, &ncm, 0))
+    {
+        if (ncm.lfMessageFont.lfHeight < 0) ncm.lfMessageFont.lfHeight *= -1;
+        QFont sysfont(QString::fromWCharArray(ncm.lfMessageFont.lfFaceName));
+        sysfont.setPixelSize(ncm.lfMessageFont.lfHeight);
+        commander.setFont(sysfont);
+    }
+#endif
 
     QCommandLineParser parser;
     parser.setApplicationDescription("virtual 1541 disk image commander");

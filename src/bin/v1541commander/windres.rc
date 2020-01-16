@@ -7,7 +7,7 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName", "Excess"
-      VALUE "FileDescription", "V1541Commander: virtual 1541 disk commander"
+      VALUE "FileDescription", "virtual 1541 disk commander"
       VALUE "FileVersion", "1.0.0"
       VALUE "InternalName", "v1541commander"
       VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"

@@ -1,9 +1,9 @@
 #include "aboutbox.h"
 
 #include <QCoreApplication>
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 class AboutBox::priv
@@ -13,14 +13,15 @@ class AboutBox::priv
 	QVBoxLayout mainLayout;
 	QHBoxLayout contentLayout;
 	QVBoxLayout textLayout;
-	QHBoxLayout buttonsLayout;
+        QHBoxLayout titleLayout;
 	QLabel appLogo;
 	QLabel excessLogo;
 	QLabel aboutText;
-	QPushButton okButton;
+        QLabel titleText;
+	QDialogButtonBox buttons;
 };
 
-static const QChar logo[] = {
+static const QChar logo[] = {0xa,
     0xe0b0, 0xe0d5, 0xe0c0, 0xe0b2, 0xe0b2, 0xe0b2, 0xe0c0, 0xe0b2,
     0xe0c0, 0xe0b2, 0xe0c0, 0xe0b2, 0xe0c0, 0xe0b2, 0xe0c9, 0xe0ae, 0xa,
     0xe0b0, 0xe0b3, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd,
@@ -30,19 +31,17 @@ static const QChar logo[] = {
     0xe0ad, 0xe0b3, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd,
     0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0dd, 0xe0ab, 0xe0db, 0xe0bd, 0xa,
     0xe0ad, 0xe0ca, 0xe0c0, 0xe0b1, 0xe0b1, 0xe0b1, 0xe0c0, 0xe0b1,
-    0xe0c0, 0xe0b1, 0xe0c0, 0xe0b1, 0xe0c0, 0xe0b1, 0xe0cb, 0xe0bd
+    0xe0c0, 0xe0b1, 0xe0c0, 0xe0b1, 0xe0c0, 0xe0b1, 0xe0cb, 0xe0bd, 0xa
 };
 
 AboutBox::priv::priv() :
     mainLayout(),
     contentLayout(),
     textLayout(),
-    buttonsLayout(),
+    titleLayout(),
     appLogo(),
     excessLogo(QString::fromRawData(logo, sizeof logo / sizeof *logo)),
-    aboutText(QString("<p>%1 v%2<br />"
-	    "virtual 1541 disk commander<br />"
-	    "by Zirias/Excess</p>"
+    aboutText(tr(
 	    "<p>This is free software provided under BSD 2clause license, "
 	    "with no warranties whatsoever, see LICENSE.txt included with the "
 	    "package.</p>"
@@ -53,10 +52,13 @@ AboutBox::priv::priv() :
 	    "<a href=\"https://github.com/excess-c64/v1541commander\">"
 	    "https://github.com/excess-c64/v1541commander</a> for "
 	    "instructions to build your own executable, possibly linking "
-	    "different library versions.</p>")
+	    "different library versions.</p>")),
+    titleText(QString(tr("<p><font size=\"+1\"><b>%1 v%2</b></font></p>"
+            "<p>virtual 1541 disk commander<br />"
+            "by Zirias/Excess</p>"))
 	    .arg(QCoreApplication::applicationName())
 	    .arg(QCoreApplication::applicationVersion())),
-    okButton(tr("Ok"))
+    buttons(QDialogButtonBox::Ok)
 {
     appLogo.setPixmap(QPixmap(":/icon_256.png"));
 }
@@ -68,17 +70,17 @@ AboutBox::AboutBox(const QFont &c64font) :
     d = new priv();
     d->excessLogo.setFont(c64font);
     d->aboutText.setWordWrap(true);
-    d->textLayout.addWidget(&d->excessLogo);
+    d->titleLayout.addWidget(&d->titleText);
+    d->titleLayout.addWidget(&d->excessLogo);
+    d->textLayout.addLayout(&d->titleLayout);
     d->textLayout.addWidget(&d->aboutText);
     d->contentLayout.addWidget(&d->appLogo);
     d->contentLayout.addLayout(&d->textLayout);
     d->mainLayout.addLayout(&d->contentLayout);
-    d->buttonsLayout.addStretch();
-    d->buttonsLayout.addWidget(&d->okButton);
-    d->mainLayout.addLayout(&d->buttonsLayout);
+    d->mainLayout.addWidget(&d->buttons);
     d->mainLayout.setSizeConstraint(QLayout::SetFixedSize);
     setLayout(&d->mainLayout);
-    connect(&d->okButton, &QPushButton::clicked, this, &AboutBox::hide);
+    connect(&d->buttons, &QDialogButtonBox::accepted, this, &AboutBox::hide);
 }
 
 AboutBox::~AboutBox()
