@@ -8,6 +8,7 @@ class QAction;
 class QIcon;
 #endif
 class QPixmap;
+class QTranslator;
 
 #define cmdr (V1541Commander::instance())
 
@@ -47,7 +48,7 @@ class V1541Commander: public QApplication
 	void readyRead();
         
     public:
-        V1541Commander(int &argc, char **argv);
+        V1541Commander(int &argc, char **argv, QTranslator *translator);
         ~V1541Commander();
         const QFont &c64font() const;
         const QPixmap &statusLedRed() const;

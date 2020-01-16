@@ -3,6 +3,7 @@
 .*.pyc
 *.o
 *.d
+*.qm
 *.exe
 *.core
 defaults.mk

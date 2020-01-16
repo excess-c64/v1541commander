@@ -19,6 +19,7 @@
 #include <QPixmap>
 #include <QSet>
 #include <QSettings>
+#include <QTranslator>
 #ifdef _WIN32
 #include <windows.h>
 #include <lmcons.h>
@@ -325,13 +326,14 @@ void V1541Commander::priv::updateActions(MainWindow *w)
 	    && w->hasValidContent() && w->hasValidSelection());
 }
 
-V1541Commander::V1541Commander(int &argc, char **argv)
+V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
     : QApplication(argc, argv)
 {
 #ifdef DEBUG
     setMaxLogLevel(L_DEBUG);
 #endif
     QFontDatabase::addApplicationFont(":/C64_Pro_Mono-STYLE.ttf");
+    installTranslator(translator);
     d = new priv(this);
     d->addWindow(false);
     QSettings settings(QCoreApplication::organizationName(),
@@ -475,10 +477,11 @@ static QString getFilterForWindowContent(MainWindow::Content content)
     switch (content)
     {
 	case MainWindow::Content::Image:
-	    return QString(QT_TR_NOOP(
-			"1541 disk images (*.d64);;all files (*)"));
+	    return QCoreApplication::translate("V1541Commander",
+                    "1541 disk images (*.d64);;all files (*)");
 	default:
-	    return QString(QT_TR_NOOP("all files (*)"));
+	    return QCoreApplication::translate("V1541Commander",
+                    "all files (*)");
     }
 }
 
@@ -510,8 +513,7 @@ void V1541Commander::exportZipcode()
     if (!w) return;
 
     QString zcFile = QFileDialog::getSaveFileName(w, tr("Export as ..."),
-	    QString(), QString(QT_TR_NOOP(
-		    "Zipcode files (*.prg);;all files (*)")));
+	    QString(), tr("Zipcode files (*.prg);;all files (*)"));
 
     if (!zcFile.isEmpty())
     {
@@ -537,8 +539,7 @@ void V1541Commander::exportLynx()
     if (!w) return;
 
     QString lynxFile = QFileDialog::getSaveFileName(w, tr("Export as ..."),
-	    QString(), QString(QT_TR_NOOP(
-		    "LyNX files (*.lnx);;all files (*)")));
+	    QString(), tr("LyNX files (*.lnx);;all files (*)"));
 
     if (!lynxFile.isEmpty())
     {

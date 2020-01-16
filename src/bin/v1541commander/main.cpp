@@ -4,6 +4,7 @@
 #include <QDataStream>
 #include <QFileInfo>
 #include <QLocalSocket>
+#include <QTranslator>
 
 #ifdef QT_STATICPLUGIN
 #include <QtPlugin>
@@ -34,7 +35,15 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName("V1541Commander");
     QCoreApplication::setApplicationVersion("1.0");
 
-    V1541Commander commander(argc, argv);
+    QTranslator translator;
+    QString qmsuffix = QLocale::system().name();
+    if (!translator.load(":/qm/v1541commander-"+qmsuffix))
+    {
+        qmsuffix = QLocale::languageToString(QLocale::system().language());
+        translator.load(":/qm/v1541commander-"+qmsuffix);
+    }
+    V1541Commander commander(argc, argv, &translator);
+
 #ifdef _WIN32
 #if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0) \
     || QT_VERSION < QT_VERSION_CHECK(5, 15, 0)

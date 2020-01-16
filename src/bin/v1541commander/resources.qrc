@@ -5,6 +5,7 @@
 	<file alias="statusled_red.png">gfx/statusled_red.png</file>
 	<file alias="statusled_yellow.png">gfx/statusled_yellow.png</file>
 	<file alias="statusled_green.png">gfx/statusled_green.png</file>
+	<file>qm/v1541commander-de.qm</file>
 </qresource>
 </RCC>
 

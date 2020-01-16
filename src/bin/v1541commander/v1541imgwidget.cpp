@@ -86,7 +86,7 @@ bool V1541ImgWidget::priv::canSaveImage(V1541ImgWidget *w)
 	QMessageBox::critical(w->window(), tr("Unable to save"),
 		tr("<p>The filesystem on the virtual disk is broken for "
 		    "unknown reasons. You can try to change some filesystem "
-		    "options and rewrite the disk."));
+		    "options and rewrite the disk.</p>"));
 	return false;
     }
     if (status & CbmdosFsStatus::CFS_INVALIDBAM)
@@ -417,7 +417,7 @@ void V1541ImgWidget::open(const QString& filename)
                                 "for trackloaders or C128 boot sectors.</p>"
                                 "<p>It's therefore recommended to work on "
                                 "a copy. Do you want to treat this as a new "
-                                "image now?"),
+                                "image now?</p>"),
                             QMessageBox::Yes|QMessageBox::No)
                         == QMessageBox::Yes)
                 {

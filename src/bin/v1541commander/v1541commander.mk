@@ -20,3 +20,19 @@ v1541commander_win32_LDFLAGS:= -mwindows
 v1541commander_win32_RES:= windres
 
 $(call binrules, v1541commander)
+
+v1541commander_LANGS:= de
+
+$(v1541commander_OBJDIR)/resources_qrc.cpp: $(addsuffix .qm,$(addprefix \
+	$(v1541commander_SRCDIR)/qm/v1541commander-, \
+	$(v1541commander_LANGS)))
+
+LRELEASE?= lrelease
+
+$(v1541commander_SRCDIR)/qm/%.qm: $(v1541commander_SRCDIR)/%.ts
+	@mkdir -p $(v1541commander_SRCDIR)/qm
+	$(LRELEASE) $< -qm $@
+
+clean::
+	rm -fr $(v1541commander_SRCDIR)/qm
+

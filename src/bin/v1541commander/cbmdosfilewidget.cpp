@@ -351,38 +351,42 @@ static QString getFilterForType(CbmdosFileType type)
     {
 	case CbmdosFileType::CFT_PRG:
 #ifdef _WIN32
-	    return QString(QT_TR_NOOP("PRG files (*.prg);;"
-			"P00 files (*.p00);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "PRG files (*.prg);;P00 files (*.p00);;all files (*)");
 #else
-	    return QString(QT_TR_NOOP("PRG files (*.prg);;"
-			"P00 files (*.p[0-9][0-9]);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "PRG files (*.prg);;"
+                    "P00 files (*.p[0-9][0-9]);;all files (*)");
 #endif
 	case CbmdosFileType::CFT_SEQ:
 #ifdef _WIN32
-	    return QString(QT_TR_NOOP("SEQ files (*.seq);;"
-			"S00 files (*.s00);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "SEQ files (*.seq);;S00 files (*.s00);;all files (*)");
 #else
-	    return QString(QT_TR_NOOP("SEQ files (*.seq);;"
-			"S00 files (*.s[0-9][0-9]);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "SEQ files (*.seq);;"
+                    "S00 files (*.s[0-9][0-9]);;all files (*)");
 #endif
 	case CbmdosFileType::CFT_USR:
 #ifdef _WIN32
-	    return QString(QT_TR_NOOP("USR files (*.usr);;"
-			"U00 files (*.u00);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "USR files (*.usr);;U00 files (*.u00);;all files (*)");
 #else
-	    return QString(QT_TR_NOOP("USR files (*.usr);;"
-			"U00 files (*.u[0-9][0-9]);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "USR files (*.usr);;"
+                    "U00 files (*.u[0-9][0-9]);;all files (*)");
 #endif
 	case CbmdosFileType::CFT_REL:
 #ifdef _WIN32
-	    return QString(
-		    QT_TR_NOOP("R00 files (*.r00);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "R00 files (*.r00);;all files (*)");
 #else
-	    return QString(
-		    QT_TR_NOOP("R00 files (*.r[0-9][0-9]);;all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget", 
+                        "R00 files (*.r[0-9][0-9]);;all files (*)");
 #endif
 	default:
-	    return QString(QT_TR_NOOP("all files (*)"));
+	    return QCoreApplication::translate("CbmdosFileWidget",
+                    "all files (*)");
     }
 }
 
