@@ -24,10 +24,22 @@ LogWindow::LogWindow(QWidget *parent) :
     QPlainTextEdit(parent)
 {
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    QFontMetricsF fm(font());
-    setMinimumWidth(82 * fm.averageCharWidth());
     setReadOnly(true);
     setMaximumBlockCount(1024);
     setWindowTitle(tr("lib1541img log viewer"));
+    appendlog(L_INFO, "V1541Commander started, waiting for log messages from "
+	    "lib1541img ...", this);
     setCustomLogger(appendlog, this);
+    adjustSize();
+}
+
+QSize LogWindow::sizeHint() const
+{
+    QFontMetricsF fm(font());
+    return QSize(82 * fm.averageCharWidth(), 16 * fm.height());
+}
+
+QSize LogWindow::minimumSizeHint() const
+{
+    return sizeHint();
 }

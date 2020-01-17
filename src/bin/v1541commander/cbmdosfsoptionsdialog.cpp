@@ -7,9 +7,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QScreen>
 #include <QSpinBox>
-#include <QStyle>
 #include <QVBoxLayout>
+#include <QWindow>
 
 #include <1541img/cbmdosfsoptions.h>
 
@@ -374,11 +375,41 @@ void CbmdosFsOptionsDialog::reset()
 
 void CbmdosFsOptionsDialog::showEvent(QShowEvent *event)
 {
-    (void)event;
+    QDialog::showEvent(event);
+    adjustSize();
+    setFixedSize(size());
     QCoreApplication::processEvents();
-    QRect parentRect(parentWidget()->mapToGlobal(QPoint( 0, 0 )),
-            parentWidget()->size());
-    move(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(),
-                parentRect).topLeft());
+
+    QRect dlgRect = frameGeometry();
+    QRect mainWinRect = parentWidget()->window()->frameGeometry();
+    dlgRect.moveCenter(mainWinRect.center());
+
+    const QScreen *screen = 0;
+    const QWindow *currentWin = parentWidget()->windowHandle();
+    if (currentWin)
+    {
+	screen = currentWin->screen();
+    }
+    if (screen)
+    {
+	QRect screenRect = screen->availableGeometry();
+	if (dlgRect.right() > screenRect.right())
+	{
+	    dlgRect.moveRight(screenRect.right());
+	}
+	if (dlgRect.bottom() > screenRect.bottom())
+	{
+	    dlgRect.moveBottom(screenRect.bottom());
+	}
+	if (dlgRect.top() < screenRect.top())
+	{
+	    dlgRect.moveTop(screenRect.top());
+	}
+	if (dlgRect.left() < screenRect.left())
+	{
+	    dlgRect.moveLeft(screenRect.left());
+	}
+    }
+    move(dlgRect.topLeft());
 }
 

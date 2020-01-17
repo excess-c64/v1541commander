@@ -1,10 +1,10 @@
 #include "petsciibutton.h"
-#include "v1541commander.h"
 
-PetsciiButton::PetsciiButton(ushort petscii, QWidget *parent) :
+PetsciiButton::PetsciiButton(
+	ushort petscii, const QFont &c64font, QWidget *parent) :
     QLabel(parent)
 {
-    setFont(cmdr.c64font());
+    setFont(c64font);
     setText(QString(petscii));
     setStyleSheet("QLabel { padding: 4px 2px; background-color: white; }");
 }

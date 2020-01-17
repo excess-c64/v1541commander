@@ -7,8 +7,10 @@
 #include <windows.h>
 #endif
 
-PetsciiWindow::PetsciiWindow(bool lowerCase, QWidget *parent) :
-    QWidget(parent)
+PetsciiWindow::PetsciiWindow(const QFont &c64font, QWidget *parent) :
+    QWidget(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint
+	    | Qt::WindowCloseButtonHint | Qt::WindowDoesNotAcceptFocus
+	    | Qt::CustomizeWindowHint)
 {
     QGridLayout *layout = new QGridLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -26,8 +28,7 @@ PetsciiWindow::PetsciiWindow(bool lowerCase, QWidget *parent) :
             {
                 petscii += 0xe000;
             }
-            if (lowerCase) petscii |= 0x100;
-            PetsciiButton *button = new PetsciiButton(petscii, this);
+            PetsciiButton *button = new PetsciiButton(petscii, c64font, this);
 	    connect(button, &PetsciiButton::clicked,
 		    this, &PetsciiWindow::buttonClicked);
             layout->addWidget(button, row, col);
@@ -37,7 +38,6 @@ PetsciiWindow::PetsciiWindow(bool lowerCase, QWidget *parent) :
     setLayout(layout);
     setWindowTitle(tr("PETSCII Input"));
     setAttribute(Qt::WA_ShowWithoutActivating);
-    setWindowFlags(Qt::WindowDoesNotAcceptFocus);
 #ifdef _WIN32
     SetWindowLongPtr(HWND(winId()), GWL_EXSTYLE, WS_EX_NOACTIVATE);
 #endif
@@ -57,4 +57,10 @@ void PetsciiWindow::setLowercase(bool lowerCase)
 void PetsciiWindow::buttonClicked(ushort val)
 {
     emit petsciiInput(val);
+}
+
+void PetsciiWindow::showEvent(QShowEvent *event)
+{
+    (void)event;
+    setFixedSize(minimumSize());
 }

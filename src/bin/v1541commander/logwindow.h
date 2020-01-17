@@ -10,6 +10,10 @@ class LogWindow : public QPlainTextEdit
     public:
 	LogWindow(QWidget *parent = 0);
 
+    protected:
+	virtual QSize sizeHint() const;
+	virtual QSize minimumSizeHint() const;
+
     signals:
 	void logLineAppended(const QString &line);
 };

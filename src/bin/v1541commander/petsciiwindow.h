@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class PetsciiButton;
+class QShowEvent;
 
 class PetsciiWindow : public QWidget
 {
@@ -19,8 +20,11 @@ class PetsciiWindow : public QWidget
 	void buttonClicked(ushort val);
 
     public:
-        PetsciiWindow(bool lowerCase, QWidget *parent = 0);
+        PetsciiWindow(const QFont &c64font, QWidget *parent = 0);
         void setLowercase(bool lowerCase);
+
+    protected:
+	virtual void showEvent(QShowEvent *event);
 };
 
 #endif

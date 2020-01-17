@@ -91,6 +91,6 @@ AboutBox::~AboutBox()
 void AboutBox::showEvent(QShowEvent *event)
 {
     QDialog::showEvent(event);
-    resize(0, 0);
+    setFixedSize(minimumSize());
 }
 

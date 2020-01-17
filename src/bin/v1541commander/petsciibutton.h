@@ -11,7 +11,8 @@ class PetsciiButton : public QLabel
     Q_OBJECT
 
     public:
-        PetsciiButton(ushort petscii, QWidget *parent = 0);
+        PetsciiButton(
+		ushort petscii, const QFont &c64font, QWidget *parent = 0);
 
     signals:
 	void clicked(ushort val);

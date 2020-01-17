@@ -19,7 +19,9 @@
 #include <QPixmap>
 #include <QSet>
 #include <QSettings>
+#include <QScreen>
 #include <QTranslator>
+#include <QWindow>
 #ifdef _WIN32
 #include <windows.h>
 #include <lmcons.h>
@@ -64,7 +66,7 @@ class V1541Commander::priv
         QAction lowerCaseAction;
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
-        PetsciiWindow *petsciiWindow;
+        PetsciiWindow petsciiWindow;
 	AboutBox aboutBox;
 	LogWindow logWindow;
 	QString instanceServerName;
@@ -109,7 +111,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     lowerCaseAction(tr("&Lowercase")),
     allWindows(),
     lastActiveWindow(0),
-    petsciiWindow(0),
+    petsciiWindow(c64font),
     aboutBox(c64font),
     logWindow(),
     instanceServerName(),
@@ -176,6 +178,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     appIcon.addPixmap(QPixmap(":/icon_16.png"));
     logWindow.setWindowIcon(appIcon);
     aboutBox.setWindowIcon(appIcon);
+    petsciiWindow.setWindowIcon(appIcon);
 #endif
     QCryptographicHash appData(QCryptographicHash::Sha256);
     appData.addData(QCoreApplication::organizationName().toUtf8());
@@ -238,6 +241,23 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     isPrimaryInstance = listening;
 }
 
+#ifdef _WIN32
+static void stackWinPos(QPoint &pos, const QRect *screenRect)
+{
+    pos.setX(pos.x() + 64);
+    pos.setY(pos.y() + 32);
+    if (screenRect)
+    {
+	if (pos.x() + 480 > screenRect->right()
+		|| pos.y() + 120 > screenRect->bottom())
+	{
+	    pos.setX(screenRect->left());
+	    pos.setY(screenRect->top());
+	}
+    }
+}
+#endif
+
 MainWindow *V1541Commander::priv::addWindow(bool show)
 {
 #ifdef _WIN32
@@ -246,9 +266,21 @@ MainWindow *V1541Commander::priv::addWindow(bool show)
     if (!lastWin && allWindows.count() > 0) lastWin = allWindows.first();
     if (lastWin)
     {
+	const QScreen *screen = 0;
+	QRect screenGeom;
+	const QRect *screenRect = 0;
+	const QWindow *winhndl = lastWin->windowHandle();
+	if (winhndl)
+	{
+	    screen = winhndl->screen();
+	}
+	if (screen)
+	{
+	    screenGeom = screen->availableGeometry();
+	    screenRect = &screenGeom;
+	}
         QPoint pos = lastWin->pos();
-        pos.setX(pos.x() + 64);
-        pos.setY(pos.y() + 32);
+	stackWinPos(pos, screenRect);
         bool posOk = false;
         for (int i = 0; i < 20; ++i)
         {
@@ -263,8 +295,7 @@ MainWindow *V1541Commander::priv::addWindow(bool show)
                 }
             }
             if (posOk) break;
-            pos.setX(pos.x() + 64);
-            pos.setY(pos.y() + 32);
+	    stackWinPos(pos, screenRect);
         }
         newWin->move(pos);
     }
@@ -298,6 +329,8 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
         QSettings settings(QCoreApplication::organizationName(),
                 QCoreApplication::applicationName());
         settings.setValue("geometry", w->saveGeometry());
+	settings.setValue("petsciiGeometry", petsciiWindow.saveGeometry());
+	settings.setValue("logGeometry", logWindow.saveGeometry());
 	settings.setValue("lowercase", lowerCase);
 	settings.setValue("automap", autoMapToLc);
         closeAllWindows();
@@ -340,6 +373,10 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
             QCoreApplication::applicationName());
     d->lastActiveWindow->restoreGeometry(
             settings.value("geometry").toByteArray());
+    d->petsciiWindow.restoreGeometry(
+	    settings.value("petsciiGeometry").toByteArray());
+    d->logWindow.restoreGeometry(
+	    settings.value("logGeometry").toByteArray());
     d->lowerCase = settings.value("lowercase", false).toBool();
     d->lowerCaseAction.setChecked(d->lowerCase);
     d->autoMapToLc = settings.value("automap", false).toBool();
@@ -378,13 +415,12 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
             this, &V1541Commander::newFile);
     connect(&d->deleteFileAction, &QAction::triggered,
             this, &V1541Commander::deleteFile);
+    connect(&d->petsciiWindow, &PetsciiWindow::petsciiInput,
+	    this, &V1541Commander::petsciiInput);
     connect(&d->lowerCaseAction, &QAction::triggered, this, [this](){
             d->lowerCase = !d->lowerCase;
             emit lowerCaseChanged(d->lowerCase);
-            if (d->petsciiWindow)
-            {
-                d->petsciiWindow->setLowercase(d->lowerCase);
-            }
+            d->petsciiWindow.setLowercase(d->lowerCase);
         });
     connect(&d->autoMapLcAction, &QAction::triggered, this, [this](){
 	    d->autoMapToLc = !d->autoMapToLc;
@@ -401,8 +437,45 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
 
 V1541Commander::~V1541Commander()
 {
-    delete d->petsciiWindow;
     delete d;
+}
+
+static void sanitizeWindowRect(QRect *winRect, const QScreen *screen)
+{
+    if (!screen) return;
+    QRect screenRect = screen->availableGeometry();
+    if (winRect->right() > screenRect.right())
+    {
+	winRect->moveRight(screenRect.right());
+    }
+    if (winRect->bottom() > screenRect.bottom())
+    {
+	winRect->moveBottom(screenRect.bottom());
+    }
+    if (winRect->top() < screenRect.top())
+    {
+	winRect->moveTop(screenRect.top());
+    }
+    if (winRect->left() < screenRect.left())
+    {
+	winRect->moveLeft(screenRect.left());
+    }
+}
+
+static void sanitizeWindowPos(QWidget *window)
+{
+    const QScreen *screen = 0;
+    const QWindow *currentWin = window->windowHandle();
+    if (currentWin)
+    {
+	screen = currentWin->screen();
+    }
+    if (screen)
+    {
+	QRect winRect = window->frameGeometry();
+	sanitizeWindowRect(&winRect, screen);
+	window->move(winRect.topLeft());
+    }
 }
 
 void V1541Commander::show()
@@ -411,6 +484,7 @@ void V1541Commander::show()
     if (!w) return;
 
     w->show();
+    sanitizeWindowPos(w);
 }
 
 void V1541Commander::newImage()
@@ -565,11 +639,21 @@ void V1541Commander::about()
     if (!w) return;
 
     d->aboutBox.show();
+    QRect aboutBoxRect = d->aboutBox.frameGeometry();
+    QRect mainWinRect = w->frameGeometry();
+    aboutBoxRect.moveCenter(mainWinRect.center());
+
+    const QScreen *screen = 0;
+    const QWindow *currentWin = w->windowHandle();
+    if (currentWin)
+    {
+	screen = currentWin->screen();
+	sanitizeWindowRect(&aboutBoxRect, screen);
+    }
+
+    d->aboutBox.move(aboutBoxRect.topLeft());
     d->aboutBox.activateWindow();
     d->aboutBox.raise();
-    QRect aboutBoxRect = d->aboutBox.geometry();
-    aboutBoxRect.moveCenter(w->frameGeometry().center());
-    d->aboutBox.setGeometry(aboutBoxRect);
 }
 
 void V1541Commander::exit()
@@ -603,21 +687,22 @@ void V1541Commander::windowSelectionChanged()
 
 void V1541Commander::showPetsciiWindow()
 {
-    if (!d->petsciiWindow)
-    {
-        d->petsciiWindow = new PetsciiWindow(d->lowerCase);
-#ifndef _WIN32
-	d->petsciiWindow->setWindowIcon(d->appIcon);
-#endif
-	connect(d->petsciiWindow, &PetsciiWindow::petsciiInput,
-		this, &V1541Commander::petsciiInput);
-    }
-    d->petsciiWindow->show();
+    QRect geom = d->petsciiWindow.frameGeometry();
+    d->petsciiWindow.show();
+    d->petsciiWindow.move(geom.topLeft());
+    QCoreApplication::processEvents();
+    sanitizeWindowPos(&d->petsciiWindow);
+    d->petsciiWindow.raise();
 }
 
 void V1541Commander::showLogWindow()
 {
+    QRect geom = d->logWindow.frameGeometry();
     d->logWindow.show();
+    d->logWindow.move(geom.topLeft());
+    QCoreApplication::processEvents();
+    sanitizeWindowPos(&d->logWindow);
+    d->logWindow.raise();
 }
 
 void V1541Commander::fsOptions()
