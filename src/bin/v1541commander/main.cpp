@@ -8,6 +8,8 @@
 
 #ifdef QT_STATICPLUGIN
 #include <QtPlugin>
+#else
+#include <QLibraryInfo>
 #endif
 
 #ifdef _WIN32
@@ -43,6 +45,21 @@ int main(int argc, char **argv)
         translator.load(":/qm/v1541commander-"+qmsuffix);
     }
     V1541Commander commander(argc, argv, &translator);
+
+#ifdef QT_STATICPLUGIN
+    QString qttransloc(":/qm");
+#else
+    QString qttransloc = QLibraryInfo::location(
+	    QLibraryInfo::TranslationsPath);
+#endif
+    QTranslator qttrans;
+    qmsuffix = QLocale::system().name();
+    if (!qttrans.load(qttransloc+"/qtbase_"+qmsuffix))
+    {
+        qmsuffix = QLocale::languageToString(QLocale::system().language());
+        qttrans.load(qttransloc+":/qtbase_"+qmsuffix);
+    }
+    commander.installTranslator(&qttrans);
 
 #ifdef _WIN32
 #if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0) \

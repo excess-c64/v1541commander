@@ -91,12 +91,12 @@
     <message>
         <location filename="cbmdosfilewidget.cpp" line="177"/>
         <source>File locked flag (Ctrl+Shift+L)</source>
-        <translation>Flag für Datei gesperrt (Strg+Shift+L)</translation>
+        <translation>Flag für Datei gesperrt (Strg+Umschalt+L)</translation>
     </message>
     <message>
         <location filename="cbmdosfilewidget.cpp" line="181"/>
         <source>File closed flag (Ctrl+Shift+C)</source>
-        <translation>Flag für Datei geschlossen (Strg+Shift+C)</translation>
+        <translation>Flag für Datei geschlossen (Strg+Umschalt+C)</translation>
     </message>
     <message>
         <location filename="cbmdosfilewidget.cpp" line="188"/>
@@ -107,7 +107,7 @@
     <message>
         <location filename="cbmdosfilewidget.cpp" line="195"/>
         <source>Enable fake display of block size (Shift+F6)</source>
-        <translation>Anzeige einer falschen Größe in Blocks aktivieren (Shift+F6)</translation>
+        <translation>Anzeige einer falschen Größe in Blocks aktivieren (Umschalt+F6)</translation>
     </message>
     <message>
         <location filename="cbmdosfilewidget.cpp" line="205"/>
@@ -117,12 +117,12 @@
     <message>
         <location filename="cbmdosfilewidget.cpp" line="209"/>
         <source>Import file contents (Ctrl+Shift+I)</source>
-        <translation>Dateiinhalt importieren (Strg+Shift+I)</translation>
+        <translation>Dateiinhalt importieren (Strg+Umschalt+I)</translation>
     </message>
     <message>
         <location filename="cbmdosfilewidget.cpp" line="213"/>
         <source>Export file contents (Ctrl+Shift+E)</source>
-        <translation>Dateiinhalt exportieren (Strg+Shift+E)</translation>
+        <translation>Dateiinhalt exportieren (Strg+Umschalt+E)</translation>
     </message>
     <message>
         <location filename="cbmdosfilewidget.cpp" line="257"/>
@@ -361,13 +361,13 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
         <location filename="cbmdosfswidget.cpp" line="94"/>
         <location filename="cbmdosfswidget.cpp" line="95"/>
         <source>The name of the disk (Shift+F2)</source>
-        <translation>Der Name der Diskette (Shift+F2)</translation>
+        <translation>Der Name der Diskette (Umschalt+F2)</translation>
     </message>
     <message>
         <location filename="cbmdosfswidget.cpp" line="101"/>
         <location filename="cbmdosfswidget.cpp" line="102"/>
         <source>The ID of the disk (Shift+F3)</source>
-        <translation>Die ID der Diskette (Shift+F3)</translation>
+        <translation>Die ID der Diskette (Umschalt+F3)</translation>
     </message>
     <message>
         <location filename="cbmdosfswidget.cpp" line="108"/>
@@ -378,7 +378,7 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
     <message>
         <location filename="cbmdosfswidget.cpp" line="114"/>
         <source>Reset DOS version to default value (Shift+F4)</source>
-        <translation>DOS Version auf den Standardwert zurücksetzen (Shift+F4)</translation>
+        <translation>DOS Version auf den Standardwert zurücksetzen (Umschalt+F4)</translation>
     </message>
 </context>
 <context>
@@ -403,7 +403,7 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
     </message>
     <message>
         <location filename="mainwindow.cpp" line="40"/>
-        <source>&amp;Display</source>
+        <source>&amp;View</source>
         <translation>&amp;Anzeige</translation>
     </message>
     <message>
@@ -458,238 +458,238 @@ Wollen Sie jetzt speichern?</translation>
 <context>
     <name>V1541Commander</name>
     <message>
-        <location filename="v1541commander.cpp" line="90"/>
+        <location filename="v1541commander.cpp" line="91"/>
         <source>&amp;New</source>
         <translation>&amp;Neu</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="91"/>
+        <location filename="v1541commander.cpp" line="92"/>
         <source>&amp;Open</source>
         <translation>&amp;Öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="92"/>
+        <location filename="v1541commander.cpp" line="93"/>
         <source>&amp;Save</source>
         <translation>&amp;Speichern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="93"/>
+        <location filename="v1541commander.cpp" line="94"/>
         <source>Save &amp;As</source>
         <translation>Speichern &amp;als</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="94"/>
+        <location filename="v1541commander.cpp" line="95"/>
         <source>&amp;Zipcode</source>
         <translation>&amp;Zipcode</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="95"/>
+        <location filename="v1541commander.cpp" line="96"/>
         <source>Zipcode (&amp;D64)</source>
         <translation>Zipcode (&amp;D64)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="96"/>
+        <location filename="v1541commander.cpp" line="97"/>
         <source>&amp;LyNX</source>
         <translation>&amp;LyNX</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="97"/>
+        <location filename="v1541commander.cpp" line="98"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="98"/>
+        <location filename="v1541commander.cpp" line="99"/>
         <source>&amp;About</source>
         <translation>&amp;Über V1541Commander</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="99"/>
+        <location filename="v1541commander.cpp" line="100"/>
         <source>E&amp;xit</source>
         <translation>&amp;Verlassen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="100"/>
+        <location filename="v1541commander.cpp" line="101"/>
         <source>&amp;PETSCII Input</source>
         <translation>&amp;PETSCII Eingabe</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="101"/>
+        <location filename="v1541commander.cpp" line="102"/>
         <source>lib1541img &amp;log</source>
         <translation>lib1541img &amp;Log</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="102"/>
+        <location filename="v1541commander.cpp" line="103"/>
         <source>Filesystem &amp;Options</source>
         <translation>&amp;Dateisystemoptionen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="103"/>
+        <location filename="v1541commander.cpp" line="104"/>
         <source>&amp;Rewrite Image</source>
         <translation>Abbbild &amp;neu schreiben</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="104"/>
+        <location filename="v1541commander.cpp" line="105"/>
         <source>&amp;Auto map on input</source>
         <translation>Eingabe &amp;automatisch mappen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="105"/>
+        <location filename="v1541commander.cpp" line="106"/>
         <source>&amp;Map current disk</source>
         <translation>Aktuelle &amp;Diskette mappen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="106"/>
+        <location filename="v1541commander.cpp" line="107"/>
         <source>&amp;New File</source>
         <translation>&amp;Neue Datei</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="107"/>
+        <location filename="v1541commander.cpp" line="108"/>
         <source>&amp;Delete File</source>
         <translation>Datei &amp;löschen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="108"/>
+        <location filename="v1541commander.cpp" line="109"/>
         <source>&amp;Lowercase</source>
         <translation>&amp;Kleinbuchstaben</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="122"/>
+        <location filename="v1541commander.cpp" line="123"/>
         <source>Create a new disk image</source>
         <translation>Neues Diskettenabbild erstellen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="124"/>
+        <location filename="v1541commander.cpp" line="125"/>
         <source>Open a disk image</source>
         <translation>Diskettenabbild öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="126"/>
+        <location filename="v1541commander.cpp" line="127"/>
         <source>Save disk image</source>
         <translation>Diskettenabbild speichern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="132"/>
+        <location filename="v1541commander.cpp" line="133"/>
         <source>Save disk image as new file</source>
         <translation>Diskettenabbild als neue Datei speichern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="134"/>
+        <location filename="v1541commander.cpp" line="135"/>
         <source>Export as a set of Zipcode files</source>
         <translation>Als einen Satz von Zipcode Dateien exportieren</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="138"/>
+        <location filename="v1541commander.cpp" line="139"/>
         <source>Export as Zipcode files on a new D64 image</source>
         <translation>Als Zipcode Dateien auf einem neuen D64 Abbild exportieren</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="140"/>
+        <location filename="v1541commander.cpp" line="141"/>
         <source>Export as a LyNX file</source>
         <translation>Als LyNX Datei exportieren</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="142"/>
+        <location filename="v1541commander.cpp" line="143"/>
         <source>Close current file</source>
         <translation>Aktuelle Datei schließen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="148"/>
+        <location filename="v1541commander.cpp" line="149"/>
         <source>Exit the application</source>
         <translation>Die Anwendung beenden</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="150"/>
+        <location filename="v1541commander.cpp" line="151"/>
         <source>Show PETSCII input window</source>
         <translation>PETSCII Eingabefenster anzeigen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="152"/>
+        <location filename="v1541commander.cpp" line="153"/>
         <source>Show lib1541img log messages</source>
         <translation>lib1541img Loganzeigefenster anzeigen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="154"/>
+        <location filename="v1541commander.cpp" line="155"/>
         <source>Change filesystem options</source>
         <translation>Dateisystemoptionen ändern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="156"/>
+        <location filename="v1541commander.cpp" line="157"/>
         <source>Rewrite disk image from scratch</source>
         <translation>Diskettenabbild neu erstellen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="158"/>
+        <location filename="v1541commander.cpp" line="159"/>
         <source>Toggle automatic mapping of uppercase GFX chars to lowercase compatible codes</source>
         <translation>Automatisches Mapping von uppercase Grafikzeichen auf für lowercase passende Zeichen ein-/ausschalten</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="162"/>
+        <location filename="v1541commander.cpp" line="163"/>
         <source>Map uppercase GFX chars to lowercase compatible codes in current disk</source>
         <translation>Uppercase Grafikzeichen auf der aktuellen Diskette auf für lowercase passende Zeichen mappen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="165"/>
+        <location filename="v1541commander.cpp" line="166"/>
         <source>Create new file at selection</source>
         <translation>Neue Datei an der selektierten Position erstellen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="167"/>
+        <location filename="v1541commander.cpp" line="168"/>
         <source>Delete selected file</source>
         <translation>Die ausgewählte Datei löschen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="169"/>
+        <location filename="v1541commander.cpp" line="170"/>
         <source>Toggle lowercase / graphics font mode</source>
         <translation>Umschalten zwischen Kleinbuchstaben- und Grafikmodus</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="447"/>
+        <location filename="v1541commander.cpp" line="449"/>
         <source>Error reading file</source>
         <translation>Fehler beim Lesen der Datei</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="448"/>
+        <location filename="v1541commander.cpp" line="450"/>
         <source>&lt;p&gt;The file you selected couldn&apos;t be read.&lt;/p&gt;&lt;p&gt;This means you either haven&apos;t permission to read it or it doesn&apos;t contain a valid 1541 disc image.&lt;/p&gt;</source>
         <translation>&lt;p&gt;Die ausgewählte Datei konnte nicht gelesen werden.&lt;/p&gt;&lt;p&gt;Entweder Sie haben keine ausreichenden Berechtigungen, diese Datei zu lesen, oder sie beinhaltet kein gültiges 1541 Diskettenabbild.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="464"/>
+        <location filename="v1541commander.cpp" line="466"/>
         <source>Open disk image</source>
         <translation>Diskettenabbild öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="465"/>
+        <location filename="v1541commander.cpp" line="467"/>
         <source>1541 disk images (*.d64);;Zipcode files (*!*.prg);;LyNX files (*.lnx);;all files (*)</source>
         <translation>1541 Diskettenabbilddateien (*.d64);;Zipcode Dateien (*!*.prg);;LyNX Dateien (*.lnx);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="478"/>
+        <location filename="v1541commander.cpp" line="480"/>
         <source>1541 disk images (*.d64);;all files (*)</source>
         <translation>1541 Diskettenabbilddateien (*.d64);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="481"/>
+        <location filename="v1541commander.cpp" line="483"/>
         <source>all files (*)</source>
         <translation>Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="500"/>
+        <location filename="v1541commander.cpp" line="502"/>
         <source>Save as ...</source>
         <translation>Speichern als ...</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="513"/>
-        <location filename="v1541commander.cpp" line="539"/>
+        <location filename="v1541commander.cpp" line="515"/>
+        <location filename="v1541commander.cpp" line="541"/>
         <source>Export as ...</source>
         <translation>Exportieren als ...</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="514"/>
+        <location filename="v1541commander.cpp" line="516"/>
         <source>Zipcode files (*.prg);;all files (*)</source>
         <translation>Zipcode Dateien (*.prg);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="540"/>
+        <location filename="v1541commander.cpp" line="542"/>
         <source>LyNX files (*.lnx);;all files (*)</source>
         <translation>LyNX Dateien (*.lnx);;Alle Dateien (*)</translation>
     </message>
@@ -738,7 +738,7 @@ move selected file with Shift + cursor up/down</source>
         <translation>Das Inhaltsverzeichnis
 Aktivieren mit F3
 Auswahl ändern mit Pfeil hoch/runter
-Ausgewählte Datei verschieben mit Shift + Pfeil hoch/runter</translation>
+Ausgewählte Datei verschieben mit Umschalt + Pfeil hoch/runter</translation>
     </message>
     <message>
         <location filename="v1541imgwidget.cpp" line="260"/>
@@ -883,7 +883,7 @@ Ausgewählte Datei verschieben mit Shift + Pfeil hoch/runter</translation>
 <context>
     <name>main</name>
     <message>
-        <location filename="main.cpp" line="61"/>
+        <location filename="main.cpp" line="87"/>
         <source>file(s) to open (D64 disk images) or import (ZipCode, LyNX).</source>
         <translation>zu öffnende (D64 Diskettenabbilder) oder importierende (ZipCode, LyNX) Datei(en).</translation>
     </message>

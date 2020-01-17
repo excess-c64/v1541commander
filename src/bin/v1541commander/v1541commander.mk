@@ -18,21 +18,35 @@ v1541commander_DESKTOPFILE:= v1541commander
 v1541commander_DOCS:= README.md BUILDING.md LICENSE.txt LICENSE-font.txt
 v1541commander_win32_LDFLAGS:= -mwindows
 v1541commander_win32_RES:= windres
+ifneq ($(EMBEDQTL10N),)
+v1541commander_QRC+= qtl10n
+endif
 
 $(call binrules, v1541commander)
 
+ifneq ($(EMBEDQTL10N),)
+$(v1541commander_OBJDIR)$(PSEP)qtl10n_qrc.cpp: \
+	$(v1541commander_SRCDIR)$(PSEP)qtl10n.qrc
+	cp $(EMBEDQTL10N)$(PSEP)qtbase_de.qm $(v1541commander_SRCDIR)
+	$(RCC) -o $@ --name qtl10n $<
+	$(RMF) $(v1541commander_SRCDIR)$(PSEP)qtbase_de.qm
+
+endif
+
+
 v1541commander_LANGS:= de
 
-$(v1541commander_OBJDIR)/resources_qrc.cpp: $(addsuffix .qm,$(addprefix \
-	$(v1541commander_SRCDIR)/qm/v1541commander-, \
+$(v1541commander_OBJDIR)$(PSEP)resources_qrc.cpp: $(addsuffix .qm,$(addprefix \
+	$(v1541commander_SRCDIR)$(PSEP)qm$(PSEP)v1541commander-, \
 	$(v1541commander_LANGS)))
 
 LRELEASE?= lrelease
 
-$(v1541commander_SRCDIR)/qm/%.qm: $(v1541commander_SRCDIR)/%.ts
-	@mkdir -p $(v1541commander_SRCDIR)/qm
+$(v1541commander_SRCDIR)$(PSEP)qm$(PSEP)%.qm: \
+	$(v1541commander_SRCDIR)$(PSEP)%.ts
+	@$(MDP) $(v1541commander_SRCDIR)$(PSEP)qm
 	$(LRELEASE) $< -qm $@
 
 clean::
-	rm -fr $(v1541commander_SRCDIR)/qm
+	rm -fr $(v1541commander_SRCDIR)$(PSEP)qm
 
