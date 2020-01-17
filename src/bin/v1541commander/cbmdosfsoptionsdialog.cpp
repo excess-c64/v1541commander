@@ -375,6 +375,7 @@ void CbmdosFsOptionsDialog::reset()
 
 void CbmdosFsOptionsDialog::showEvent(QShowEvent *event)
 {
+    QCoreApplication::processEvents();
     QDialog::showEvent(event);
     adjustSize();
     setFixedSize(size());

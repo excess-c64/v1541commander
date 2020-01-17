@@ -241,62 +241,62 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
 <context>
     <name>CbmdosFsOptionsDialog</name>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="50"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="51"/>
         <source>35 tracks</source>
         <translation>35 Spuren</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="51"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="52"/>
         <source>40 tracks</source>
         <translation>40 Spuren</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="52"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="53"/>
         <source>42 tracks</source>
         <translation>42 Spuren</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="53"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="54"/>
         <source>allow long directories</source>
         <translation>erlaube lange Inhaltsverzeichnisse</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="54"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="55"/>
         <source>place files on dir track</source>
         <translation>platziere Dateien auf die Verz.-spur</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="55"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="56"/>
         <source>DolphinDOS BAM</source>
         <translation>DolphinDOS BAM</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="56"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="57"/>
         <source>SpeedDOS BAM</source>
         <translation>SpeedDOS BAM</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="57"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="58"/>
         <source>PrologicDOS BAM</source>
         <translation>PrologicDOS BAM</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="58"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="59"/>
         <source>report 0 blocks free</source>
         <translation>zeige 0 freie Blöcke</translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="59"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="60"/>
         <source>directory interleave: </source>
         <translation>Inhaltsverz. interleave: </translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="61"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="62"/>
         <source>default file interleave: </source>
         <translation>Standard Datei interleave: </translation>
     </message>
     <message>
-        <location filename="cbmdosfsoptionsdialog.cpp" line="63"/>
+        <location filename="cbmdosfsoptionsdialog.cpp" line="64"/>
         <source>WARNING: this disk image is broken, trying to recover data from it. It will be recreated after opening, but data could be lost. It is therefore treated like a new disk image.</source>
         <translation>WARNUNG: Das Diskettenabbild ist kaputt, versuche Daten wiederherzustellen. Nach dem Öffnen wird das Abbild neu geschrieben, aber Daten könnten fehlen. Es wird deshalb behandelt wie ein neu erzeugtes Abbild.</translation>
     </message>
@@ -384,7 +384,7 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
 <context>
     <name>LogWindow</name>
     <message>
-        <location filename="logwindow.cpp" line="31"/>
+        <location filename="logwindow.cpp" line="29"/>
         <source>lib1541img log viewer</source>
         <translation>lib1541 Logbuchanzeige</translation>
     </message>
@@ -450,7 +450,7 @@ Wollen Sie jetzt speichern?</translation>
 <context>
     <name>PetsciiWindow</name>
     <message>
-        <location filename="petsciiwindow.cpp" line="38"/>
+        <location filename="petsciiwindow.cpp" line="39"/>
         <source>PETSCII Input</source>
         <translation>PETSCII Eingabe</translation>
     </message>
@@ -458,238 +458,238 @@ Wollen Sie jetzt speichern?</translation>
 <context>
     <name>V1541Commander</name>
     <message>
-        <location filename="v1541commander.cpp" line="91"/>
+        <location filename="v1541commander.cpp" line="93"/>
         <source>&amp;New</source>
         <translation>&amp;Neu</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="92"/>
+        <location filename="v1541commander.cpp" line="94"/>
         <source>&amp;Open</source>
         <translation>&amp;Öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="93"/>
+        <location filename="v1541commander.cpp" line="95"/>
         <source>&amp;Save</source>
         <translation>&amp;Speichern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="94"/>
+        <location filename="v1541commander.cpp" line="96"/>
         <source>Save &amp;As</source>
         <translation>Speichern &amp;als</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="95"/>
+        <location filename="v1541commander.cpp" line="97"/>
         <source>&amp;Zipcode</source>
         <translation>&amp;Zipcode</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="96"/>
+        <location filename="v1541commander.cpp" line="98"/>
         <source>Zipcode (&amp;D64)</source>
         <translation>Zipcode (&amp;D64)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="97"/>
+        <location filename="v1541commander.cpp" line="99"/>
         <source>&amp;LyNX</source>
         <translation>&amp;LyNX</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="98"/>
+        <location filename="v1541commander.cpp" line="100"/>
         <source>&amp;Close</source>
         <translation>S&amp;chließen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="99"/>
+        <location filename="v1541commander.cpp" line="101"/>
         <source>&amp;About</source>
         <translation>&amp;Über V1541Commander</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="100"/>
+        <location filename="v1541commander.cpp" line="102"/>
         <source>E&amp;xit</source>
         <translation>&amp;Verlassen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="101"/>
+        <location filename="v1541commander.cpp" line="103"/>
         <source>&amp;PETSCII Input</source>
         <translation>&amp;PETSCII Eingabe</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="102"/>
+        <location filename="v1541commander.cpp" line="104"/>
         <source>lib1541img &amp;log</source>
         <translation>lib1541img &amp;Log</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="103"/>
+        <location filename="v1541commander.cpp" line="105"/>
         <source>Filesystem &amp;Options</source>
         <translation>&amp;Dateisystemoptionen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="104"/>
+        <location filename="v1541commander.cpp" line="106"/>
         <source>&amp;Rewrite Image</source>
         <translation>Abbbild &amp;neu schreiben</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="105"/>
+        <location filename="v1541commander.cpp" line="107"/>
         <source>&amp;Auto map on input</source>
         <translation>Eingabe &amp;automatisch mappen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="106"/>
+        <location filename="v1541commander.cpp" line="108"/>
         <source>&amp;Map current disk</source>
         <translation>Aktuelle &amp;Diskette mappen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="107"/>
+        <location filename="v1541commander.cpp" line="109"/>
         <source>&amp;New File</source>
         <translation>&amp;Neue Datei</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="108"/>
+        <location filename="v1541commander.cpp" line="110"/>
         <source>&amp;Delete File</source>
         <translation>Datei &amp;löschen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="109"/>
+        <location filename="v1541commander.cpp" line="111"/>
         <source>&amp;Lowercase</source>
         <translation>&amp;Kleinbuchstaben</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="123"/>
+        <location filename="v1541commander.cpp" line="125"/>
         <source>Create a new disk image</source>
         <translation>Neues Diskettenabbild erstellen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="125"/>
+        <location filename="v1541commander.cpp" line="127"/>
         <source>Open a disk image</source>
         <translation>Diskettenabbild öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="127"/>
+        <location filename="v1541commander.cpp" line="129"/>
         <source>Save disk image</source>
         <translation>Diskettenabbild speichern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="133"/>
+        <location filename="v1541commander.cpp" line="135"/>
         <source>Save disk image as new file</source>
         <translation>Diskettenabbild als neue Datei speichern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="135"/>
+        <location filename="v1541commander.cpp" line="137"/>
         <source>Export as a set of Zipcode files</source>
         <translation>Als einen Satz von Zipcode Dateien exportieren</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="139"/>
+        <location filename="v1541commander.cpp" line="141"/>
         <source>Export as Zipcode files on a new D64 image</source>
         <translation>Als Zipcode Dateien auf einem neuen D64 Abbild exportieren</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="141"/>
+        <location filename="v1541commander.cpp" line="143"/>
         <source>Export as a LyNX file</source>
         <translation>Als LyNX Datei exportieren</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="143"/>
+        <location filename="v1541commander.cpp" line="145"/>
         <source>Close current file</source>
         <translation>Aktuelle Datei schließen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="149"/>
+        <location filename="v1541commander.cpp" line="151"/>
         <source>Exit the application</source>
         <translation>Die Anwendung beenden</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="151"/>
+        <location filename="v1541commander.cpp" line="153"/>
         <source>Show PETSCII input window</source>
         <translation>PETSCII Eingabefenster anzeigen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="153"/>
+        <location filename="v1541commander.cpp" line="155"/>
         <source>Show lib1541img log messages</source>
         <translation>lib1541img Loganzeigefenster anzeigen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="155"/>
+        <location filename="v1541commander.cpp" line="157"/>
         <source>Change filesystem options</source>
         <translation>Dateisystemoptionen ändern</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="157"/>
+        <location filename="v1541commander.cpp" line="159"/>
         <source>Rewrite disk image from scratch</source>
         <translation>Diskettenabbild neu erstellen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="159"/>
+        <location filename="v1541commander.cpp" line="161"/>
         <source>Toggle automatic mapping of uppercase GFX chars to lowercase compatible codes</source>
         <translation>Automatisches Mapping von uppercase Grafikzeichen auf für lowercase passende Zeichen ein-/ausschalten</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="163"/>
+        <location filename="v1541commander.cpp" line="165"/>
         <source>Map uppercase GFX chars to lowercase compatible codes in current disk</source>
         <translation>Uppercase Grafikzeichen auf der aktuellen Diskette auf für lowercase passende Zeichen mappen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="166"/>
+        <location filename="v1541commander.cpp" line="168"/>
         <source>Create new file at selection</source>
         <translation>Neue Datei an der selektierten Position erstellen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="168"/>
+        <location filename="v1541commander.cpp" line="170"/>
         <source>Delete selected file</source>
         <translation>Die ausgewählte Datei löschen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="170"/>
+        <location filename="v1541commander.cpp" line="172"/>
         <source>Toggle lowercase / graphics font mode</source>
         <translation>Umschalten zwischen Kleinbuchstaben- und Grafikmodus</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="449"/>
+        <location filename="v1541commander.cpp" line="523"/>
         <source>Error reading file</source>
         <translation>Fehler beim Lesen der Datei</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="450"/>
+        <location filename="v1541commander.cpp" line="524"/>
         <source>&lt;p&gt;The file you selected couldn&apos;t be read.&lt;/p&gt;&lt;p&gt;This means you either haven&apos;t permission to read it or it doesn&apos;t contain a valid 1541 disc image.&lt;/p&gt;</source>
         <translation>&lt;p&gt;Die ausgewählte Datei konnte nicht gelesen werden.&lt;/p&gt;&lt;p&gt;Entweder Sie haben keine ausreichenden Berechtigungen, diese Datei zu lesen, oder sie beinhaltet kein gültiges 1541 Diskettenabbild.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="466"/>
+        <location filename="v1541commander.cpp" line="540"/>
         <source>Open disk image</source>
         <translation>Diskettenabbild öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="467"/>
+        <location filename="v1541commander.cpp" line="541"/>
         <source>1541 disk images (*.d64);;Zipcode files (*!*.prg);;LyNX files (*.lnx);;all files (*)</source>
         <translation>1541 Diskettenabbilddateien (*.d64);;Zipcode Dateien (*!*.prg);;LyNX Dateien (*.lnx);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="480"/>
+        <location filename="v1541commander.cpp" line="554"/>
         <source>1541 disk images (*.d64);;all files (*)</source>
         <translation>1541 Diskettenabbilddateien (*.d64);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="483"/>
+        <location filename="v1541commander.cpp" line="557"/>
         <source>all files (*)</source>
         <translation>Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="502"/>
+        <location filename="v1541commander.cpp" line="576"/>
         <source>Save as ...</source>
         <translation>Speichern als ...</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="515"/>
-        <location filename="v1541commander.cpp" line="541"/>
+        <location filename="v1541commander.cpp" line="589"/>
+        <location filename="v1541commander.cpp" line="615"/>
         <source>Export as ...</source>
         <translation>Exportieren als ...</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="516"/>
+        <location filename="v1541commander.cpp" line="590"/>
         <source>Zipcode files (*.prg);;all files (*)</source>
         <translation>Zipcode Dateien (*.prg);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="542"/>
+        <location filename="v1541commander.cpp" line="616"/>
         <source>LyNX files (*.lnx);;all files (*)</source>
         <translation>LyNX Dateien (*.lnx);;Alle Dateien (*)</translation>
     </message>
@@ -883,9 +883,24 @@ Ausgewählte Datei verschieben mit Umschalt + Pfeil hoch/runter</translation>
 <context>
     <name>main</name>
     <message>
-        <location filename="main.cpp" line="87"/>
+        <location filename="main.cpp" line="117"/>
+        <source>virtual 1541 disk image commander</source>
+        <translation>Virtueller 1541 disk commander</translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="121"/>
+        <source>file</source>
+        <translation>Datei</translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="122"/>
         <source>file(s) to open (D64 disk images) or import (ZipCode, LyNX).</source>
         <translation>zu öffnende (D64 Diskettenabbilder) oder importierende (ZipCode, LyNX) Datei(en).</translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="124"/>
+        <source>[file ...]</source>
+        <translation>[Datei ...]</translation>
     </message>
 </context>
 </TS>

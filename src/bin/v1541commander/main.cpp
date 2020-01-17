@@ -16,23 +16,52 @@
 #include <windows.h>
 #include <QFont>
 #include <QtGlobal>
+#else
+#include <signal.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#endif
+
+#ifndef _WIN32
+void handlesig(int sig)
+{
+    (void) sig;
+    _exit(0);
+}
 #endif
 
 int main(int argc, char **argv)
 {
+#ifndef _WIN32
+    pid_t pid = fork();
+    if (pid < 0) return 1;
+    if (pid)
+    {
+	signal(SIGHUP, handlesig);
+	for (;;)
+	{
+	    int crc;
+	    if (wait(&crc) > 0)
+	    {
+		if (WIFEXITED(crc)) return 0;
+		else return WEXITSTATUS(crc);
+	    }
+	}
+    }
+    setsid();
+#endif
+
 #ifdef QT_STATICPLUGIN
 #ifdef _WIN32
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
     Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin);
-#ifdef DEBUG
-    AllocConsole();
-    freopen("CONOUT$", "w", stdout);
-    freopen("CONOUT$", "w", stderr);
-#endif
 #else
     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #endif
 #endif
+
     QCoreApplication::setOrganizationName("Excess");
     QCoreApplication::setApplicationName("V1541Commander");
     QCoreApplication::setApplicationVersion("1.0");
@@ -80,19 +109,27 @@ int main(int argc, char **argv)
 #endif
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("virtual 1541 disk image commander");
+    parser.setApplicationDescription(QCoreApplication::translate("main",
+		"virtual 1541 disk image commander"));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument("file",
+    parser.addPositionalArgument(QCoreApplication::translate("main", "file"),
 	    QCoreApplication::translate("main", "file(s) to open (D64 disk "
 		"images) or import (ZipCode, LyNX)."),
-	    "[file ...]");
+	    QCoreApplication::translate("main", "[file ...]"));
     parser.process(commander);
 
     const QStringList &positionalArgs = parser.positionalArguments();
 
     if (commander.isPrimaryInstance())
     {
+#ifndef _WIN32
+        freopen("/dev/null", "r", stdin);
+        freopen("/dev/null", "w", stdout);
+        freopen("/dev/null", "w", stderr);
+	kill(getppid(), SIGHUP);
+#endif
+
 	commander.show();
 
 	for (QStringList::const_iterator i = positionalArgs.constBegin();
