@@ -1,0 +1,24 @@
+1 24 "setup.exe.manifest"
+1 VERSIONINFO
+FILEVERSION	1,0,0,0
+PRODUCTVERSION	1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "Excess"
+      VALUE "FileDescription", "V1541Commander Setup"
+      VALUE "FileVersion", "1.0.0"
+      VALUE "InternalName", "setup"
+      VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
+      VALUE "OriginalFilename", "setup.exe"
+      VALUE "ProductName", "V1541Commander Setup"
+      VALUE "ProductVersion", "1.0.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END

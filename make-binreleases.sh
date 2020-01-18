@@ -22,6 +22,7 @@ rm -fr ${WINPKGDIR} ${WINPKG} ${LINPKGDIR} ${LINPKG}
 
 mkdir ${WINPKGDIR}
 cp bin/${WINTARGET}/release/${NAME}.exe ${WINPKGDIR}
+cp bin/${WINTARGET}/release/setup.exe ${WINPKGDIR}
 cp ${DOCS} ${WINPKGDIR}
 zip -9r ${WINPKG} ${WINPKGDIR}
 rm -fr ${WINPKGDIR}
