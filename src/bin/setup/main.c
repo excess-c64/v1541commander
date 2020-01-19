@@ -154,6 +154,21 @@ done:
     }
 }
 
+static void addFileTypeCheckbox(HWND w, int cid, LPCWSTR desc, int checked,
+	HDC dc, int padding, int *ypos, int *fullwidth)
+{
+    SIZE size;
+    GetTextExtentExPointW(dc, desc, wcslen(desc), 0, 0, 0, &size);
+    size.cx += 2*padding;
+    *fullwidth = size.cx > *fullwidth ? size.cx : *fullwidth;
+    HWND cb = CreateWindowExW(0, L"Button", desc,
+	    WS_CHILD|WS_VISIBLE|BS_CHECKBOX, padding, *ypos,
+	    size.cx, size.cy, w, (HMENU)cid, instance, 0);
+    *ypos += size.cy + padding;
+    SendMessageW(cb, WM_SETFONT, (WPARAM)messageFont, 0);
+    if (checked) CheckDlgButton(w, cid, BST_CHECKED);
+}
+
 static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
@@ -174,35 +189,14 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 		    size.cx, size.cy, w, 0, instance, 0);
 	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
 	    ypos += size.cy + padding;
-	    text = L"D64 disk images (.d64)";
-	    GetTextExtentExPointW(dc, text, wcslen(text), 0, 0, 0, &size);
-	    size.cx += 2*padding;
-	    fullwidth = size.cx > fullwidth ? size.cx : fullwidth;
-	    ctrl = CreateWindowExW(0, L"Button", text,
-		    WS_CHILD|WS_VISIBLE|BS_CHECKBOX, padding, ypos,
-		    size.cx, size.cy, w, (HMENU)CID_d64, instance, 0);
-	    ypos += size.cy + padding;
-	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
-	    CheckDlgButton(w, CID_d64, BST_CHECKED);
-	    text = L"LyNX archives (.lnx)";
-	    GetTextExtentExPointW(dc, text, wcslen(text), 0, 0, 0, &size);
-	    size.cx += 2*padding;
-	    fullwidth = size.cx > fullwidth ? size.cx : fullwidth;
-	    ctrl = CreateWindowExW(0, L"Button", text,
-		    WS_CHILD|WS_VISIBLE|BS_CHECKBOX, padding, ypos,
-		    size.cx, size.cy, w, (HMENU)CID_lynx, instance, 0);
-	    ypos += size.cy + padding;
-	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
-	    CheckDlgButton(w, CID_lynx, BST_CHECKED);
-	    text = L"Zipcode files (.prg)";
-	    GetTextExtentExPointW(dc, text, wcslen(text), 0, 0, 0, &size);
-	    size.cx += 2*padding;
-	    fullwidth = size.cx > fullwidth ? size.cx : fullwidth;
-	    ctrl = CreateWindowExW(0, L"Button", text,
-		    WS_CHILD|WS_VISIBLE|BS_CHECKBOX, padding, ypos,
-		    size.cx, size.cy, w, (HMENU)CID_zipcode, instance, 0);
-	    ypos += size.cy + padding;
-	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
+
+	    addFileTypeCheckbox(w, CID_d64, L"D64 disk images (.d64)", 1,
+		    dc, padding, &ypos, &fullwidth);
+	    addFileTypeCheckbox(w, CID_lynx, L"LyNX archives (.lnx)", 1,
+		    dc, padding, &ypos, &fullwidth);
+	    addFileTypeCheckbox(w, CID_zipcode, L"Zipcode files (.prg)", 0,
+		    dc, padding, &ypos, &fullwidth);
+
 	    ctrl = CreateWindowExW(0, L"Button", L"Register",
 		    WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
 		    padding + fullwidth - buttonWidth, ypos,
