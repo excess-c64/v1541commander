@@ -12,6 +12,7 @@ LINPKG=${LINPKGDIR}.tar.xz
 DOCS="README.md BUILDING.md LICENSE.txt LICENSE-font.txt"
 ICONS=src/bin/${NAME}/icons
 DESKTOP=src/bin/${NAME}/${NAME}.desktop
+MIMETYPES=src/bin/${NAME}/mime
 
 rm -fr ${WINPKGDIR} ${WINPKG} ${LINPKGDIR} ${LINPKG}
 
@@ -29,8 +30,14 @@ rm -fr ${WINPKGDIR}
 
 mkdir ${LINPKGDIR}
 cp bin/${LINTARGET}/release/${NAME} ${LINPKGDIR}
+cp scripts/setup.sh ${LINPKGDIR}
+cp scripts/uninstall.sh ${LINPKGDIR}
+chmod 755 ${LINPKGDIR}/setup.sh
+chmod 755 ${LINPKGDIR}/uninstall.sh
 cp ${DOCS} ${LINPKGDIR}
+cp ${DESKTOP} ${LINPKGDIR}
 cp -R ${ICONS} ${LINPKGDIR}/
+cp -R ${MIMETYPES} ${LINPKGDIR}/
 tar cJvf ${LINPKG} ${LINPKGDIR}
 rm -fr ${LINPKGDIR}
 

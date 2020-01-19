@@ -12,8 +12,13 @@ For instructions to build this yourself on your system, see
 For **downloads** of the latest binaries for **Windows or Linux**, search
 [CSDb](https://csdb.dk/) for "v1541commander".
 
-For Linux, it's recommended to build from source, or look out for a package
-offered for your distribution. If there is none, create one ;)
+The Windows binary download comes with a little `setup.exe` that can be used
+to associate V1541Commander with common filetypes it can open.
+
+The Linux binary download includes a `setup.sh` for installing icons and
+filetype associations, and an `uninstall.sh` for removing them again.
+For Linux, it's recommended to build from source instead, or look out for a
+package offered for your distribution. If there is none, create one ;)
 
 ## Features
 
@@ -138,7 +143,9 @@ The *Export* submenu from the *File* menu gives you several options:
 * Zipcode: export as ZipCode compressed fileset. If the filename you choose
   doesn't already start with "1!" to "4!", this will be automatically prepended
   to the names of the individual files. If you don't specify an extension,
-  .prg is used.
+  .prg is used. You might want to rewrite your image (see below) before
+  exporting as ZipCode, because this removes any leftovers from deleted files,
+  so your compressed ZipCode files will be smaller.
 * Zipcode (D64): export as ZipCode compressed fileset on a new D64 image. A
   new image will open containing properly named ZipCode files.
 * LyNX: export files as a Lynx archive. This will disregard .DEL files, as
