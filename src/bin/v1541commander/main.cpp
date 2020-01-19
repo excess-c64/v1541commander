@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
 #ifdef _WIN32
 #if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0) \
-    || QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    && QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     // work around a QSpinBox layout bug in Qt 5.13:
     commander.setStyleSheet("QFoo{}");
 #endif

@@ -1,5 +1,6 @@
 #include <wchar.h>
 
+#define OEMRESOURCE
 #include <windows.h>
 #include <commctrl.h>
 #include <shlwapi.h>
@@ -24,13 +25,77 @@ static int ftZipcode = 0;
 
 static WCHAR opencmd[MAX_PATH];
 
+static const WCHAR *locales[] = {
+    L"C",
+    L"de",
+};
+
+enum textid {
+    TID_title,
+    TID_notfound_title,
+    TID_notfound_message,
+    TID_regsuccess_title,
+    TID_regsuccess_message,
+    TID_regfailure_title,
+    TID_regfailure_message,
+    TID_select_types,
+    TID_register,
+    TID_d64,
+    TID_lynx,
+    TID_zipcode,
+
+    TID_N_texts
+};
+
+static const WCHAR *locale_texts[][TID_N_texts] = {
+    {
+	L"V1541Commander Setup",
+	L"v1541commander.exe not found",
+	L"Please run this from the same directory\n"
+	    L"where v1541commander.exe is located.",
+	L"File types registered",
+	L"The selected file types were associated\n"
+	    L"to V1541Commander successfully.",
+	L"Registration failed",
+	L"There was an unexpected error registering\n"
+	    L"the selected file types to V1541Commander.",
+	L"Select the file types to register V1541Commander for:",
+	L"Register",
+	L"1541 disk images (.d64)",
+	L"LyNX archives (.lnx)",
+	L"Zipcode files (.prg)",
+    },
+    {
+	L"V1541Commander Einrichtung",
+	L"v1541commander.exe nicht gefunden",
+	L"Bitte starten Sie dieses Programm aus dem\n"
+	    L"gleichen Verzeichnis, in dem sich auch\n"
+	    L"v1541commander.exe befindet.",
+	L"Dateitypen registriert",
+	L"Die gewählten Dateitypen wurden erfolgreich\n"
+	    L"V1541Commander zugeordnet.",
+	L"Registrierung fehlgeschlagen",
+	L"Bei der Registrierung der gewählten Dateitypen\n"
+	    "für V1541Commander ist ein unerwarteter Fehler\n"
+	    "aufgetreten.",
+	L"Wählen Sie die Dateitypen, für die V1541Commander\n"
+	    "registriert werden soll:",
+	L"Registrieren",
+	L"1541 Diskettenabbilddateien (.d64)",
+	L"LyNX Archive (.lnx)",
+	L"Zipcode Dateien (.prg)",
+    },
+};
+
+static const WCHAR **texts = locale_texts[0];
+
 static void init(void)
 {
     INITCOMMONCONTROLSEX icx;
-    icx.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icx.dwSize = sizeof icx;
     icx.dwICC = ICC_WIN95_CLASSES;
     InitCommonControlsEx(&icx);
-    ncm.cbSize = sizeof(ncm);
+    ncm.cbSize = sizeof ncm;
     SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
     messageFont = CreateFontIndirectW(&ncm.lfMessageFont);
     HDC dc = GetDC(0);
@@ -44,18 +109,31 @@ static void init(void)
     buttonWidth = MulDiv(sampleSize.cx, 50, 4 * 52);
     buttonHeight = MulDiv(messageFontMetrics.tmHeight, 14, 8);
     instance = GetModuleHandleW(0);
+
+    WCHAR lang[10];
+    if (GetLocaleInfoW(LOCALE_USER_DEFAULT,
+		LOCALE_SISO639LANGNAME, lang, 10) > 0)
+    {
+	for (size_t i = 1; i < sizeof locales / sizeof *locales; ++i)
+	{
+	    if (!wcscmp(locales[i], lang))
+	    {
+		texts = locale_texts[i];
+		break;
+	    }
+	}
+    }
 }
 
-static int checkForCommander(void)
+static int createOpenCmd(void)
 {
-    HMODULE hModule = GetModuleHandleW(0);
-    GetModuleFileNameW(hModule, opencmd, MAX_PATH);
+    GetModuleFileNameW(instance, opencmd, MAX_PATH);
     WCHAR *pos = wcsrchr(opencmd, L'\\');
     if (!pos) return 0;
     wcscpy(pos+1, L"v1541commander.exe");
     int rc = PathFileExistsW(opencmd);
     if (!rc) return rc;
-    wcscpy(pos+sizeof "v1541commander.exe", L" \"%1\"");
+    wcscpy(pos + sizeof "v1541commander.exe", L" \"%1\"");
     return rc;
 }
 
@@ -85,7 +163,7 @@ static int registerType(HKEY classes, LPCWSTR ext, LPCWSTR name,
     {
 	goto error;
     }
-    DWORD ctSize = (wcslen(contentType)+1) * sizeof (WCHAR);
+    DWORD ctSize = (wcslen(contentType)+1) * sizeof *contentType;
     if (RegSetValueExW(tkey, L"Content Type", 0, REG_SZ,
 		(const BYTE *)contentType, ctSize) != ERROR_SUCCESS)
     {
@@ -140,17 +218,13 @@ static void registerTypes(HWND w)
 done:
     if (success)
     {
-	MessageBoxW(w, L"The selected file types were associated\n"
-		L"to V1541Commander successfully.",
-		L"File types registered",
-		MB_OK|MB_ICONINFORMATION);
+	MessageBoxW(w, texts[TID_regsuccess_message],
+		texts[TID_regsuccess_title], MB_OK|MB_ICONINFORMATION);
     }
     else
     {
-	MessageBoxW(w, L"There was an unexpected error registering\n"
-		L"the selected file types to V1541Commander.",
-		L"File type registration failed",
-		MB_OK|MB_ICONERROR);
+	MessageBoxW(w, texts[TID_regfailure_message],
+		texts[TID_regfailure_title], MB_OK|MB_ICONERROR);
     }
 }
 
@@ -177,27 +251,26 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 	{
 	    HDC dc = GetDC(0);
 	    SelectObject(dc, (HGDIOBJ) messageFont);
-	    SIZE size;
+	    RECT textrect = {0, 0, 0, 0};
 	    int padding = messageFontMetrics.tmAveCharWidth * 3 / 2;
 	    int ypos = padding;
-	    WCHAR *text =
-		L"Select the file types to register V1541Commander for:";
-	    GetTextExtentExPointW(dc, text, wcslen(text), 0, 0, 0, &size);
-	    int fullwidth = size.cx;
+	    const WCHAR *text = texts[TID_select_types];
+	    DrawTextExW(dc, (WCHAR *)text, -1, &textrect, DT_CALCRECT, 0);
+	    int fullwidth = textrect.right;
 	    HWND ctrl = CreateWindowExW(0, L"Static", text,
 		    WS_CHILD|WS_VISIBLE, padding, ypos,
-		    size.cx, size.cy, w, 0, instance, 0);
+		    textrect.right, textrect.bottom, w, 0, instance, 0);
 	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
-	    ypos += size.cy + padding;
+	    ypos += textrect.bottom + padding;
 
-	    addFileTypeCheckbox(w, CID_d64, L"D64 disk images (.d64)", 1,
+	    addFileTypeCheckbox(w, CID_d64, texts[TID_d64], 1,
 		    dc, padding, &ypos, &fullwidth);
-	    addFileTypeCheckbox(w, CID_lynx, L"LyNX archives (.lnx)", 1,
+	    addFileTypeCheckbox(w, CID_lynx, texts[TID_lynx], 1,
 		    dc, padding, &ypos, &fullwidth);
-	    addFileTypeCheckbox(w, CID_zipcode, L"Zipcode files (.prg)", 0,
+	    addFileTypeCheckbox(w, CID_zipcode, texts[TID_zipcode], 0,
 		    dc, padding, &ypos, &fullwidth);
 
-	    ctrl = CreateWindowExW(0, L"Button", L"Register",
+	    ctrl = CreateWindowExW(0, L"Button", texts[TID_register],
 		    WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
 		    padding + fullwidth - buttonWidth, ypos,
 		    buttonWidth, buttonHeight,
@@ -251,26 +324,25 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 int main(void)
 {
     init();
-    if (!checkForCommander())
+    if (!createOpenCmd())
     {
-	MessageBoxW(0, L"Please run this from the same directory\n"
-		L"where v1541commander.exe is located.",
-		L"v1541commander.exe not found",
+	MessageBoxW(0, texts[TID_notfound_title], texts[TID_notfound_message],
 		MB_OK|MB_ICONERROR);
 	return 0;
     }
 
     WNDCLASSEXW wc;
-    memset(&wc, 0, sizeof(wc));
-    wc.cbSize = sizeof(wc);
+    memset(&wc, 0, sizeof wc);
+    wc.cbSize = sizeof wc;
     wc.hInstance = instance;
     wc.lpszClassName = WC_mainWindow;
     wc.lpfnWndProc = wproc;
     wc.hbrBackground = (HBRUSH) COLOR_WINDOW;
-    wc.hCursor = LoadCursorA(0, IDC_ARROW);
+    wc.hCursor = (HCURSOR) LoadImageW(0, MAKEINTRESOURCEW(OCR_NORMAL),
+	    IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE|LR_SHARED);
     RegisterClassExW(&wc);
 
-    mainWindow = CreateWindowExW(0, WC_mainWindow, L"V1541Commander Setup",
+    mainWindow = CreateWindowExW(0, WC_mainWindow, texts[TID_title],
             WS_CAPTION|WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
 	    320, 100, 0, 0, instance, 0);
     ShowWindow(mainWindow, SW_SHOWNORMAL);
