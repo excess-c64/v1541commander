@@ -2,10 +2,12 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="application/vnd.cbm.d64-disk-image">
     <comment>D64 disk image</comment>
+    <comment xml:lang="de">D64 Diskettenabbild</comment>
     <glob pattern="*.d64" />
   </mime-type>
   <mime-type type="application/x.willcorley.lynx-archive">
     <comment>C64 LyNX archive</comment>
+    <comment xml:lang="de">C64 LyNX Archiv</comment>
     <glob pattern="*.lnx" />
     <glob pattern="*.prg" />
     <magic>
@@ -14,26 +16,32 @@
   </mime-type>
   <mime-type type="application/x.c64.zip-code">
     <comment>C64 Zip-Code archive file</comment>
+    <comment xml:lang="de">C64 Zip-Code Archivdatei</comment>
     <glob pattern="[1-5]!*.prg" />
   </mime-type>
   <mime-type type="application/vnd.cbm.program-file">
     <comment>Commodore program</comment>
+    <comment xml:lang="de">Commodore Programm</comment>
     <glob pattern="*.prg" />
   </mime-type>
   <mime-type type="application/vnd.cbm.sequential-file">
     <comment>Commodore sequential file</comment>
+    <comment xml:lang="de">Commodore sequentielle Datei</comment>
     <glob pattern="*.seq" />
   </mime-type>
   <mime-type type="application/vnd.cbm.relative-file">
     <comment>Commodore relative file data</comment>
+    <comment xml:lang="de">Commodore relative Datei (Inhalt)</comment>
     <glob pattern="*.rel" />
   </mime-type>
   <mime-type type="application/vnd.cbm.userformat-file">
     <comment>Commodore user format file</comment>
+    <comment xml:lang="de">Commodore Datei (benutzerspezifisch)</comment>
     <glob pattern="*.usr" />
   </mime-type>
   <mime-type type="application/vnd.pc64.c64-container-file">
     <comment>PC64 Container for C64 file</comment>
+    <comment xml:lang="de">PC64 Container für C64 Datei</comment>
     <glob pattern="*.[prsu][0-9][0-9]" />
     <magic>
       <match type="string" offset="0"
