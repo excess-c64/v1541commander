@@ -25,6 +25,7 @@ static int ftLynx = 1;
 static int ftZipcode = 0;
 
 static WCHAR commanderPath[MAX_PATH];
+static WCHAR friendlyTypeName[MAX_PATH];
 
 static const WCHAR *locales[] = {
     L"C",
@@ -155,7 +156,8 @@ static int getCommanderPath(void)
 }
 
 static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
-        LPCWSTR name, LPCWSTR desc, LPCWSTR contentType, int associate)
+        LPCWSTR name, LPCWSTR desc, LPCWSTR contentType, int nameId,
+        int associate)
 {
     HKEY tkey = 0;
     HKEY ekey = 0;
@@ -202,6 +204,21 @@ static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
     {
 	goto done;
     }
+
+    valSize = wcslen(commanderPath) + 2;
+    friendlyTypeName[0] = L'@';
+    wcscpy(friendlyTypeName+1, commanderPath);
+    int numlen = swprintf(friendlyTypeName + valSize - 1, PATH_MAX - valSize,
+            L",-%d", nameId);
+    if (numlen < 1) goto done;
+    valSize += numlen;
+    valSize *= sizeof *friendlyTypeName;
+    if (RegSetValueExW(tkey, L"FriendlyTypeName", 0, REG_SZ,
+		(const BYTE *)friendlyTypeName, valSize) != ERROR_SUCCESS)
+    {
+	goto done;
+    }
+
     if (RegOpenKeyExW(tkey, L"shell", 0, KEY_WRITE, &tmp) == ERROR_SUCCESS)
     {
         if (RegSetValueExW(tmp, 0, 0, REG_SZ, (const BYTE *)L"open",
@@ -290,20 +307,20 @@ static void registerTypes(HWND w)
         {
             if (!registerType(classes, regkey,
                         L".d64", L"V1541Commander.D64", L"D64 disk image",
-                        L"application/vnd.cbm.d64-disk-image", ftD64))
+                        L"application/vnd.cbm.d64-disk-image", 1, ftD64))
             {
                 goto done;
             }
             if (!registerType(classes, regkey,
                         L".lnx", L"V1541Commander.LyNX", L"C64 LyNX archive",
-                        L"application/x.willcorley.lynx-archive", ftLynx))
+                        L"application/x.willcorley.lynx-archive", 2, ftLynx))
             {
                 goto done;
             }
             if (!registerType(classes, regkey,
                         L".prg", L"V1541Commander.Zipcode",
                         L"C64 Zip-Code archive file",
-                        L"application/x.c64.zip-code", ftZipcode))
+                        L"application/x.c64.zip-code", 3, ftZipcode))
             {
                 goto done;
             }
