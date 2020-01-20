@@ -7,9 +7,10 @@
 
 #define WC_mainWindow L"V1541CommanderSetup"
 #define CID_register 0x101
-#define CID_d64 0x102
-#define CID_lynx 0x103
-#define CID_zipcode 0x104
+#define CID_cancel 0x102
+#define CID_d64 0x103
+#define CID_lynx 0x104
+#define CID_zipcode 0x105
 
 static HINSTANCE instance;
 static HWND mainWindow;
@@ -23,7 +24,7 @@ static int ftD64 = 1;
 static int ftLynx = 1;
 static int ftZipcode = 0;
 
-static WCHAR opencmd[MAX_PATH];
+static WCHAR commanderPath[MAX_PATH];
 
 static const WCHAR *locales[] = {
     L"C",
@@ -39,7 +40,9 @@ enum textid {
     TID_regfailure_title,
     TID_regfailure_message,
     TID_select_types,
+    TID_prg_warn,
     TID_register,
+    TID_cancel,
     TID_d64,
     TID_lynx,
     TID_zipcode,
@@ -59,8 +62,17 @@ static const WCHAR *locale_texts[][TID_N_texts] = {
 	L"Registration failed",
 	L"There was an unexpected error registering\n"
 	    L"the selected file types to V1541Commander.",
-	L"Select the file types to register V1541Commander for:",
+	L"This tool registers V1541Commander with windows\n"
+            L"and associates it with all file types that can be\n"
+            L"opened or imported.\n"
+            L"\n"
+            L"Select here for which file types V1541Commander\n"
+            L"should be set as the default application:",
+        L"It's not recommended to set V1541Commander as the\n"
+            L"default application for .prg files, as most .prg files\n"
+            L"aren't Zipcode files.",
 	L"Register",
+        L"Cancel",
 	L"1541 disk images (.d64)",
 	L"LyNX archives (.lnx)",
 	L"Zipcode files (.prg)",
@@ -76,11 +88,19 @@ static const WCHAR *locale_texts[][TID_N_texts] = {
 	    L"V1541Commander zugeordnet.",
 	L"Registrierung fehlgeschlagen",
 	L"Bei der Registrierung der gewählten Dateitypen\n"
-	    "für V1541Commander ist ein unerwarteter Fehler\n"
-	    "aufgetreten.",
-	L"Wählen Sie die Dateitypen, für die V1541Commander\n"
-	    "registriert werden soll:",
+	    L"für V1541Commander ist ein unerwarteter Fehler\n"
+	    L"aufgetreten.",
+	L"Dieses Programm registriert V1541Commander in Windows\n"
+            L"und verknüpft es mit allen Dateitypen, die geöffnet oder\n"
+            L"importiert werden können.\n"
+            L"\n"
+            L"Wählen Sie hier die Dateitypen, für die V1541Commander\n"
+            L"als Standardanwendung gesetzt werden soll:",
+        L"Es wird nicht empfohlen, V1541Commander als Standard-\n"
+            L"anwendung für .prg-Dateien zu setzen, da die meisten .prg-\n"
+            L"Dateien keine Zipcode Dateien sind.",
 	L"Registrieren",
+        L"Abbrechen",
 	L"1541 Diskettenabbilddateien (.d64)",
 	L"LyNX Archive (.lnx)",
 	L"Zipcode Dateien (.prg)",
@@ -125,97 +145,175 @@ static void init(void)
     }
 }
 
-static int createOpenCmd(void)
+static int getCommanderPath(void)
 {
-    GetModuleFileNameW(instance, opencmd, MAX_PATH);
-    WCHAR *pos = wcsrchr(opencmd, L'\\');
+    GetModuleFileNameW(instance, commanderPath, MAX_PATH);
+    WCHAR *pos = wcsrchr(commanderPath, L'\\');
     if (!pos) return 0;
     wcscpy(pos+1, L"v1541commander.exe");
-    int rc = PathFileExistsW(opencmd);
-    if (!rc) return rc;
-    wcscpy(pos + sizeof "v1541commander.exe", L" \"%1\"");
-    return rc;
+    return PathFileExistsW(commanderPath);
 }
 
-static int registerType(HKEY classes, LPCWSTR ext, LPCWSTR name,
-	LPCWSTR desc, LPCWSTR contentType)
+static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
+        LPCWSTR name, LPCWSTR desc, LPCWSTR contentType, int associate)
 {
-    HKEY tkey;
-    HKEY ekey;
+    HKEY tkey = 0;
+    HKEY ekey = 0;
     HKEY tmp;
     int rc = 0;
 
-    if (RegCreateKeyW(classes, name, &tkey) != ERROR_SUCCESS) return 0;
-    if (RegCreateKeyW(classes, ext, &ekey) != ERROR_SUCCESS) goto openexterror;
-
-    if (RegCreateKeyW(tkey, L"shell\\open\\command", &tmp) == ERROR_SUCCESS)
+    if (RegCreateKeyExW(suppTypes, ext, 0, 0, 0, KEY_WRITE,
+                0, &tmp, 0) == ERROR_SUCCESS)
     {
-	if (RegSetValueW(tmp, 0, REG_SZ, opencmd, 0) != ERROR_SUCCESS)
+        RegCloseKey(tmp);
+    }
+    else goto done;
+
+    if (RegCreateKeyExW(classes, ext, 0, 0, 0, KEY_WRITE, 0, &ekey, 0)
+            != ERROR_SUCCESS) goto done;
+
+    if (RegCreateKeyExW(classes, name, 0, 0, 0, KEY_WRITE, 0, &tkey, 0)
+            != ERROR_SUCCESS) goto done;
+
+    if (RegCreateKeyExW(tkey, L"shell\\open\\command", 0, 0, 0, KEY_WRITE,
+                0, &tmp, 0) == ERROR_SUCCESS)
+    {
+	if (RegSetValueExW(tmp, 0, 0, REG_SZ,
+                    (const BYTE *)L"v1541commander.exe \"%1\"",
+                    sizeof L"v1541commander.exe \"%1\"")
+                != ERROR_SUCCESS)
 	{
 	    RegCloseKey(tmp);
-	    goto error;
+	    goto done;
 	}
 	RegCloseKey(tmp);
     }
-    else goto error;
+    else goto done;
 
-    if (RegSetValueW(tkey, 0, REG_SZ, desc, 0) != ERROR_SUCCESS)
+    DWORD valSize = (wcslen(desc)+1) * sizeof *desc;
+    if (RegSetValueExW(tkey, 0, 0, REG_SZ,
+                (const BYTE *)desc, valSize) != ERROR_SUCCESS)
     {
-	goto error;
+	goto done;
     }
-    DWORD ctSize = (wcslen(contentType)+1) * sizeof *contentType;
+    valSize = (wcslen(contentType)+1) * sizeof *contentType;
     if (RegSetValueExW(tkey, L"Content Type", 0, REG_SZ,
-		(const BYTE *)contentType, ctSize) != ERROR_SUCCESS)
+		(const BYTE *)contentType, valSize) != ERROR_SUCCESS)
     {
-	goto error;
+	goto done;
     }
-    if (RegSetValueW(tkey, L"shell", REG_SZ, L"open", 0) != ERROR_SUCCESS)
+    if (RegOpenKeyExW(tkey, L"shell", 0, KEY_WRITE, &tmp) == ERROR_SUCCESS)
     {
-	goto error;
+        if (RegSetValueExW(tmp, 0, 0, REG_SZ, (const BYTE *)L"open",
+                    sizeof L"open") != ERROR_SUCCESS)
+        {
+            RegCloseKey(tmp);
+            goto done;
+        }
+        RegCloseKey(tmp);
     }
-    if (RegSetValueW(ekey, 0, REG_SZ, name, 0) != ERROR_SUCCESS)
+    else goto done;
+
+    if (RegCreateKeyExW(ekey, L"OpenWithProgids", 0, 0, 0,
+                KEY_WRITE, 0, &tmp, 0) == ERROR_SUCCESS)
     {
-	goto error;
+        if (RegSetValueExW(tmp, name, 0, REG_NONE, 0, 0) != ERROR_SUCCESS)
+        {
+            RegCloseKey(tmp);
+            goto done;
+        }
+        RegCloseKey(tmp);
+    }
+    else goto done;
+
+    if (!associate)
+    {
+        rc = 1;
+        goto done;
+    }
+
+    valSize = (wcslen(name)+1) * sizeof *name;
+    if (RegSetValueExW(ekey, 0, 0, REG_SZ, (const BYTE *)name, valSize)
+            != ERROR_SUCCESS)
+    {
+	goto done;
     }
     rc = 1;
 
-error:
-    RegCloseKey(ekey);
-openexterror:
-    RegCloseKey(tkey);
+done:
+    if (ekey) RegCloseKey(ekey);
+    if (tkey) RegCloseKey(tkey);
     return rc;
 }
 
 static void registerTypes(HWND w)
 {
     int success = 0;
-    HKEY classes;
+    HKEY regkey = 0;
+    if (RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\"
+                "CurrentVersion\\App Paths\\v1541commander.exe", 0,
+                0, 0, KEY_WRITE, 0, &regkey, 0) != ERROR_SUCCESS)
+    {
+        goto done;
+    }
+    DWORD valSize = (wcslen(commanderPath)+1) * sizeof *commanderPath;
+    if (RegSetValueExW(regkey, 0, 0, REG_SZ,
+                (const BYTE *)commanderPath, valSize) != ERROR_SUCCESS)
+    {
+        goto done;
+    }
+    RegCloseKey(regkey);
+    regkey = 0;
+
+    HKEY classes = 0;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes", 0,
 		KEY_WRITE, &classes) == ERROR_SUCCESS)
     {
-	if (ftD64 && !registerType(classes,
-			L".d64", L"D64", L"D64 disk image",
-			L"application/vnd.cbm.d64-disk-image"))
-	{
-	    goto done;
-	}
-	if (ftLynx && !registerType(classes,
-			L".lnx", L"LyNX", L"C64 LyNX archive",
-			L"application/x.willcorley.lynx-archive"))
-	{
-	    goto done;
-	}
-	if (ftZipcode && !registerType(classes,
-			L".prg", L"Zipcode", L"C64 Zip-Code archive file",
-			L"application/x.c64.zip-code"))
-	{
-	    goto done;
-	}
-	RegCloseKey(classes);
-	success = 1;
+        if (RegCreateKeyExW(classes,
+                    L"Applications\\v1541commander.exe\\shell\\open\\command",
+                    0, 0, 0, KEY_WRITE, 0, &regkey, 0) == ERROR_SUCCESS)
+        {
+            if (RegSetValueExW(regkey, 0, 0, REG_SZ,
+                        (const BYTE *)L"v1541commander.exe \"%1\"",
+                        sizeof L"v1541commander.exe \"%1\"")
+                    != ERROR_SUCCESS)
+            {
+                goto done;
+	    }
+	    RegCloseKey(regkey);
+            regkey = 0;
+        }
+        else goto done;
+        if (RegCreateKeyExW(classes,
+                    L"Applications\\v1541commander.exe\\SupportedTypes", 0,
+                    0, 0, KEY_WRITE, 0, &regkey, 0) == ERROR_SUCCESS)
+        {
+            if (!registerType(classes, regkey,
+                        L".d64", L"V1541Commander.D64", L"D64 disk image",
+                        L"application/vnd.cbm.d64-disk-image", ftD64))
+            {
+                goto done;
+            }
+            if (!registerType(classes, regkey,
+                        L".lnx", L"V1541Commander.LyNX", L"C64 LyNX archive",
+                        L"application/x.willcorley.lynx-archive", ftLynx))
+            {
+                goto done;
+            }
+            if (!registerType(classes, regkey,
+                        L".prg", L"V1541Commander.Zipcode",
+                        L"C64 Zip-Code archive file",
+                        L"application/x.c64.zip-code", ftZipcode))
+            {
+                goto done;
+            }
+            success = 1;
+        }
     }
 
 done:
+    if (regkey) RegCloseKey(regkey);
+    if (classes) RegCloseKey(classes);
     if (success)
     {
 	MessageBoxW(w, texts[TID_regsuccess_message],
@@ -254,6 +352,7 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 	    RECT textrect = {0, 0, 0, 0};
 	    int padding = messageFontMetrics.tmAveCharWidth * 3 / 2;
 	    int ypos = padding;
+
 	    const WCHAR *text = texts[TID_select_types];
 	    DrawTextExW(dc, (WCHAR *)text, -1, &textrect, DT_CALCRECT, 0);
 	    int fullwidth = textrect.right;
@@ -270,13 +369,31 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 	    addFileTypeCheckbox(w, CID_zipcode, texts[TID_zipcode], 0,
 		    dc, padding, &ypos, &fullwidth);
 
+	    text = texts[TID_prg_warn];
+            memset(&textrect, 0, sizeof textrect);
+	    DrawTextExW(dc, (WCHAR *)text, -1, &textrect, DT_CALCRECT, 0);
+	    fullwidth = textrect.right > fullwidth
+                ? textrect.right : fullwidth;
+	    ctrl = CreateWindowExW(0, L"Static", text,
+		    WS_CHILD|WS_VISIBLE, padding, ypos,
+		    textrect.right, textrect.bottom, w, 0, instance, 0);
+	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
+	    ypos += textrect.bottom + padding;
+
 	    ctrl = CreateWindowExW(0, L"Button", texts[TID_register],
+		    WS_CHILD|WS_VISIBLE|BS_DEFPUSHBUTTON,
+		    fullwidth - 2*buttonWidth, ypos,
+		    buttonWidth, buttonHeight,
+		    w, (HMENU)CID_register, instance, 0);
+	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
+	    ctrl = CreateWindowExW(0, L"Button", texts[TID_cancel],
 		    WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON,
 		    padding + fullwidth - buttonWidth, ypos,
 		    buttonWidth, buttonHeight,
-		    w, (HMENU)CID_register, instance, 0);
-	    ypos += buttonHeight + padding;
+		    w, (HMENU)CID_cancel, instance, 0);
 	    SendMessageW(ctrl, WM_SETFONT, (WPARAM)messageFont, 0);
+	    ypos += buttonHeight + padding;
+
 	    ReleaseDC(0, dc);
 	    RECT winRect = {0, 0, fullwidth + 2*padding, ypos};
 	    AdjustWindowRect(&winRect, WS_CAPTION|WS_SYSMENU, 0);
@@ -288,6 +405,18 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 
     case WM_DESTROY:
         PostQuitMessage(0);
+        break;
+
+    case WM_KEYDOWN:
+        if (wp == VK_RETURN)
+        {
+            registerTypes(w);
+            DestroyWindow(w);
+        }
+        else if (wp == VK_ESCAPE)
+        {
+            DestroyWindow(w);
+        }
         break;
 
     case WM_COMMAND:
@@ -313,6 +442,8 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 
         case CID_register:
 	    registerTypes(w);
+            /* fall through */
+        case CID_cancel:
 	    DestroyWindow(w);
             break;
         }
@@ -324,7 +455,7 @@ static LRESULT CALLBACK wproc(HWND w, UINT msg, WPARAM wp, LPARAM lp)
 int main(void)
 {
     init();
-    if (!createOpenCmd())
+    if (!getCommanderPath())
     {
 	MessageBoxW(0, texts[TID_notfound_title], texts[TID_notfound_message],
 		MB_OK|MB_ICONERROR);

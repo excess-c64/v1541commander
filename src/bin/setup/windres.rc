@@ -19,6 +19,31 @@ BEGIN
   END
   BLOCK "VarFileInfo"
   BEGIN
-    VALUE "Translation", 0x409, 1252, 0x407, 1252
+    VALUE "Translation", 0x409, 1252
   END
 END
+LANGUAGE 0x0407, 0
+1 VERSIONINFO
+FILEVERSION	1,0,0,0
+PRODUCTVERSION	1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040704E4"
+    BEGIN
+      VALUE "CompanyName", "Excess"
+      VALUE "FileDescription", "V1541Commander Einrichtung"
+      VALUE "FileVersion", "1.0.0"
+      VALUE "InternalName", "setup"
+      VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
+      VALUE "OriginalFilename", "setup.exe"
+      VALUE "ProductName", "V1541Commander Setup"
+      VALUE "ProductVersion", "1.0.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x407, 1252
+  END
+END
+

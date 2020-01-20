@@ -1,4 +1,4 @@
-IDI_ICON1	ICON	DISCARDABLE	"gfx/icon.ico"
+1 24 "uninstall.exe.manifest"
 1 VERSIONINFO
 FILEVERSION	1,0,0,0
 PRODUCTVERSION	1,0,0,0
@@ -8,12 +8,12 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "CompanyName", "Excess"
-      VALUE "FileDescription", "virtual 1541 disk commander"
+      VALUE "FileDescription", "V1541Commander Uninstall"
       VALUE "FileVersion", "1.0.0"
-      VALUE "InternalName", "v1541commander"
+      VALUE "InternalName", "uninstall"
       VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
-      VALUE "OriginalFilename", "v1541commander.exe"
-      VALUE "ProductName", "V1541Commander"
+      VALUE "OriginalFilename", "uninstall.exe"
+      VALUE "ProductName", "V1541Commander Uninstall"
       VALUE "ProductVersion", "1.0.0"
     END
   END
@@ -32,12 +32,12 @@ BEGIN
     BLOCK "040704E4"
     BEGIN
       VALUE "CompanyName", "Excess"
-      VALUE "FileDescription", "virtueller 1541 disk commander"
+      VALUE "FileDescription", "V1541Commander entfernen"
       VALUE "FileVersion", "1.0.0"
-      VALUE "InternalName", "v1541commander"
+      VALUE "InternalName", "uninstall"
       VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
-      VALUE "OriginalFilename", "v1541commander.exe"
-      VALUE "ProductName", "V1541Commander"
+      VALUE "OriginalFilename", "uninstall.exe"
+      VALUE "ProductName", "V1541Commander Uninstall"
       VALUE "ProductVersion", "1.0.0"
     END
   END
