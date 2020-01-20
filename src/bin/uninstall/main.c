@@ -103,27 +103,58 @@ static void init(void)
     }
 }
 
+static void regTreeDel(HKEY key, LPCWSTR subKey)
+{
+    HKEY sub;
+    if (RegOpenKeyExW(key, subKey, 0, KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &sub)
+	    == ERROR_SUCCESS)
+    {
+	WCHAR subName[256];
+	DWORD subNameLen;
+	while (subNameLen = 256,
+		RegEnumKeyExW(sub, 0, subName, &subNameLen, 0, 0, 0, 0)
+		== ERROR_SUCCESS)
+	{
+	    regTreeDel(sub, subName);
+	}
+	RegCloseKey(sub);
+	RegDeleteKeyW(key, subKey);
+    }
+    else MessageBoxW(0, subKey, L"Error", MB_OK|MB_ICONERROR);
+}
+
 static int unregisterType(HKEY classes, LPCWSTR ext, LPCWSTR name)
 {
     int success = 1;
 
-    WCHAR value[128];
-    DWORD len = 128;
-    if (RegGetValueW(classes, ext, 0, RRF_RT_REG_SZ, 0, value, &len)
-            == ERROR_SUCCESS)
-    {
-        if (!wcscmp(value, name))
-        {
-            if (RegDeleteKeyValueW(classes, ext, 0) != ERROR_SUCCESS)
-            {
-                success = 0;
-            }
-        }
-    }
-
     HKEY ekey;
-    if (RegOpenKeyExW(classes, ext, 0, KEY_WRITE, &ekey) == ERROR_SUCCESS)
+
+    if (RegOpenKeyExW(classes, ext, 0, KEY_WRITE|KEY_QUERY_VALUE, &ekey)
+	    == ERROR_SUCCESS)
     {
+	WCHAR value[128];
+	DWORD len = 128;
+	DWORD valueType;
+	if (RegQueryValueExW(ekey, 0, 0, &valueType, (LPBYTE)&value, &len)
+		== ERROR_SUCCESS)
+	{
+	    if (valueType != REG_SZ)
+	    {
+		success = 0;
+	    }
+	    else
+	    {
+		value[len] = L'\0';
+		if (!wcscmp(value, name))
+		{
+		    if (RegDeleteValueW(ekey, 0) != ERROR_SUCCESS)
+		    {
+			success = 0;
+		    }
+		}
+	    }
+	}
+
         HKEY owkey;
         if (RegOpenKeyExW(ekey, L"OpenWithProgids", 0, KEY_WRITE, &owkey)
                 == ERROR_SUCCESS)
@@ -134,7 +165,7 @@ static int unregisterType(HKEY classes, LPCWSTR ext, LPCWSTR name)
         RegCloseKey(ekey);
     }
 
-    RegDeleteTreeW(classes, name);
+    regTreeDel(classes, name);
 
     return success;
 }
@@ -143,29 +174,36 @@ static void unregister(HWND w)
 {
     int success = 1;
     
-    RegDeleteTreeW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\"
-            "CurrentVersion\\App Paths\\v1541commander.exe");
-
-    RegDeleteTreeW(HKEY_CURRENT_USER,
-            L"SOFTWARE\\Classes\\Applications\\v1541commander.exe");
-
-    HKEY classes;
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes", 0,
-		KEY_WRITE, &classes) == ERROR_SUCCESS)
+    HKEY key;
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\"
+		"CurrentVersion\\App Paths", 0,
+		KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
     {
-        if (!unregisterType(classes, L".prg", L"V1541Commander.Zipcode"))
+	regTreeDel(key, L"v1541commander.exe");
+	RegCloseKey(key);
+    }
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\Applications",
+		0, KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
+    {
+	regTreeDel(key, L"v1541commander.exe");
+	RegCloseKey(key);
+    }
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes", 0,
+		KEY_WRITE, &key) == ERROR_SUCCESS)
+    {
+        if (!unregisterType(key, L".prg", L"V1541Commander.Zipcode"))
         {
             success = 0;
         }
-        if (!unregisterType(classes, L".lnx", L"V1541Commander.LyNX"))
+        if (!unregisterType(key, L".lnx", L"V1541Commander.LyNX"))
         {
             success = 0;
         }
-        if (!unregisterType(classes, L".d64", L"V1541Commander.D64"))
+        if (!unregisterType(key, L".d64", L"V1541Commander.D64"))
         {
             success = 0;
         }
-        RegCloseKey(classes);
+        RegCloseKey(key);
     }
     else success = 0;
 
