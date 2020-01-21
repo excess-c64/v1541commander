@@ -13,7 +13,9 @@ For **downloads** of the latest binaries for **Windows or Linux**, search
 [CSDb](https://csdb.dk/) for "v1541commander".
 
 The Windows binary download comes with a little `setup.exe` that can be used
-to associate V1541Commander with common filetypes it can open.
+to associate V1541Commander with the file types it can open, and where you
+can select, for which file types V1541Commander should become the default
+application. To remove them again, an `uninstall.exe` tool is also included.
 
 The Linux binary download includes a `setup.sh` for installing icons and
 filetype associations, and an `uninstall.sh` for removing them again.
