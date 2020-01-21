@@ -15,6 +15,8 @@ v1541commander_INCLUDES= -I$(v1541commander_PPSRCDIR)
 v1541commander_PKGDEPS:= Qt5Core Qt5Gui	Qt5Widgets Qt5Network \
 	1541img >= 1.0 1541img < 2
 v1541commander_ICONSIZES:= 16x16 32x32 48x48 256x256
+v1541commander_MIMEICONS:= v1541commander-d64 v1541commander-zipcode \
+	v1541commander-lynx v1541commander-prg
 v1541commander_DESKTOPFILE:= v1541commander
 v1541commander_SHAREDMIMEINFO:= v1541commander
 v1541commander_DOCS:= README.md BUILDING.md LICENSE.txt LICENSE-font.txt

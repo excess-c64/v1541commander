@@ -4,6 +4,7 @@
     <comment>D64 disk image</comment>
     <comment xml:lang="de">D64 Diskettenabbild</comment>
     <glob pattern="*.d64" />
+    <icon name="v1541commander-d64" />
   </mime-type>
   <mime-type type="application/x.willcorley.lynx-archive">
     <comment>C64 LyNX archive</comment>
@@ -13,16 +14,19 @@
     <magic>
       <match type="string" offset="4:240" value="\x4c\x59\x4e\x58\x20" />
     </magic>
+    <icon name="v1541commander-lynx" />
   </mime-type>
   <mime-type type="application/x.c64.zip-code">
     <comment>C64 Zip-Code archive file</comment>
     <comment xml:lang="de">C64 Zip-Code Archivdatei</comment>
     <glob pattern="[1-5]!*.prg" />
+    <icon name="v1541commander-zipcode" />
   </mime-type>
   <mime-type type="application/vnd.cbm.program-file">
     <comment>Commodore program</comment>
     <comment xml:lang="de">Commodore Programm</comment>
     <glob pattern="*.prg" />
+    <icon name="v1541commander-prg" />
   </mime-type>
   <mime-type type="application/vnd.cbm.sequential-file">
     <comment>Commodore sequential file</comment>

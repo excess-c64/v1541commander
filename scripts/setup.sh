@@ -51,7 +51,10 @@ if test "$missingtesttool" = "y"; then
 	exit 1;
 fi
 
-V1541CMD=$(dirname $0 | realpath)/v1541commander
+V1541DIR=$(dirname $0)
+V1541CMD=$(realpath $V1541DIR)/v1541commander
+cd "$V1541DIR"
+
 if test ! -x $V1541CMD; then
 	echo ERROR: v1541commander not found. Please make sure to place this
 	echo "       script in the directory where v1541commander is located."
@@ -74,12 +77,45 @@ sed -e "s:^Exec=v1541commander:Exec=$V1541CMD:" \
 echo Installing icons ...
 xdg-icon-resource install --novendor --mode user \
 	--size 16 icons/16x16/v1541commander.png
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 16 icons/16x16/v1541commander-d64.png v1541commander-d64
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 16 icons/16x16/v1541commander-zipcode.png v1541commander-zipcode
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 16 icons/16x16/v1541commander-lynx.png v1541commander-lynx
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 16 icons/16x16/v1541commander-prg.png v1541commander-prg
 xdg-icon-resource install --novendor --mode user \
 	--size 32 icons/32x32/v1541commander.png
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 32 icons/32x32/v1541commander-d64.png v1541commander-d64
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 32 icons/32x32/v1541commander-zipcode.png v1541commander-zipcode
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 32 icons/32x32/v1541commander-lynx.png v1541commander-lynx
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 32 icons/32x32/v1541commander-prg.png v1541commander-prg
 xdg-icon-resource install --novendor --mode user \
 	--size 48 icons/48x48/v1541commander.png
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 48 icons/48x48/v1541commander-d64.png v1541commander-d64
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 48 icons/48x48/v1541commander-zipcode.png v1541commander-zipcode
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 48 icons/48x48/v1541commander-lynx.png v1541commander-lynx
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 48 icons/48x48/v1541commander-prg.png v1541commander-prg
 xdg-icon-resource install --novendor --mode user \
 	--size 256 icons/256x256/v1541commander.png
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 256 icons/256x256/v1541commander-d64.png v1541commander-d64
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 256 icons/256x256/v1541commander-zipcode.png \
+	v1541commander-zipcode
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 256 icons/256x256/v1541commander-lynx.png v1541commander-lynx
+xdg-icon-resource install --context mimetypes --novendor --mode user \
+	--size 256 icons/256x256/v1541commander-prg.png v1541commander-prg
 echo Installing menu entry ...
 xdg-desktop-menu install --novendor --mode user v1541commander-local.desktop
 echo Installing file type associations ...
