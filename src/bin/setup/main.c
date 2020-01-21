@@ -2,6 +2,8 @@
 
 #define OEMRESOURCE
 #include <windows.h>
+#include <accctrl.h>
+#include <aclapi.h>
 #include <commctrl.h>
 #include <shlwapi.h>
 #include <shlobj.h>
@@ -26,7 +28,19 @@ static int ftLynx = 1;
 static int ftZipcode = 0;
 
 static WCHAR commanderPath[MAX_PATH];
-static WCHAR regValTmp[MAX_PATH];
+static WCHAR commanderQuotedPath[MAX_PATH+2];
+static WCHAR commanderRegCommand[MAX_PATH+7];
+static DWORD commanderRegCommandSize;
+static WCHAR regValTmp[MAX_PATH+16];
+
+#define FEXIDX (sizeof "SOFTWARE\\Microsoft\\Windows\\" \
+    "CurrentVersion\\Explorer\\FileExts\\" - 1)
+#define UCNLEN ((FEXIDX) + sizeof ".xxxxxxxx\\UserChoice")
+
+static WCHAR userChoiceName[UCNLEN] = L"SOFTWARE\\Microsoft\\"
+    "Windows\\CurrentVersion\\Explorer\\FileExts\\";
+
+static PSID sid = 0;
 
 static const WCHAR *locales[] = {
     L"C",
@@ -145,6 +159,28 @@ static void init(void)
 	    }
 	}
     }
+
+    HANDLE token;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token))
+    {
+        DWORD size = 0;
+        GetTokenInformation(token, TokenUser, 0, 0, &size);
+        if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+        {
+            TOKEN_USER *user = malloc(size);
+            if (GetTokenInformation(token, TokenUser, user, size, &size))
+            {
+                if (IsValidSid(user->User.Sid))
+                {
+                    DWORD sidSize = GetLengthSid(user->User.Sid);
+                    sid = malloc(sidSize);
+                    CopySid(sidSize, sid, user->User.Sid);
+                }
+            }
+            free(user);
+        }
+        CloseHandle(token);
+    }
 }
 
 static int getCommanderPath(void)
@@ -153,7 +189,156 @@ static int getCommanderPath(void)
     WCHAR *pos = wcsrchr(commanderPath, L'\\');
     if (!pos) return 0;
     wcscpy(pos+1, L"v1541commander.exe");
-    return PathFileExistsW(commanderPath);
+    int rc = PathFileExistsW(commanderPath);
+    if (rc)
+    {
+        size_t pathlen = wcslen(commanderPath);
+        commanderQuotedPath[0] = L'"';
+        wcscpy(commanderQuotedPath+1, commanderPath);
+        commanderQuotedPath[pathlen+1] = L'"';
+        commanderQuotedPath[pathlen+2] = L'\0';
+        wcscpy(commanderRegCommand, commanderQuotedPath);
+        wcscpy(commanderRegCommand + pathlen + 2, L" \"%1\"");
+        commanderRegCommandSize = (pathlen + 8)
+            * sizeof *commanderRegCommand;
+    }
+    return rc;
+}
+
+static void regTreeDel(HKEY key, LPCWSTR subKey)
+{
+    HKEY sub;
+    if (RegOpenKeyExW(key, subKey, 0, DELETE|KEY_ENUMERATE_SUB_KEYS, &sub)
+	    == ERROR_SUCCESS)
+    {
+	WCHAR subName[256];
+	DWORD subNameLen;
+	while (subNameLen = 256,
+		RegEnumKeyExW(sub, 0, subName, &subNameLen, 0, 0, 0, 0)
+		== ERROR_SUCCESS)
+	{
+	    regTreeDel(sub, subName);
+	}
+	RegCloseKey(sub);
+	RegDeleteKeyW(key, subKey);
+    }
+}
+
+static void regUnprotect(LPCWSTR subKey)
+{
+    if (!sid) return;
+    SECURITY_DESCRIPTOR sd;
+    HKEY sub;
+    if (!InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION))
+    {
+        return;
+    }
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, subKey, 0, WRITE_DAC, &sub)
+            != ERROR_SUCCESS) return;
+    EXPLICIT_ACCESS_W ea[1] = { 0 };
+    PACL acl = 0;
+    ea[0].grfAccessPermissions = GENERIC_ALL;
+    ea[0].grfAccessMode = SET_ACCESS;
+    ea[0].grfInheritance = SUB_OBJECTS_ONLY_INHERIT;
+    ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    ea[0].Trustee.TrusteeType = TRUSTEE_IS_USER;
+    ea[0].Trustee.ptstrName = (void *)sid;
+    if (SetEntriesInAclW(1, ea, 0, &acl) != ERROR_SUCCESS)
+    {
+        RegCloseKey(sub);
+        return;
+    }
+    if (!SetSecurityDescriptorDacl(&sd, 1, acl, 0))
+    {
+        LocalFree(acl);
+        RegCloseKey(sub);
+        return;
+    }
+    RegSetKeySecurity(sub, DACL_SECURITY_INFORMATION, &sd);
+    LocalFree(acl);
+    RegCloseKey(sub);
+}
+
+static int setFriendlyTypeNameAndIcon(HKEY tkey, int nameId)
+{
+    DWORD valSize = wcslen(commanderQuotedPath) + 2;
+    regValTmp[0] = L'@';
+    wcscpy(regValTmp+1, commanderQuotedPath);
+    int numlen = swprintf(regValTmp + valSize - 1, PATH_MAX - valSize,
+            L",-%d", nameId);
+    if (numlen < 1) return 0;
+    valSize += numlen;
+    valSize *= sizeof *regValTmp;
+    if (RegSetValueExW(tkey, L"FriendlyTypeName", 0, REG_SZ,
+		(const BYTE *)regValTmp, valSize) != ERROR_SUCCESS)
+    {
+	return 0;
+    }
+
+    HKEY tmp;
+    if (RegCreateKeyExW(tkey, L"DefaultIcon", 0, 0, 0, KEY_WRITE, 0, &tmp, 0)
+	    != ERROR_SUCCESS) return 0;
+
+    valSize = wcslen(commanderQuotedPath) + 1;
+    wcscpy(regValTmp, commanderQuotedPath);
+    numlen = swprintf(regValTmp + valSize - 1, PATH_MAX - valSize,
+            L",%d", nameId);
+    if (numlen < 1)
+    {
+        RegCloseKey(tmp);
+        return 0;
+    }
+    valSize += numlen;
+    valSize *= sizeof *regValTmp;
+    if (RegSetValueExW(tmp, 0, 0, REG_SZ,
+                (const BYTE *)regValTmp, valSize) != ERROR_SUCCESS)
+    {
+        RegCloseKey(tmp);
+        return 0;
+    }
+    RegCloseKey(tmp);
+    return 1;
+}
+
+static void registerAutoType(HKEY classes, LPCWSTR ext, int nameId)
+{
+    HKEY tmp;
+    if (RegOpenKeyExW(classes, ext, 0, KEY_QUERY_VALUE, &tmp)
+            != ERROR_SUCCESS) return;
+
+    WCHAR value[128];
+    DWORD len = 128;
+    DWORD valueType;
+    if (RegQueryValueExW(tmp, 0, 0, &valueType, (LPBYTE)&value, &len)
+            == ERROR_SUCCESS)
+    {
+        if (valueType != REG_SZ)
+        {
+            RegCloseKey(tmp);
+            return;
+        }
+        value[len] = L'\0';
+        WCHAR autoTypeKeyName[18];
+        wcscpy(autoTypeKeyName, ext+1);
+        wcscat(autoTypeKeyName, L"_auto_file");
+        if (!wcscmp(value, autoTypeKeyName))
+        {
+            RegCloseKey(tmp);
+            if (RegOpenKeyExW(classes, autoTypeKeyName, 0, KEY_WRITE, &tmp)
+                    != ERROR_SUCCESS) return;
+            HKEY ico;
+            if (RegOpenKeyExW(tmp, L"DefaultIcon", 0, KEY_WRITE, &ico)
+                    == ERROR_SUCCESS)
+            {
+                RegCloseKey(ico);
+            }
+            else
+            {
+                setFriendlyTypeNameAndIcon(tmp, nameId);
+            }
+        }
+    }
+    RegCloseKey(tmp);
 }
 
 static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
@@ -182,8 +367,8 @@ static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
                 0, &tmp, 0) == ERROR_SUCCESS)
     {
 	if (RegSetValueExW(tmp, 0, 0, REG_SZ,
-                    (const BYTE *)L"v1541commander.exe \"%1\"",
-                    sizeof L"v1541commander.exe \"%1\"")
+                    (const BYTE *)commanderRegCommand,
+                    commanderRegCommandSize)
                 != ERROR_SUCCESS)
 	{
 	    RegCloseKey(tmp);
@@ -206,42 +391,7 @@ static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
 	goto done;
     }
 
-    valSize = wcslen(commanderPath) + 2;
-    regValTmp[0] = L'@';
-    wcscpy(regValTmp+1, commanderPath);
-    int numlen = swprintf(regValTmp + valSize - 1, PATH_MAX - valSize,
-            L",-%d", nameId);
-    if (numlen < 1) goto done;
-    valSize += numlen;
-    valSize *= sizeof *regValTmp;
-    if (RegSetValueExW(tkey, L"FriendlyTypeName", 0, REG_SZ,
-		(const BYTE *)regValTmp, valSize) != ERROR_SUCCESS)
-    {
-	goto done;
-    }
-
-    if (RegCreateKeyExW(tkey, L"DefaultIcon", 0, 0, 0, KEY_WRITE, 0, &tmp, 0)
-	    == ERROR_SUCCESS)
-    {
-	valSize = wcslen(commanderPath) + 1;
-	wcscpy(regValTmp, commanderPath);
-	numlen = swprintf(regValTmp + valSize - 1, PATH_MAX - valSize,
-		L",%d", nameId);
-	if (numlen < 1)
-	{
-	    RegCloseKey(tmp);
-	    goto done;
-	}
-	valSize += numlen;
-	valSize *= sizeof *regValTmp;
-	if (RegSetValueExW(tmp, 0, 0, REG_SZ,
-		    (const BYTE *)regValTmp, valSize) != ERROR_SUCCESS)
-	{
-	    RegCloseKey(tmp);
-	    goto done;
-	}
-
-    } else goto done;
+    if (!setFriendlyTypeNameAndIcon(tkey, nameId)) goto done;
 
     if (RegOpenKeyExW(tkey, L"shell", 0, KEY_WRITE, &tmp) == ERROR_SUCCESS)
     {
@@ -267,6 +417,7 @@ static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
     }
     else goto done;
 
+    registerAutoType(classes, ext, nameId);
     if (!associate)
     {
         rc = 1;
@@ -280,6 +431,19 @@ static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
 	goto done;
     }
     rc = 1;
+
+    size_t extLen = wcslen(ext);
+    wcscpy(userChoiceName + FEXIDX, ext);
+    userChoiceName[FEXIDX + extLen] = L'\\';
+    wcscpy(userChoiceName + FEXIDX + extLen + 1, L"UserChoice");
+    regUnprotect(userChoiceName);
+    userChoiceName[FEXIDX + extLen] = L'\0';
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, userChoiceName, 0,
+                DELETE|KEY_ENUMERATE_SUB_KEYS, &tmp) == ERROR_SUCCESS)
+    {
+        regTreeDel(tmp, L"UserChoice");
+        RegCloseKey(tmp);
+    }
 
 done:
     if (ekey) RegCloseKey(ekey);
@@ -315,8 +479,8 @@ static void registerTypes(HWND w)
                     0, 0, 0, KEY_WRITE, 0, &regkey, 0) == ERROR_SUCCESS)
         {
             if (RegSetValueExW(regkey, 0, 0, REG_SZ,
-                        (const BYTE *)L"v1541commander.exe \"%1\"",
-                        sizeof L"v1541commander.exe \"%1\"")
+                        (const BYTE *)commanderRegCommand,
+                        commanderRegCommandSize)
                     != ERROR_SUCCESS)
             {
                 goto done;
@@ -529,6 +693,7 @@ int main(void)
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
+    free(sid);
     return (int)msg.wParam;
 }
 

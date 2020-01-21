@@ -107,7 +107,7 @@ static void init(void)
 static void regTreeDel(HKEY key, LPCWSTR subKey)
 {
     HKEY sub;
-    if (RegOpenKeyExW(key, subKey, 0, KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &sub)
+    if (RegOpenKeyExW(key, subKey, 0, DELETE|KEY_ENUMERATE_SUB_KEYS, &sub)
 	    == ERROR_SUCCESS)
     {
 	WCHAR subName[256];
@@ -177,19 +177,19 @@ static void unregister(HWND w)
     HKEY key;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\"
 		"CurrentVersion\\App Paths", 0,
-		KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
+		DELETE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
     {
 	regTreeDel(key, L"v1541commander.exe");
 	RegCloseKey(key);
     }
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\Applications",
-		0, KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
+		0, DELETE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
     {
 	regTreeDel(key, L"v1541commander.exe");
 	RegCloseKey(key);
     }
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes", 0,
-		KEY_WRITE, &key) == ERROR_SUCCESS)
+		KEY_WRITE|KEY_ENUMERATE_SUB_KEYS, &key) == ERROR_SUCCESS)
     {
         if (!unregisterType(key, L".prg", L"V1541Commander.Zipcode"))
         {
