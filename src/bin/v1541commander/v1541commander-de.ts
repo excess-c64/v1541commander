@@ -769,7 +769,7 @@ Ausgewählte Datei verschieben mit Umschalt + Pfeil hoch/runter</translation>
         <location filename="v1541imgwidget.cpp" line="414"/>
         <source>&lt;p&gt;This disk&apos;s BAM seems invalid. This could be a sign that the disk contains things not supported by this tool, like e.g. data for trackloaders or C128 boot sectors.&lt;/p&gt;&lt;p&gt;It&apos;s therefore recommended to work on a copy. Do you want to treat this as a new image now?&lt;/p&gt;</source>
         <oldsource>&lt;p&gt;This disk&apos;s BAM seems invalid. This could be a sign that the disk contains things not supported by this tool, like e.g. data for trackloaders or C128 boot sectors.&lt;/p&gt;&lt;p&gt;It&apos;s therefore recommended to work on a copy. Do you want to treat this as a new image now?</oldsource>
-        <translation>&lt;p&gt;Die BAM dieser Diskette scheint ungültig zu sein. Das könnte ein Zeichen dafür sein, dass die Diskette Dinge enthält, die diese Anwendung nicht kannt, wie z.B. Daten für Trackloader, oder Bootsektoren für den C128.&lt;/p&gt;&lt;p&gt;Es wird deshalb empfohlen, auf einer Kopie zu arbeiten. Wollen Sie dieses Abbild als neu erstelltes Abbild behandeln?&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;Die BAM dieser Diskette scheint ungültig zu sein. Das könnte ein Zeichen dafür sein, dass die Diskette Dinge enthält, die diese Anwendung nicht kennt, wie z.B. Daten für Trackloader, oder Bootsektoren für den C128.&lt;/p&gt;&lt;p&gt;Es wird deshalb empfohlen, auf einer Kopie zu arbeiten. Wollen Sie dieses Abbild als neu erstelltes Abbild behandeln?&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="v1541imgwidget.cpp" line="474"/>
