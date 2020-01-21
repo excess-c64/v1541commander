@@ -3,6 +3,7 @@
 #define OEMRESOURCE
 #include <windows.h>
 #include <commctrl.h>
+#include <shlobj.h>
 
 #define WC_mainWindow L"V1541CommanderUninstall"
 #define CID_uninstall 0x101
@@ -120,7 +121,6 @@ static void regTreeDel(HKEY key, LPCWSTR subKey)
 	RegCloseKey(sub);
 	RegDeleteKeyW(key, subKey);
     }
-    else MessageBoxW(0, subKey, L"Error", MB_OK|MB_ICONERROR);
 }
 
 static int unregisterType(HKEY classes, LPCWSTR ext, LPCWSTR name)
@@ -195,6 +195,10 @@ static void unregister(HWND w)
         {
             success = 0;
         }
+        if (!unregisterType(key, L".prg", L"V1541Commander.PRG"))
+        {
+            success = 0;
+        }
         if (!unregisterType(key, L".lnx", L"V1541Commander.LyNX"))
         {
             success = 0;
@@ -207,6 +211,7 @@ static void unregister(HWND w)
     }
     else success = 0;
 
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
     if (success)
     {
 	MessageBoxW(w, texts[TID_success_message],

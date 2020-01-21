@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <shlwapi.h>
+#include <shlobj.h>
 
 #define WC_mainWindow L"V1541CommanderSetup"
 #define CID_register 0x101
@@ -25,7 +26,7 @@ static int ftLynx = 1;
 static int ftZipcode = 0;
 
 static WCHAR commanderPath[MAX_PATH];
-static WCHAR friendlyTypeName[MAX_PATH];
+static WCHAR regValTmp[MAX_PATH];
 
 static const WCHAR *locales[] = {
     L"C",
@@ -206,18 +207,41 @@ static int registerType(HKEY classes, HKEY suppTypes, LPCWSTR ext,
     }
 
     valSize = wcslen(commanderPath) + 2;
-    friendlyTypeName[0] = L'@';
-    wcscpy(friendlyTypeName+1, commanderPath);
-    int numlen = swprintf(friendlyTypeName + valSize - 1, PATH_MAX - valSize,
+    regValTmp[0] = L'@';
+    wcscpy(regValTmp+1, commanderPath);
+    int numlen = swprintf(regValTmp + valSize - 1, PATH_MAX - valSize,
             L",-%d", nameId);
     if (numlen < 1) goto done;
     valSize += numlen;
-    valSize *= sizeof *friendlyTypeName;
+    valSize *= sizeof *regValTmp;
     if (RegSetValueExW(tkey, L"FriendlyTypeName", 0, REG_SZ,
-		(const BYTE *)friendlyTypeName, valSize) != ERROR_SUCCESS)
+		(const BYTE *)regValTmp, valSize) != ERROR_SUCCESS)
     {
 	goto done;
     }
+
+    if (RegCreateKeyExW(tkey, L"DefaultIcon", 0, 0, 0, KEY_WRITE, 0, &tmp, 0)
+	    == ERROR_SUCCESS)
+    {
+	valSize = wcslen(commanderPath) + 1;
+	wcscpy(regValTmp, commanderPath);
+	numlen = swprintf(regValTmp + valSize - 1, PATH_MAX - valSize,
+		L",%d", nameId);
+	if (numlen < 1)
+	{
+	    RegCloseKey(tmp);
+	    goto done;
+	}
+	valSize += numlen;
+	valSize *= sizeof *regValTmp;
+	if (RegSetValueExW(tmp, 0, 0, REG_SZ,
+		    (const BYTE *)regValTmp, valSize) != ERROR_SUCCESS)
+	{
+	    RegCloseKey(tmp);
+	    goto done;
+	}
+
+    } else goto done;
 
     if (RegOpenKeyExW(tkey, L"shell", 0, KEY_WRITE, &tmp) == ERROR_SUCCESS)
     {
@@ -318,9 +342,12 @@ static void registerTypes(HWND w)
                 goto done;
             }
             if (!registerType(classes, regkey,
-                        L".prg", L"V1541Commander.Zipcode",
-                        L"C64 Zip-Code archive file",
-                        L"application/x.c64.zip-code", 3, ftZipcode))
+                        L".prg", ftZipcode ? L"V1541Commander.Zipcode" :
+			L"V1541Commander.PRG", ftZipcode ?
+			L"C64 Zip-Code archive file" : L"Commodore program",
+                        ftZipcode ? L"application/x.c64.zip-code" :
+			L"application/vnd.cbm.program-file",
+			ftZipcode ? 3 : 4, ftZipcode))
             {
                 goto done;
             }
@@ -331,6 +358,7 @@ static void registerTypes(HWND w)
 done:
     if (regkey) RegCloseKey(regkey);
     if (classes) RegCloseKey(classes);
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
     if (success)
     {
 	MessageBoxW(w, texts[TID_regsuccess_message],

@@ -1,4 +1,8 @@
-IDI_ICON1	ICON	DISCARDABLE	"gfx/icon.ico"
+1000	ICON	DISCARDABLE	"gfx/icon.ico"
+1001	ICON	DISCARDABLE	"gfx/icon-d64.ico"
+1002	ICON	DISCARDABLE	"gfx/icon-lynx.ico"
+1003	ICON	DISCARDABLE	"gfx/icon-zipcode.ico"
+1004	ICON	DISCARDABLE	"gfx/icon-prg.ico"
 1 VERSIONINFO
 FILEVERSION	1,0,0,0
 PRODUCTVERSION	1,0,0,0
@@ -24,9 +28,10 @@ BEGIN
 END
 STRINGTABLE
 BEGIN
-  1 "D64 disk image"
-  2 "C64 LyNX archive"
-  3 "C64 Zip-Code archive file"
+  1 L"D64 disk image"
+  2 L"C64 LyNX archive"
+  3 L"C64 Zip-Code archive file"
+  4 L"Commodore program"
 END
 LANGUAGE 0x0407, 0
 1 VERSIONINFO
@@ -54,7 +59,8 @@ BEGIN
 END
 STRINGTABLE
 BEGIN
-  1 "D64 Diskettenabbild"
-  2 "C64 LyNX Archiv"
-  3 "C64 Zip-Code Archivdatei"
+  1 L"D64 Diskettenabbild"
+  2 L"C64 LyNX Archiv"
+  3 L"C64 Zip-Code Archivdatei"
+  4 L"Commodore Programm"
 END
