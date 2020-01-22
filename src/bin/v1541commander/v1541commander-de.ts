@@ -386,7 +386,7 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
     <message>
         <location filename="logwindow.cpp" line="29"/>
         <source>lib1541img log viewer</source>
-        <translation>lib1541 Logbuchanzeige</translation>
+        <translation>lib1541img Logbuchanzeige</translation>
     </message>
 </context>
 <context>
