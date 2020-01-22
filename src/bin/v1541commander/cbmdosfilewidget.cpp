@@ -23,6 +23,7 @@
 #include <1541img/cbmdosfileeventargs.h>
 #include <1541img/event.h>
 #include <1541img/filedata.h>
+#include <1541img/petscii.h>
 
 static void evhdl(void *receiver, int id, const void *sender, const void *args)
 {
@@ -431,8 +432,13 @@ void CbmdosFileWidget::exportFile()
     if (CbmdosFile_type(d->file) == CbmdosFileType::CFT_DEL) return;
     const FileData *data = CbmdosFile_rdata(d->file);
     if (!data || !FileData_size(data)) return;
+    uint8_t namelen;
+    const char *name = CbmdosFile_name(d->file, &namelen);
+    char utf8name[65];
+    petscii_toUtf8(utf8name, 65, name, namelen, cmdr.lowerCase(), 1, 0, 0);
     QString hostFile = QFileDialog::getSaveFileName(this, tr("Export file"),
-	    QString(), getFilterForType(CbmdosFile_type(d->file)));
+	    QString::fromUtf8(utf8name),
+            getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
 #ifdef _WIN32

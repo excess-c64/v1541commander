@@ -8,6 +8,7 @@
 #include <QAction>
 #include <QCryptographicHash>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFont>
 #include <QFontDatabase>
 #ifndef _WIN32
@@ -586,8 +587,13 @@ void V1541Commander::exportZipcode()
     MainWindow *w = d->lastActiveWindow;
     if (!w) return;
 
+    QString filename = w->filename();
+    if (!filename.isEmpty())
+    {
+        filename = QFileInfo(filename).completeBaseName();
+    }
     QString zcFile = QFileDialog::getSaveFileName(w, tr("Export as ..."),
-	    QString(), tr("Zipcode files (*.prg);;all files (*)"));
+	    filename, tr("Zipcode files (*.prg);;all files (*)"));
 
     if (!zcFile.isEmpty())
     {
@@ -612,8 +618,13 @@ void V1541Commander::exportLynx()
     MainWindow *w = d->lastActiveWindow;
     if (!w) return;
 
+    QString filename = w->filename();
+    if (!filename.isEmpty())
+    {
+        filename = QFileInfo(filename).completeBaseName();
+    }
     QString lynxFile = QFileDialog::getSaveFileName(w, tr("Export as ..."),
-	    QString(), tr("LyNX files (*.lnx);;all files (*)"));
+	    filename, tr("LyNX files (*.lnx);;all files (*)"));
 
     if (!lynxFile.isEmpty())
     {
