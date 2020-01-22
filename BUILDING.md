@@ -17,11 +17,11 @@ To get the source from git, type the following
     cd lib1541img
     git submodule update --init
 
-If you want a specific version, e.g. 0.9, do the following
+If you want a specific version, e.g. 1.0, do the following
 
     git clone https://github.com/excess-c64/lib1541img
     cd lib1541img
-    git checkout v0.9
+    git checkout v1.0
     git submodule update --init
 
 To build and install lib1541img, the following commands should be enough:
