@@ -20,6 +20,11 @@ CbmdosFsListView::CbmdosFsListView() : QListView()
 
 void CbmdosFsListView::dragEnterEvent(QDragEnterEvent *event)
 {
+    if (!event->source())
+    {
+        event->ignore();
+        return;
+    }
     if (event->source() != this)
     {
         event->setDropAction(Qt::CopyAction);
@@ -33,6 +38,11 @@ void CbmdosFsListView::dragEnterEvent(QDragEnterEvent *event)
 
 void CbmdosFsListView::dragMoveEvent(QDragMoveEvent *event)
 {
+    if (!event->source())
+    {
+        event->ignore();
+        return;
+    }
     if (event->source() != this)
     {
         event->setDropAction(Qt::CopyAction);
@@ -46,6 +56,11 @@ void CbmdosFsListView::dragMoveEvent(QDragMoveEvent *event)
 
 void CbmdosFsListView::dropEvent(QDropEvent *event)
 {
+    if (!event->source())
+    {
+        event->ignore();
+        return;
+    }
     if (event->source() != this)
     {
         event->setDropAction(Qt::CopyAction);
