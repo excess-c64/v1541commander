@@ -1,5 +1,6 @@
 #include "v1541imgwidget.h"
 #include "v1541commander.h"
+#include "cbmdosfslistview.h"
 #include "cbmdosfsmodel.h"
 #include "cbmdosfsoptionsdialog.h"
 #include "cbmdosfsstatuswidget.h"
@@ -10,7 +11,6 @@
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QKeyEvent>
-#include <QListView>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QVBoxLayout>
@@ -36,7 +36,7 @@ class V1541ImgWidget::priv
 	priv();
 	CbmdosFs *fs;
 	CbmdosFsModel model;
-	QListView dirList;
+	CbmdosFsListView dirList;
 	CbmdosFsWidget fsprop;
 	CbmdosFileWidget file;
         CbmdosFsStatusWidget fsstat;
@@ -115,15 +115,7 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
     d = new priv();
     QHBoxLayout *layout = new QHBoxLayout(this);
     QVBoxLayout *propLayout = new QVBoxLayout();
-    d->dirList.setMinimumHeight(200);
-    d->dirList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     d->dirList.setModel(&d->model);
-    d->dirList.setDragEnabled(true);
-    d->dirList.setAcceptDrops(true);
-    d->dirList.setDragDropMode(QAbstractItemView::InternalMove);
-    d->dirList.addAction(&cmdr.newFileAction());
-    d->dirList.addAction(&cmdr.deleteFileAction());
-    d->dirList.setContextMenuPolicy(Qt::ActionsContextMenu);
     layout->addWidget(&d->dirList);
     propLayout->addWidget(&d->fsprop);
     propLayout->addWidget(&d->file);

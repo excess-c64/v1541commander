@@ -13,7 +13,8 @@
 #include <1541img/cbmdosfile.h>
 #include <1541img/event.h>
 
-static const QString fileposMimeType("application/x-cbmdosfs-filepos");
+static const QString fileposMimeType("application/x.v1541c.filepos");
+static const QString fileptrMimeType("application/x.v1541c.fileptr");
 
 static void evhdl(void *receiver, int id, const void *sender, const void *args)
 {
@@ -248,7 +249,7 @@ Qt::ItemFlags CbmdosFsModel::flags(const QModelIndex &index) const
 
 QStringList CbmdosFsModel::mimeTypes() const
 {
-    return QStringList(fileposMimeType);
+    return QStringList({fileposMimeType, fileptrMimeType});
 }
 
 QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
@@ -260,11 +261,14 @@ QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
     if (row > 0 && row < rowCount() - 1)
     {
 	--row;
-	QByteArray itemData;
-	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-	dataStream << row;
+	QByteArray posData;
+	QDataStream posStream(&posData, QIODevice::WriteOnly);
+	posStream << row;
+        CbmdosFile *file = CbmdosVfs_file(CbmdosFs_vfs(d->fs), row);
+        QByteArray ptrData(reinterpret_cast<char *>(&file), sizeof file);
 	QMimeData *mimeData = new QMimeData;
-	mimeData->setData(fileposMimeType, itemData);
+	mimeData->setData(fileposMimeType, posData);
+        mimeData->setData(fileptrMimeType, ptrData);
 	return mimeData;
     }
     return 0;
@@ -272,7 +276,7 @@ QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
 
 Qt::DropActions CbmdosFsModel::supportedDropActions() const
 {
-    return Qt::MoveAction;
+    return Qt::MoveAction|Qt::CopyAction;
 }
 
 bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
@@ -280,17 +284,30 @@ bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 {
     (void) parent;
     if (!d->fs) return false;
-    if (action != Qt::MoveAction) return false;
-    if (row < 0 || column < 0) return false;
-    if (row < 1) ++row;
-    if (!data->hasFormat(fileposMimeType)) return false;
-    int to = row - 1;
-    const QByteArray &itemData = data->data(fileposMimeType);
-    QDataStream dataStream(itemData);
-    int from;
-    dataStream >> from;
-    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
-    if (to > from) --to;
-    CbmdosVfs_move(vfs, to, from);
-    return true;
+    if (action == Qt::MoveAction)
+    {
+        if (!data->hasFormat(fileposMimeType)) return false;
+        if (row < 0 || column < 0) return false;
+        if (row < 1) ++row;
+        int to = row - 1;
+        const QByteArray &itemData = data->data(fileposMimeType);
+        QDataStream dataStream(itemData);
+        int from;
+        dataStream >> from;
+        CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+        if (to > from) --to;
+        CbmdosVfs_move(vfs, to, from);
+        return true;
+    }
+    if (action == Qt::CopyAction)
+    {
+        if (!data->hasFormat(fileptrMimeType)) return false;
+        const QByteArray &itemData = data->data(fileptrMimeType);
+        CbmdosFile *orig;
+        memcpy(&orig, itemData.data(), sizeof orig);
+        CbmdosFile *copy = CbmdosFile_clone(orig);
+        addFile(createIndex(row, column), copy);
+        return true;
+    }
+    return false;
 }
