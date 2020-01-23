@@ -22,6 +22,9 @@ filetype associations, and an `uninstall.sh` for removing them again.
 For Linux, it's recommended to build from source instead, or look out for a
 package offered for your distribution. If there is none, create one ;)
 
+For more information about the official builds, see *Hints about official 
+builds*.
+
 ## Features
 
 * Read and write D64 disk images
@@ -357,4 +360,81 @@ Most actions can be triggered by a keyboard shortcut, see this table:
 For the keyboard shortcuts for some other actions in the menus, see the
 display of the menu items -- they might differ, depending on what operating
 system you are running V1541Commander on.
+
+## Hints about official builds
+
+The official builds are "portable" and statically linked. This means
+everything needed is included in the executable itself. You can place it
+anywhere and it will work.
+
+Included in the packages are tools for registering and uninstalling
+V1541Commander in a Desktop. **If you use these, you shouldn't move the
+executable later**, because some things (like opening files with V1541Commander
+from your file manager and maybe display of the correct icons for files) would
+stop working.
+
+### Official build for Linux
+
+The package for Linux includes a `setup.sh` script that will register
+V1541Commander with your desktop. It works with any desktop conforming to the
+freedesktop.org specifications, for example KDE, Gnome, XFCE and may others.
+
+Installed are MIME-Types for the following types:
+
+* .d64 - disk image
+* .lnx - LyNX archive
+* [1-5]!\*.prg - Zipcode archive file
+* .prg - Commodore program file
+* .seq - Commodore sequential file
+* .rel - Commodore relative file
+* .usr - Commodore user-format file
+* .p[xx]/.s[xx]/.r[xx]/.u[xx] - PC64 container for Commodore file
+
+For D64, LyNX, Zipcode and PRG, icons are installed as well. A `.desktop`
+file for V1541Commander is installed, which should tell your desktop to
+include it in its start menu and register it as capable of opening D64, LyNX
+and Zipcode files.
+
+You can run `uninstall.sh` to remove everything registered/installed by
+`setup.sh`. For this to work reliably, **do not remove anything from the
+package directory**.
+
+### Official build for Windows
+
+The package for Windows includes a `setup.exe` tool for registering
+V1541Commander and creating file type associations.
+
+On Windows, there's a little problem V1541Commander can't solve: file types
+are determined by Windows Explorer *only* based on the extension of the file
+name. This means a `.prg` can either be registered as a Commodore program, or
+as a Zipcode archive file. It's impossible to have Windows Explorer
+distinguish between them.
+
+`setup.exe` will register V1541Commander as capable of opening D64, LyNX and
+".prg", so it will appear in the "open with" submenu on these file types. It
+also gives you a choice, for which of these types V1541Commander should become
+the *default* application. Setting this will remove any choice the user
+made earlier by ticking "always open using this application" in Windows
+Explorer, and then set V1541Commander as the default, which has the side
+effect of setting V1541Commander's icon for the file type.
+
+For `.prg`, a little more is done, because Windows Explorer can never tell
+whether this is a Zipcode file or a "normal" program file:
+
+* If you set V1541Commander as the default application for `.prg`, it is
+  registered as "Zipcode" with the appropriate icon. This is not recommended,
+  because in practice, most `.prg` files will not be Zipcode
+* If you don't set V1541Commander as the default application for `.prg`,
+  these files will always be considered Commodore program files (with the
+  appropriate icon set), but V1541Commander is registered as being capable
+  of opening them. Furthermore, if there already is another association for
+  `.prg` that was *done manually* in Windows Explorer and doesn't have an
+  icon yet, V1541Commander's icon for program files is set for this
+  association as well.
+
+To remove the associations done by `setup.exe`, run `uninstall.exe`. This
+removes everything short of one exception: If `setup.exe` found a manual
+association for `.prg` files without an icon and added V1541Commander's icon
+to that, it will stay. This isn't a problem though, Windows Explorer will
+notice when you remove `v1541commander.exe` and then just ignore this icon.
 
