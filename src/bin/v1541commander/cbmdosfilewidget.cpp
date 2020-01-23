@@ -62,6 +62,8 @@ class CbmdosFileWidget::priv
 	QPushButton exportButton;
 	int lastNameCursorPos;
 	bool ignoreNameCursorPos;
+
+        void setDataSize(size_t size);
 };
 
 CbmdosFileWidget::priv::priv() :
@@ -89,6 +91,12 @@ CbmdosFileWidget::priv::priv() :
     lastNameCursorPos(0),
     ignoreNameCursorPos(false)
 {
+}
+
+void CbmdosFileWidget::priv::setDataSize(size_t size)
+{
+    dataSizeLabel.setText(QString("%1 KiB")
+            .arg(QLocale::system().toString(size/1024.0, 'f', 3), -5, '0'));
 }
 
 CbmdosFileWidget::CbmdosFileWidget(QWidget *parent)
@@ -286,8 +294,7 @@ void CbmdosFileWidget::typeChanged(int typeIndex)
 	    }
 	    else
 	    {
-		d->dataSizeLabel.setText(QString("%1 KiB")
-			.arg(size/1024.0, 5, 'f', 3));
+		d->setDataSize(size);
 		d->importButton.setEnabled(true);
 		d->exportButton.setEnabled(true);
 	    }
@@ -403,9 +410,7 @@ void CbmdosFileWidget::importFile()
 	{
 	    if (CbmdosFile_import(d->file, f) >= 0)
 	    {
-		d->dataSizeLabel.setText(QString("%1 KiB")
-			.arg(FileData_size(
-				CbmdosFile_rdata(d->file))/1024.0, 5, 'f', 3));
+		d->setDataSize(FileData_size(CbmdosFile_rdata(d->file)));
 		d->exportButton.setEnabled(true);
 		uint8_t nameLength;
 		const char *name = CbmdosFile_name(d->file, &nameLength);
@@ -539,8 +544,7 @@ void CbmdosFileWidget::setFile(CbmdosFile *file)
 	}
 	else
 	{
-	    d->dataSizeLabel.setText(QString("%1 KiB")
-		    .arg(size/1024.0, 5, 'f', 3));
+	    d->setDataSize(size);
 	    d->importButton.setEnabled(true);
 	    d->exportButton.setEnabled(true);
 	}
