@@ -43,7 +43,9 @@ class V1541Commander::priv
         QPixmap statusLedRed;
         QPixmap statusLedYellow;
         QPixmap statusLedGreen;
-#ifndef _WIN32
+#ifdef _WIN32
+        HICON appIcon;
+#else
 	QIcon appIcon;
 #endif
         QAction newAction;
@@ -88,9 +90,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     statusLedRed(":/statusled_red.png"),
     statusLedYellow(":/statusled_yellow.png"),
     statusLedGreen(":/statusled_green.png"),
-#ifndef _WIN32
     appIcon(),
-#endif
     newAction(tr("&New")),
     openAction(tr("&Open")),
     saveAction(tr("&Save")),
@@ -172,7 +172,11 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     lowerCaseAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
     lowerCaseAction.setStatusTip(tr("Toggle lowercase / graphics font mode"));
     lowerCaseAction.setCheckable(true);
-#ifndef _WIN32
+#ifdef _WIN32
+    HINSTANCE inst = GetModuleHandleW(0);
+    appIcon = LoadIcon(inst, MAKEINTRESOURCE(1000));
+    SetClassLong(HWND(aboutBox.winId()), GCL_HICON, (LONG)appIcon);
+#else
     appIcon.addPixmap(QPixmap(":/icon_256.png"));
     appIcon.addPixmap(QPixmap(":/icon_48.png"));
     appIcon.addPixmap(QPixmap(":/icon_32.png"));
