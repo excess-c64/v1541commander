@@ -35,6 +35,7 @@ void handlesig(int sig)
 int main(int argc, char **argv)
 {
 #ifndef _WIN32
+#ifndef DEBUG
     pid_t pid = fork();
     if (pid < 0) return 1;
     if (pid)
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
 	}
     }
     setsid();
+#endif
 #endif
 
 #ifdef QT_STATICPLUGIN
@@ -124,10 +126,12 @@ int main(int argc, char **argv)
     if (commander.isPrimaryInstance())
     {
 #ifndef _WIN32
+#ifndef DEBUG
         freopen("/dev/null", "r", stdin);
         freopen("/dev/null", "w", stdout);
         freopen("/dev/null", "w", stderr);
 	kill(getppid(), SIGHUP);
+#endif
 #endif
 
 	commander.show();

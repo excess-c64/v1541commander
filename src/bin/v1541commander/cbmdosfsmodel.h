@@ -7,6 +7,7 @@
 struct CbmdosFile;
 struct CbmdosFs;
 struct CbmdosVfsEventArgs;
+class QTemporaryDir;
 
 class CbmdosFsModel: public QAbstractListModel
 {
@@ -24,6 +25,7 @@ class CbmdosFsModel: public QAbstractListModel
 	void fsChanged(const CbmdosVfsEventArgs *args);
 	void deleteAt(const QModelIndex &at);
 	void addFile(const QModelIndex &at, CbmdosFile *newFile);
+	const QTemporaryDir *tmpDir() const;
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index,
 		int role = Qt::DisplayRole) const;

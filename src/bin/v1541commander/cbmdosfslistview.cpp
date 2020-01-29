@@ -1,4 +1,5 @@
 #include "cbmdosfslistview.h"
+#include "cbmdosfsmodel.h"
 #include "v1541commander.h"
 
 #include <QDragEnterEvent>
@@ -12,7 +13,7 @@ CbmdosFsListView::CbmdosFsListView() : QListView()
     setDragEnabled(true);
     setAcceptDrops(true);
     setDragDropMode(QAbstractItemView::DragDrop);
-    setDefaultDropAction(Qt::MoveAction);
+    setDefaultDropAction(Qt::CopyAction);
     addAction(&cmdr.newFileAction());
     addAction(&cmdr.deleteFileAction());
     setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -20,50 +21,35 @@ CbmdosFsListView::CbmdosFsListView() : QListView()
 
 void CbmdosFsListView::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (!event->source())
+    if (event->source() == this)
     {
-        event->ignore();
-        return;
-    }
-    if (event->source() != this)
-    {
-        event->setDropAction(Qt::CopyAction);
+        event->setDropAction(Qt::MoveAction);
     }
     QListView::dragEnterEvent(event);
-    if (event->isAccepted() && event->source() != this)
+    if (event->source() == this)
     {
-        event->setDropAction(Qt::CopyAction);
+        event->setDropAction(Qt::MoveAction);
     }
 }
 
 void CbmdosFsListView::dragMoveEvent(QDragMoveEvent *event)
 {
-    if (!event->source())
+    if (event->source() == this)
     {
-        event->ignore();
-        return;
-    }
-    if (event->source() != this)
-    {
-        event->setDropAction(Qt::CopyAction);
+        event->setDropAction(Qt::MoveAction);
     }
     QListView::dragMoveEvent(event);
-    if (event->isAccepted() && event->source() != this)
+    if (event->source() == this)
     {
-        event->setDropAction(Qt::CopyAction);
+        event->setDropAction(Qt::MoveAction);
     }
 }
 
 void CbmdosFsListView::dropEvent(QDropEvent *event)
 {
-    if (!event->source())
+    if (event->source() == this)
     {
-        event->ignore();
-        return;
-    }
-    if (event->source() != this)
-    {
-        event->setDropAction(Qt::CopyAction);
+        event->setDropAction(Qt::MoveAction);
     }
     QListView::dropEvent(event);
 }

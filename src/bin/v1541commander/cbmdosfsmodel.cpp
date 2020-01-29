@@ -1,20 +1,18 @@
 #include "cbmdosfsmodel.h"
+#include "cbmdosfilemimedata.h"
 #include "v1541commander.h"
 #include "petsciistr.h"
 
 #include <QFontMetricsF>
-#include <QMimeData>
 #include <QSizeF>
 #include <QStyle>
+#include <QTemporaryDir>
 
 #include <1541img/cbmdosfs.h>
 #include <1541img/cbmdosvfs.h>
 #include <1541img/cbmdosvfseventargs.h>
 #include <1541img/cbmdosfile.h>
 #include <1541img/event.h>
-
-static const QString fileposMimeType("application/x.v1541c.filepos");
-static const QString fileptrMimeType("application/x.v1541c.fileptr");
 
 static void evhdl(void *receiver, int id, const void *sender, const void *args)
 {
@@ -30,12 +28,19 @@ class CbmdosFsModel::priv
 {
     public:
 	priv();
+	~priv();
+	QTemporaryDir *tmpDir;
 	CbmdosFs *fs;
 };
 
 CbmdosFsModel::priv::priv() :
-    fs(0)
+    tmpDir(0), fs(0)
 {}
+
+CbmdosFsModel::priv::~priv()
+{
+    delete tmpDir;
+}
 
 CbmdosFsModel::CbmdosFsModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -173,6 +178,12 @@ void CbmdosFsModel::addFile(const QModelIndex &at, CbmdosFile *newFile)
     }
 }
 
+const QTemporaryDir *CbmdosFsModel::tmpDir() const
+{
+    if (!d->tmpDir) d->tmpDir = new QTemporaryDir();
+    return d->tmpDir;
+}
+
 int CbmdosFsModel::rowCount(const QModelIndex &parent) const
 {
     (void) parent;
@@ -249,7 +260,7 @@ Qt::ItemFlags CbmdosFsModel::flags(const QModelIndex &index) const
 
 QStringList CbmdosFsModel::mimeTypes() const
 {
-    return QStringList({fileposMimeType, fileptrMimeType});
+    return QStringList(CbmdosFileMimeData::internalFormat());
 }
 
 QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
@@ -260,16 +271,8 @@ QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
     int row = index.row();
     if (row > 0 && row < rowCount() - 1)
     {
-	--row;
-	QByteArray posData;
-	QDataStream posStream(&posData, QIODevice::WriteOnly);
-	posStream << row;
-        CbmdosFile *file = CbmdosVfs_file(CbmdosFs_vfs(d->fs), row);
-        QByteArray ptrData(reinterpret_cast<char *>(&file), sizeof file);
-	QMimeData *mimeData = new QMimeData;
-	mimeData->setData(fileposMimeType, posData);
-        mimeData->setData(fileptrMimeType, ptrData);
-	return mimeData;
+	return new CbmdosFileMimeData(
+		CbmdosVfs_rfile(CbmdosFs_vfs(d->fs), row-1), row-1, this);
     }
     return 0;
 }
@@ -284,30 +287,27 @@ bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 {
     (void) parent;
     if (!d->fs) return false;
-    if (action == Qt::MoveAction)
+    const CbmdosFileMimeData *fileData =
+	qobject_cast<const CbmdosFileMimeData *>(data);
+    if (fileData)
     {
-        if (!data->hasFormat(fileposMimeType)) return false;
-        if (row < 0 || column < 0) return false;
-        if (row < 1) ++row;
-        int to = row - 1;
-        const QByteArray &itemData = data->data(fileposMimeType);
-        QDataStream dataStream(itemData);
-        int from;
-        dataStream >> from;
-        CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
-        if (to > from) --to;
-        CbmdosVfs_move(vfs, to, from);
-        return true;
-    }
-    if (action == Qt::CopyAction)
-    {
-        if (!data->hasFormat(fileptrMimeType)) return false;
-        const QByteArray &itemData = data->data(fileptrMimeType);
-        CbmdosFile *orig;
-        memcpy(&orig, itemData.data(), sizeof orig);
-        CbmdosFile *copy = CbmdosFile_clone(orig);
-        addFile(createIndex(row, column), copy);
-        return true;
+	if (action == Qt::MoveAction)
+	{
+	    if (row < 0 || column < 0) return false;
+	    if (row < 1) ++row;
+	    int to = row - 1;
+	    int from = fileData->pos();
+	    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+	    if (to > from) --to;
+	    CbmdosVfs_move(vfs, to, from);
+	    return true;
+	}
+	if (action == Qt::CopyAction)
+	{
+	    CbmdosFile *copy = CbmdosFile_clone(fileData->file());
+	    addFile(createIndex(row, column), copy);
+	    return true;
+	}
     }
     return false;
 }

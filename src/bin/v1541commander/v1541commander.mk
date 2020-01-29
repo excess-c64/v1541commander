@@ -1,7 +1,7 @@
 v1541commander_PREPROCMODULES:= v1541commander mainwindow v1541imgwidget \
 	cbmdosfsmodel cbmdosfswidget cbmdosfsoptionsdialog cbmdosfilewidget \
 	cbmdosfsstatuswidget petsciiedit petsciibutton petsciiwindow \
-	logwindow aboutbox cbmdosfslistview
+	logwindow aboutbox cbmdosfslistview cbmdosfilemimedata
 v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr \
 	petsciiconvert
 v1541commander_QRC:= resources
@@ -12,6 +12,7 @@ v1541commander_PREPROC:= MOC
 v1541commander_PREPROCFLAGS:= -p.
 v1541commander_posix_CXXFLAGS?= -fPIC
 v1541commander_INCLUDES= -I$(v1541commander_PPSRCDIR)
+v1541commander_CXXFLAGS= -fno-exceptions -fno-rtti
 v1541commander_PKGDEPS:= Qt5Core Qt5Gui	Qt5Widgets Qt5Network \
 	1541img >= 1.0 1541img < 2
 v1541commander_ICONSIZES:= 16x16 32x32 48x48 256x256

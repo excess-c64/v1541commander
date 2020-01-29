@@ -12,8 +12,8 @@ class CbmdosFsListView : public QListView
         CbmdosFsListView();
 
     protected:
-        void dragEnterEvent(QDragEnterEvent *event);
-        void dragMoveEvent(QDragMoveEvent *event);
-        void dropEvent(QDropEvent *event);
+        virtual void dragEnterEvent(QDragEnterEvent *event);
+        virtual void dragMoveEvent(QDragMoveEvent *event);
+        virtual void dropEvent(QDropEvent *event);
 };
 

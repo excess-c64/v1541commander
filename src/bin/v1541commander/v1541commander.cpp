@@ -781,7 +781,7 @@ void V1541Commander::newConnection()
 
 void V1541Commander::disconnected()
 {
-    QLocalSocket *sock = dynamic_cast<QLocalSocket *>(sender());
+    QLocalSocket *sock = qobject_cast<QLocalSocket *>(sender());
     if (sock)
     {
 	if (!d->activeClients.contains(sock))
@@ -801,7 +801,7 @@ void V1541Commander::disconnected()
 
 void V1541Commander::readyRead()
 {
-    QLocalSocket *sock = dynamic_cast<QLocalSocket *>(sender());
+    QLocalSocket *sock = qobject_cast<QLocalSocket *>(sender());
     if (sock)
     {
 	d->activeClients.insert(sock);
@@ -824,7 +824,7 @@ void V1541Commander::readyRead()
 
 void V1541Commander::petsciiInput(ushort val)
 {
-    PetsciiEdit *pe = dynamic_cast<PetsciiEdit *>(focusWidget());
+    PetsciiEdit *pe = qobject_cast<PetsciiEdit *>(focusWidget());
     if (pe) pe->petsciiInput(val);
 }
 
