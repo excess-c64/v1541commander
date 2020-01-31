@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QStyle>
 #include <QVBoxLayout>
 
 #include <1541img/d64.h>
@@ -115,6 +116,10 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
     d = new priv();
     QHBoxLayout *layout = new QHBoxLayout(this);
     QVBoxLayout *propLayout = new QVBoxLayout();
+    d->model.setItemSize(QSizeF(
+		cmdr.c64font().pointSize() * 28 * logicalDpiX() / 72
+		+ cmdr.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
+		cmdr.c64font().pointSize() * logicalDpiY() / 72));
     d->dirList.setModel(&d->model);
     layout->addWidget(&d->dirList);
     propLayout->addWidget(&d->fsprop);

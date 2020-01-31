@@ -95,7 +95,7 @@ void PetsciiEdit::petsciiInput(ushort val)
 void PetsciiEdit::setMaxLength(int length)
 {
     QFontMetricsF fm(font());
-    setMinimumWidth((length+1) * fm.averageCharWidth()
+    setMinimumWidth(length * fm.averageCharWidth()
 	    + 2 * cmdr.style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
     QLineEdit::setMaxLength(length);
 }

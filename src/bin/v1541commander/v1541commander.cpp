@@ -86,7 +86,7 @@ class V1541Commander::priv
 
 V1541Commander::priv::priv(V1541Commander *commander) :
     commander(commander),
-    c64font("C64 Pro Mono"),
+    c64font("C64 Pro Mono", 10),
     statusLedRed(":/statusled_red.png"),
     statusLedYellow(":/statusled_yellow.png"),
     statusLedGreen(":/statusled_green.png"),

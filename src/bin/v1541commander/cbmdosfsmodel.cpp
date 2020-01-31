@@ -4,10 +4,8 @@
 #include "petsciistr.h"
 #include "utils.h"
 
-#include <QFontMetricsF>
+#include <QFont>
 #include <QList>
-#include <QSizeF>
-#include <QStyle>
 #include <QTemporaryDir>
 #include <QUrl>
 
@@ -35,10 +33,11 @@ class CbmdosFsModel::priv
 	~priv();
 	QTemporaryDir *tmpDir;
 	CbmdosFs *fs;
+	QSizeF itemSize;
 };
 
 CbmdosFsModel::priv::priv() :
-    tmpDir(0), fs(0)
+    tmpDir(0), fs(0), itemSize()
 {}
 
 CbmdosFsModel::priv::~priv()
@@ -182,6 +181,11 @@ void CbmdosFsModel::addFile(const QModelIndex &at, CbmdosFile *newFile)
     }
 }
 
+void CbmdosFsModel::setItemSize(QSizeF size)
+{
+    d->itemSize = size;
+}
+
 const QTemporaryDir *CbmdosFsModel::tmpDir() const
 {
     if (!d->tmpDir) d->tmpDir = new QTemporaryDir();
@@ -207,10 +211,7 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::SizeHintRole)
     {
-	QFontMetricsF fm(cmdr.c64font());
-	return QSizeF(fm.ascent() * 29 * 13 / 14
-		+ cmdr.style()->pixelMetric(QStyle::PM_ScrollBarExtent),
-		fm.ascent() * 13 / 14);
+	return d->itemSize;
     }
 
     if (!d->fs) return QVariant();
