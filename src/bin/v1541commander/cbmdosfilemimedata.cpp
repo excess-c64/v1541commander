@@ -32,7 +32,7 @@ CbmdosFileMimeData::priv::priv(const CbmdosFile *file, int pos,
     const char *name = CbmdosFile_name(file, &namelen);
     char utf8name[65];
     petscii_toUtf8(utf8name, 65, name, namelen, cmdr.lowerCase(), 1, 0, 0);
-    QString hostFileName = QString::fromUtf8(utf8name);
+    QString hostFileName = qfnsan(QString::fromUtf8(utf8name));
     switch (CbmdosFile_type(file))
     {
 	case CbmdosFileType::CFT_DEL:
@@ -78,11 +78,12 @@ bool CbmdosFileMimeData::hasFormat(const QString &mimeType) const
 
 QStringList CbmdosFileMimeData::formats() const
 {
-    if (d->haveContent)
+    QStringList formats = QMimeData::formats();
+    if (d->haveContent && !d->tmpSaved)
     {
-	return QMimeData::formats() << "text/uri-list";
+	formats.prepend("text/uri-list");
     }
-    return QMimeData::formats();
+    return formats;
 }
 
 const CbmdosFile *CbmdosFileMimeData::file() const
@@ -115,7 +116,7 @@ QVariant CbmdosFileMimeData::retrieveData(
 	    if (rc >= 0)
 	    {
 		const_cast<CbmdosFileMimeData *>(this)->setUrls({
-			QUrl("file://" + fullName)
+			QUrl::fromLocalFile(fullName)
 			});
 		d->tmpSaved = true;
 	    }

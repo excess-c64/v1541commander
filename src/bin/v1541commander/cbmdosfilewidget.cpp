@@ -442,7 +442,7 @@ void CbmdosFileWidget::exportFile()
     char utf8name[65];
     petscii_toUtf8(utf8name, 65, name, namelen, cmdr.lowerCase(), 1, 0, 0);
     QString hostFile = QFileDialog::getSaveFileName(this, tr("Export file"),
-	    QString::fromUtf8(utf8name),
+	    qfnsan(QString::fromUtf8(utf8name)),
             getFilterForType(CbmdosFile_type(d->file)));
     if (!hostFile.isEmpty())
     {
