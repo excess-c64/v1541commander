@@ -15,13 +15,13 @@ class CbmdosFileMimeData: public QMimeData
 	priv *d;
 
     public:
-	CbmdosFileMimeData(
-		const CbmdosFile *file, int pos, const CbmdosFsModel *model);
+	CbmdosFileMimeData(const CbmdosFsModel *model);
 	virtual ~CbmdosFileMimeData();
 	virtual bool hasFormat(const QString &mimeType) const;
 	virtual QStringList formats() const;
-	const CbmdosFile *file() const;
-	int pos() const;
+	void addFile(const CbmdosFile *file, int pos);
+	const QList<const CbmdosFile *> &files() const;
+	const QList<int> &filePositions() const;
 
 	static const QString &internalFormat();
 

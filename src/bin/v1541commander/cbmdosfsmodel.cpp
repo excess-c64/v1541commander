@@ -272,16 +272,27 @@ QStringList CbmdosFsModel::mimeTypes() const
 
 QMimeData *CbmdosFsModel::mimeData(const QModelIndexList &indexes) const
 {
-    if (indexes.count() != 1) return 0;
-    const QModelIndex &index = indexes.front();
-    if (!index.isValid()) return 0;
-    int row = index.row();
-    if (row > 0 && row < rowCount() - 1)
+    if (indexes.empty()) return 0;
+    CbmdosFileMimeData *mimeData = new CbmdosFileMimeData(this);
+    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
+    for (QModelIndexList::const_iterator i = indexes.cbegin();
+	    i != indexes.cend(); ++i)
     {
-	return new CbmdosFileMimeData(
-		CbmdosVfs_rfile(CbmdosFs_vfs(d->fs), row-1), row-1, this);
+	if (i->isValid())
+	{
+	    int row = i->row();
+	    if (row > 0 && row < rowCount() - 1)
+	    {
+		mimeData->addFile(CbmdosVfs_rfile(vfs, row-1), row-1);
+	    }
+	}
     }
-    return 0;
+    if (mimeData->files().empty())
+    {
+	delete mimeData;
+	return 0;
+    }
+    return mimeData;
 }
 
 Qt::DropActions CbmdosFsModel::supportedDropActions() const
@@ -303,20 +314,33 @@ bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 	    if (row < 0 || column < 0) return false;
 	    if (row < 1) ++row;
 	    int to = row - 1;
-	    int from = fileData->pos();
+	    QList<int> fromRows;
+	    for (int r = 0; r < rowCount() - 2; ++r) fromRows.append(r);
 	    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
-	    if (to > from) --to;
-	    CbmdosVfs_move(vfs, to, from);
+	    for (int i = 0; i < fileData->filePositions().size(); ++i)
+	    {
+		int from = fromRows.at(fileData->filePositions().at(i));
+		if (to > from) --to;
+		CbmdosVfs_move(vfs, to, from);
+		int oldfrom = fromRows.at(to);
+		fromRows.removeAt(to);
+		fromRows.insert(from, oldfrom);
+		++to;
+	    }
 	    return true;
 	}
 	if (action == Qt::CopyAction)
 	{
-	    CbmdosFile *copy = CbmdosFile_clone(fileData->file());
-	    addFile(createIndex(row, column), copy);
+	    if (fileData->files().empty()) return false;
+	    for (int i = 0; i < fileData->files().size(); ++i)
+	    {
+		CbmdosFile *copy = CbmdosFile_clone(fileData->files().at(i));
+		addFile(createIndex(row+i, column), copy);
+	    }
 	    return true;
 	}
     }
-    if (data->hasUrls())
+    else if (data->hasUrls())
     {
 	QList<QUrl> urls = data->urls();
 	int fileno = 0;

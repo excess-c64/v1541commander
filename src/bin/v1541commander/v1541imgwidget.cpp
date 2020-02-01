@@ -143,7 +143,7 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 	    if (!d->fs) return;
 	    QModelIndexList selected =
 		    d->dirList.selectionModel()->selectedIndexes();
-	    if (selected.count() == 0) return;
+	    if (selected.count() != 1) return;
 	    QModelIndex current = selected.first();
 	    if (current.row() < 2) return;
 	    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);
@@ -155,7 +155,7 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 	    if (!d->fs) return;
 	    QModelIndexList selected =
 		    d->dirList.selectionModel()->selectedIndexes();
-	    if (selected.count() == 0) return;
+	    if (selected.count() != 1) return;
 	    QModelIndex current = selected.first();
 	    if (current.row() < 1) return;
 	    CbmdosVfs *vfs = CbmdosFs_vfs(d->fs);

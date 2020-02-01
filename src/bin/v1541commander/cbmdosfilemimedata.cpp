@@ -15,19 +15,25 @@ static const QString internalType = "application/x.v1541c.cbmdosfile";
 class CbmdosFileMimeData::priv
 {
     public:
-	priv(const CbmdosFile *file, int pos, const CbmdosFsModel *model);
-	const CbmdosFile *file;
-	int pos;
+	priv(const CbmdosFsModel *model);
+	void addFile(const CbmdosFile *file, int pos);
 	const CbmdosFsModel *model;
-	QString fileName;
+	QList<const CbmdosFile *> files;
+	QList<int> positions;
+	QStringList fileNames;
 	bool haveContent;
 	bool tmpSaved;
 };
 
-CbmdosFileMimeData::priv::priv(const CbmdosFile *file, int pos,
-	const CbmdosFsModel *model) :
-    file(file), pos(pos), model(model)
+CbmdosFileMimeData::priv::priv(const CbmdosFsModel *model) :
+    model(model), files(), positions(), fileNames(),
+    haveContent(false), tmpSaved(false)
+{}
+
+void CbmdosFileMimeData::priv::addFile(const CbmdosFile *file, int pos)
 {
+    files.append(file);
+    positions.append(pos);
     uint8_t namelen;
     const char *name = CbmdosFile_name(file, &namelen);
     char utf8name[65];
@@ -51,17 +57,17 @@ CbmdosFileMimeData::priv::priv(const CbmdosFile *file, int pos,
 	    hostFileName.append(".rel");
 	    break;
     }
-    fileName = hostFileName;
-    const FileData *data = CbmdosFile_rdata(file);
-    haveContent = data && FileData_size(data);
-    tmpSaved = false;
+    fileNames.append(hostFileName);
+    if (!haveContent)
+    {
+	const FileData *data = CbmdosFile_rdata(file);
+	haveContent = data && FileData_size(data);
+    }
 }
 
-CbmdosFileMimeData::CbmdosFileMimeData(const CbmdosFile *file, int pos,
-	const CbmdosFsModel *model)
+CbmdosFileMimeData::CbmdosFileMimeData(const CbmdosFsModel *model)
 {
-    d = new priv(file, pos, model);
-    setText(d->fileName);
+    d = new priv(model);
 }
 
 CbmdosFileMimeData::~CbmdosFileMimeData()
@@ -86,16 +92,23 @@ QStringList CbmdosFileMimeData::formats() const
     return formats;
 }
 
-const CbmdosFile *CbmdosFileMimeData::file() const
+void CbmdosFileMimeData::addFile(const CbmdosFile *file, int pos)
 {
-    return d->file;
+    d->addFile(file, pos);
+    setText(d->fileNames.join('\n'));
 }
 
-int CbmdosFileMimeData::pos() const
+const QList<const CbmdosFile *> &CbmdosFileMimeData::files() const
 {
-    return d->pos;
+    return d->files;
 }
 
+const QList<int> &CbmdosFileMimeData::filePositions() const
+{
+    return d->positions;
+}
+
+/* static */
 const QString &CbmdosFileMimeData::internalFormat()
 {
     return internalType;
@@ -106,20 +119,26 @@ QVariant CbmdosFileMimeData::retrieveData(
 {
     if (d->haveContent && mimeType == "text/uri-list" && !d->tmpSaved)
     {
+	QList<QUrl> uris;
 	const QTemporaryDir *td = d->model->tmpDir();
-	QString fullName = td->filePath(d->fileName);
-	FILE *f = qfopen(fullName, "wb");
-	if (f)
+	for (int i = 0; i < d->files.size(); ++i)
 	{
-	    int rc = CbmdosFile_exportRaw(d->file, f);
-	    fclose(f);
-	    if (rc >= 0)
+	    QString fullName = td->filePath(d->fileNames.at(i));
+	    FILE *f = qfopen(fullName, "wb");
+	    if (f)
 	    {
-		const_cast<CbmdosFileMimeData *>(this)->setUrls({
-			QUrl::fromLocalFile(fullName)
-			});
-		d->tmpSaved = true;
+		int rc = CbmdosFile_exportRaw(d->files.at(i), f);
+		fclose(f);
+		if (rc >= 0)
+		{
+		    uris.append(QUrl::fromLocalFile(fullName));
+		}
 	    }
+	}
+	if (!uris.empty())
+	{
+	    const_cast<CbmdosFileMimeData *>(this)->setUrls(uris);
+	    d->tmpSaved = true;
 	}
     }
 

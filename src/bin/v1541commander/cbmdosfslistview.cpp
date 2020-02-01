@@ -17,6 +17,7 @@ CbmdosFsListView::CbmdosFsListView() : QListView()
     addAction(&cmdr.newFileAction());
     addAction(&cmdr.deleteFileAction());
     setContextMenuPolicy(Qt::ActionsContextMenu);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void CbmdosFsListView::dragEnterEvent(QDragEnterEvent *event)
