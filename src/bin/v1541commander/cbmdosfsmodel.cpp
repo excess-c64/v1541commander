@@ -7,6 +7,7 @@
 
 #include <QFont>
 #include <QList>
+#include <QRegularExpression>
 #include <QTemporaryDir>
 #include <QUrl>
 
@@ -362,25 +363,30 @@ bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 		    if(--nameLen > 16) nameLen = 16;
 		    CbmdosFile_setName(newFile, name, nameLen);
 		    QString ext = file.suffix().toLower();
-		    if (ext == "seq")
+		    if (ext == "seq" || QRegularExpression("^s\\d{2}$")
+			    .match(ext).hasMatch())
 		    {
 			CbmdosFile_setType(newFile, CbmdosFileType::CFT_SEQ);
 		    }
-		    else if (ext == "usr")
+		    else if (ext == "usr" || QRegularExpression("^u\\d{2}$").
+			    match(ext).hasMatch())
 		    {
 			CbmdosFile_setType(newFile, CbmdosFileType::CFT_USR);
 		    }
-		    else if (ext == "prg")
+		    else if (ext == "prg" || QRegularExpression("^p\\d{2}$").
+			    match(ext).hasMatch())
 		    {
 			CbmdosFile_setType(newFile, CbmdosFileType::CFT_PRG);
 		    }
-		    else if (ext == "rel")
+		    else if (ext == "rel" || QRegularExpression("^r\\d{2}$").
+			    match(ext).hasMatch())
 		    {
 			CbmdosFile_setType(newFile, CbmdosFileType::CFT_REL);
 		    }
 		    else
 		    {
-			CbmdosFile_setType(newFile, CbmdosFileType::CFT_USR);
+			CbmdosFile_setType(newFile,
+				cmdr.settings().defaultImportType());
 		    }
 		    int rc = CbmdosFile_import(newFile, fp);
 		    fclose(fp);

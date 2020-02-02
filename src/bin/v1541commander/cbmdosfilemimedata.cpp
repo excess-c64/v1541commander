@@ -41,24 +41,6 @@ void CbmdosFileMimeData::priv::addFile(const CbmdosFile *file, int pos)
     petscii_toUtf8(utf8name, 65, name, namelen,
 	    cmdr.settings().lowercase(), 1, 0, 0);
     QString hostFileName = qfnsan(QString::fromUtf8(utf8name));
-    switch (CbmdosFile_type(file))
-    {
-	case CbmdosFileType::CFT_DEL:
-	    hostFileName.append(".del");
-	    break;
-	case CbmdosFileType::CFT_SEQ:
-	    hostFileName.append(".seq");
-	    break;
-	case CbmdosFileType::CFT_USR:
-	    hostFileName.append(".usr");
-	    break;
-	case CbmdosFileType::CFT_PRG:
-	    hostFileName.append(".prg");
-	    break;
-	case CbmdosFileType::CFT_REL:
-	    hostFileName.append(".rel");
-	    break;
-    }
     fileNames.append(hostFileName);
     if (!haveContent)
     {
@@ -126,10 +108,36 @@ QVariant CbmdosFileMimeData::retrieveData(
 	for (int i = 0; i < d->files.size(); ++i)
 	{
 	    QString fullName = td->filePath(d->fileNames.at(i));
+	    bool pc64 = cmdr.settings().exportAsPc64();
+	    switch (CbmdosFile_type(d->files.at(i)))
+	    {
+		case CbmdosFileType::CFT_DEL:
+		    continue;
+		case CbmdosFileType::CFT_SEQ:
+		    fullName.append(pc64 ? ".s00" : ".seq");
+		    break;
+		case CbmdosFileType::CFT_USR:
+		    fullName.append(pc64 ? ".u00" : ".usr");
+		    break;
+		case CbmdosFileType::CFT_PRG:
+		    fullName.append(pc64 ? ".p00" : ".prg");
+		    break;
+		case CbmdosFileType::CFT_REL:
+		    fullName.append(pc64 ? ".r00" : ".rel");
+		    break;
+	    }
 	    FILE *f = qfopen(fullName, "wb");
 	    if (f)
 	    {
-		int rc = CbmdosFile_exportRaw(d->files.at(i), f);
+		int rc;
+		if (pc64)
+		{
+		    rc = CbmdosFile_exportPC64(d->files.at(i), f);
+		}
+		else
+		{
+		    rc = CbmdosFile_exportRaw(d->files.at(i), f);
+		}
 		fclose(f);
 		if (rc >= 0)
 		{

@@ -4,9 +4,6 @@
 #include <QApplication>
 
 class QAction;
-#ifdef _WIN32
-class QIcon;
-#endif
 class QPixmap;
 class QTranslator;
 class Settings;

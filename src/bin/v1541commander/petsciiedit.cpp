@@ -5,7 +5,6 @@
 #include "v1541commander.h"
 
 #include <QKeyEvent>
-#include <QStyle>
 
 static const ushort cbmLetterChars[] =
 {
@@ -97,8 +96,8 @@ void PetsciiEdit::petsciiInput(ushort val)
 void PetsciiEdit::setMaxLength(int length)
 {
     QFontMetricsF fm(font());
-    setMinimumWidth(length * fm.averageCharWidth()
-	    + 2 * cmdr.style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+    setMinimumWidth(minimumSizeHint().width() - fm.maxWidth()
+	    + length * fm.height());
     QLineEdit::setMaxLength(length);
 }
 

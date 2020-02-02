@@ -15,7 +15,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QShortcut>
 #include <QSpinBox>
 #include <QVBoxLayout>
@@ -359,40 +359,56 @@ static QString getFilterForType(CbmdosFileType type)
     switch (type)
     {
 	case CbmdosFileType::CFT_PRG:
+/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "PRG files (*.prg);;P00 files (*.p00);;all files (*)");
 #else
+*/
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "PRG files (*.prg);;"
-                    "P00 files (*.p[0-9][0-9]);;all files (*)");
+                    "P00 files (*.p00 *.p[0-9][0-9]);;all files (*)");
+/*
 #endif
+*/
 	case CbmdosFileType::CFT_SEQ:
+/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "SEQ files (*.seq);;S00 files (*.s00);;all files (*)");
 #else
+*/
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "SEQ files (*.seq);;"
-                    "S00 files (*.s[0-9][0-9]);;all files (*)");
+                    "S00 files (*.s00 *.s[0-9][0-9]);;all files (*)");
+/*
 #endif
+*/
 	case CbmdosFileType::CFT_USR:
+/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "USR files (*.usr);;U00 files (*.u00);;all files (*)");
 #else
+*/
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "USR files (*.usr);;"
-                    "U00 files (*.u[0-9][0-9]);;all files (*)");
+                    "U00 files (*.u00 *.u[0-9][0-9]);;all files (*)");
+/*
 #endif
+*/
 	case CbmdosFileType::CFT_REL:
+/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "R00 files (*.r00);;all files (*)");
 #else
+*/
 	    return QCoreApplication::translate("CbmdosFileWidget", 
-                        "R00 files (*.r[0-9][0-9]);;all files (*)");
+                        "R00 files (*.r00 *.r[0-9][0-9]);;all files (*)");
+/*
 #endif
+*/
 	default:
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "all files (*)");
@@ -456,8 +472,8 @@ void CbmdosFileWidget::exportFile()
 	    hostFile = corrected.filePath();
 	}
 #endif
-	QRegExp pc64pat("\\.[PpSsUuRr]\\d{2}");
-	bool ispc64 = pc64pat.indexIn(hostFile, -4) > 0;
+	QRegularExpression pc64pat("\\.[PpSsUuRr]\\d{2}$");
+	bool ispc64 = pc64pat.match(hostFile).hasMatch();
 	if (!ispc64 && CbmdosFile_type(d->file) == CbmdosFileType::CFT_REL
 		&& QMessageBox::question(this,
 		    tr("Export REL file as raw data?"),
