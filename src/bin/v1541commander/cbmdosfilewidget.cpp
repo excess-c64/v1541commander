@@ -360,56 +360,40 @@ static QString getFilterForType(CbmdosFileType type)
     switch (type)
     {
 	case CbmdosFileType::CFT_PRG:
-/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "PRG files (*.prg);;P00 files (*.p00);;all files (*)");
 #else
-*/
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "PRG files (*.prg);;"
                     "P00 files (*.p00 *.p[0-9][0-9]);;all files (*)");
-/*
 #endif
-*/
 	case CbmdosFileType::CFT_SEQ:
-/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "SEQ files (*.seq);;S00 files (*.s00);;all files (*)");
 #else
-*/
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "SEQ files (*.seq);;"
                     "S00 files (*.s00 *.s[0-9][0-9]);;all files (*)");
-/*
 #endif
-*/
 	case CbmdosFileType::CFT_USR:
-/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "USR files (*.usr);;U00 files (*.u00);;all files (*)");
 #else
-*/
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "USR files (*.usr);;"
                     "U00 files (*.u00 *.u[0-9][0-9]);;all files (*)");
-/*
 #endif
-*/
 	case CbmdosFileType::CFT_REL:
-/*
 #ifdef _WIN32
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "R00 files (*.r00);;all files (*)");
 #else
-*/
 	    return QCoreApplication::translate("CbmdosFileWidget", 
                         "R00 files (*.r00 *.r[0-9][0-9]);;all files (*)");
-/*
 #endif
-*/
 	default:
 	    return QCoreApplication::translate("CbmdosFileWidget",
                     "all files (*)");
@@ -488,7 +472,7 @@ void CbmdosFileWidget::exportFile()
     {
 #ifdef _WIN32
 	QFileInfo fileInfo(hostFile);
-	if (fileInfo.completeSuffix() != fileInfo.suffix())
+	if (fileInfo.completeSuffix().contains('.'))
 	{
 	    QFileInfo corrected(fileInfo.dir(), fileInfo.completeBaseName());
 	    hostFile = corrected.filePath();
