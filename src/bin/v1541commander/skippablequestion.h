@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class QShowEvent;
+
 class SkippableQuestion: public QDialog
 {
     Q_OBJECT
@@ -16,6 +18,9 @@ class SkippableQuestion: public QDialog
 		QWidget *parent = nullptr);
 	~SkippableQuestion();
 	bool skip() const;
+
+    protected:
+	virtual void showEvent(QShowEvent *event);
 };
 
 #endif

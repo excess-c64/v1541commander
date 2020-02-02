@@ -26,6 +26,7 @@ class V1541Commander: public QApplication
 	void exportZipcodeD64();
 	void exportLynx();
         void close();
+	void showSettings();
 	void about();
         void exit();
         void windowActivated();
@@ -60,6 +61,7 @@ class V1541Commander: public QApplication
 	QAction &exportZipcodeD64Action();
 	QAction &exportLynxAction();
         QAction &closeAction();
+	QAction &settingsAction();
 	QAction &aboutAction();
         QAction &exitAction();
         QAction &petsciiWindowAction();

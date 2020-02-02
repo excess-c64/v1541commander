@@ -35,6 +35,7 @@ MainWindow::MainWindow()
     exportMenu->addAction(&cmdr.exportLynxAction());
     fileMenu->addAction(&cmdr.closeAction());
     fileMenu->addSeparator();
+    fileMenu->addAction(&cmdr.settingsAction());
     fileMenu->addAction(&cmdr.aboutAction());
     fileMenu->addAction(&cmdr.exitAction());
     QMenu *displayMenu = menuBar()->addMenu(tr("&View"));

@@ -5,6 +5,7 @@
 #include "petsciiwindow.h"
 #include "petsciiedit.h"
 #include "settings.h"
+#include "settingsdialog.h"
 
 #include <QAction>
 #include <QCryptographicHash>
@@ -56,6 +57,7 @@ class V1541Commander::priv
 	QAction exportZipcodeD64Action;
 	QAction exportLynxAction;
         QAction closeAction;
+	QAction settingsAction;
 	QAction aboutAction;
         QAction exitAction;
         QAction petsciiWindowAction;
@@ -72,6 +74,7 @@ class V1541Commander::priv
         PetsciiWindow petsciiWindow;
 	AboutBox aboutBox;
 	LogWindow logWindow;
+	SettingsDialog settingsDialog;
 	QString instanceServerName;
 	QLocalServer instanceServer;
 	bool isPrimaryInstance;
@@ -98,6 +101,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     exportZipcodeD64Action(tr("Zipcode (&D64)")),
     exportLynxAction(tr("&LyNX")),
     closeAction(tr("&Close")),
+    settingsAction(tr("Se&ttings")),
     aboutAction(tr("&About")),
     exitAction(tr("E&xit")),
     petsciiWindowAction(tr("&PETSCII Input")),
@@ -114,6 +118,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     petsciiWindow(c64font),
     aboutBox(c64font),
     logWindow(),
+    settingsDialog(),
     instanceServerName(),
     instanceServer(),
     isPrimaryInstance(false),
@@ -142,6 +147,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     exportLynxAction.setStatusTip(tr("Export as a LyNX file"));
     closeAction.setShortcuts(QKeySequence::Close);
     closeAction.setStatusTip(tr("Close current file"));
+    settingsAction.setStatusTip(tr("Configure V1541Commander settings"));
 #ifdef _WIN32
     exitAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Q));
 #else
@@ -396,6 +402,8 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
 	    this, &V1541Commander::exportLynx);
     connect(&d->closeAction, &QAction::triggered,
 	    this, &V1541Commander::close);
+    connect(&d->settingsAction, &QAction::triggered,
+	    this, &V1541Commander::showSettings);
     connect(&d->aboutAction, &QAction::triggered,
 	    this, &V1541Commander::about);
     connect(&d->exitAction, &QAction::triggered,
@@ -643,6 +651,29 @@ void V1541Commander::close()
     }
 }
 
+void V1541Commander::showSettings()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    d->settingsDialog.show();
+    QRect settingsDialogRect = d->settingsDialog.frameGeometry();
+    QRect mainWinRect = w->frameGeometry();
+    settingsDialogRect.moveCenter(mainWinRect.center());
+
+    const QScreen *screen = 0;
+    const QWindow *currentWin = w->windowHandle();
+    if (currentWin)
+    {
+	screen = currentWin->screen();
+	sanitizeWindowRect(&settingsDialogRect, screen);
+    }
+
+    d->settingsDialog.move(settingsDialogRect.topLeft());
+    d->settingsDialog.activateWindow();
+    d->settingsDialog.raise();
+}
+
 void V1541Commander::about()
 {
     MainWindow *w = d->lastActiveWindow;
@@ -881,6 +912,11 @@ QAction &V1541Commander::exportLynxAction()
 QAction &V1541Commander::closeAction()
 {
     return d->closeAction;
+}
+
+QAction &V1541Commander::settingsAction()
+{
+    return d->settingsAction;
 }
 
 QAction &V1541Commander::aboutAction()

@@ -2,7 +2,7 @@ v1541commander_PREPROCMODULES:= v1541commander mainwindow v1541imgwidget \
 	cbmdosfsmodel cbmdosfswidget cbmdosfsoptionsdialog cbmdosfilewidget \
 	cbmdosfsstatuswidget petsciiedit petsciibutton petsciiwindow \
 	logwindow aboutbox cbmdosfslistview cbmdosfilemimedata \
-	skippablequestion
+	skippablequestion settingsdialog
 v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr \
 	petsciiconvert settings editoperationcheck
 v1541commander_QRC:= resources

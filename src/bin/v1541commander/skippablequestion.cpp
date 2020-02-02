@@ -30,8 +30,10 @@ SkippableQuestion::priv::priv(const QString &caption) :
 {}
 
 SkippableQuestion::SkippableQuestion(const QString &title,
-	const QString &caption, QWidget *parent)
-    : QDialog(parent)
+	const QString &caption, QWidget *parent) :
+    QDialog(parent, Qt::WindowSystemMenuHint
+	    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint
+	    | Qt::CustomizeWindowHint)
 {
     d = new priv(caption);
     setWindowTitle(title);
@@ -61,5 +63,11 @@ SkippableQuestion::~SkippableQuestion()
 bool SkippableQuestion::skip() const
 {
     return d->skipCheckBox.isChecked();
+}
+
+void SkippableQuestion::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+    setFixedSize(size());
 }
 
