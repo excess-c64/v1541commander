@@ -8,6 +8,7 @@
 struct CbmdosFile;
 struct CbmdosFs;
 struct CbmdosVfsEventArgs;
+class EditOperationCheck;
 class QTemporaryDir;
 
 class CbmdosFsModel: public QAbstractListModel
@@ -42,6 +43,7 @@ class CbmdosFsModel: public QAbstractListModel
 	void selectedIndexChanged(const QModelIndex &to,
 		QItemSelectionModel::SelectionFlags command);
 	void modified();
+	void checkEditOperation(EditOperationCheck &check);
 };
 
 #endif

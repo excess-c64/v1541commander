@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+class EditOperationCheck;
 class QKeyEvent;
 class QModelIndex;
 
@@ -19,6 +20,7 @@ class V1541ImgWidget: public QWidget
     private slots:
 	void selected(const QModelIndex &current, const QModelIndex &previous);
 	void modelModified();
+	void checkEditOperation(EditOperationCheck &check);
 
     protected:
 	virtual void keyPressEvent(QKeyEvent *event);

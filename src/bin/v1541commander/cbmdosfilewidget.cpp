@@ -1,4 +1,5 @@
 #include "cbmdosfilewidget.h"
+#include "editoperationcheck.h"
 #include "petsciistr.h"
 #include "petsciiedit.h"
 #include "settings.h"
@@ -425,6 +426,27 @@ void CbmdosFileWidget::importFile()
 	FILE *f = qfopen(hostFile, "rb");
 	if (f)
 	{
+	    if (cmdr.settings().warnDiskCapacity())
+	    {
+		CbmdosFile *newFile = CbmdosFile_clone(d->file);
+		if (CbmdosFile_import(newFile, f) < 0)
+		{
+		    CbmdosFile_destroy(newFile);
+		    fclose(f);
+		    QMessageBox::critical(this, tr("Error reading file"),
+			    tr("The selected file couldn't be read."));
+		    return;
+		}
+		rewind(f);
+		EditOperationCheck check(newFile, d->file);
+		emit checkEditOperation(check);
+		CbmdosFile_destroy(newFile);
+		if (!check.allowed())
+		{
+		    fclose(f);
+		    return;
+		}
+	    }
 	    if (CbmdosFile_import(d->file, f) >= 0)
 	    {
 		d->setDataSize(FileData_size(CbmdosFile_rdata(d->file)));

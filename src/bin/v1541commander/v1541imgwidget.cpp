@@ -6,7 +6,9 @@
 #include "cbmdosfsstatuswidget.h"
 #include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
+#include "editoperationcheck.h"
 #include "settings.h"
+#include "skippablequestion.h"
 #include "utils.h"
 
 #include <QFileInfo>
@@ -22,6 +24,7 @@
 #include <1541img/d64writer.h>
 #include <1541img/cbmdosfile.h>
 #include <1541img/cbmdosfs.h>
+#include <1541img/cbmdosfsoptions.h>
 #include <1541img/cbmdosvfs.h>
 #include <1541img/cbmdosvfsreader.h>
 #include <1541img/filedata.h>
@@ -137,6 +140,10 @@ V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
 		    QItemSelectionModel::SelectionFlags)));
     connect(&d->model, &CbmdosFsModel::modified,
 	    this, &V1541ImgWidget::modelModified);
+    connect(&d->model, &CbmdosFsModel::checkEditOperation,
+	    this, &V1541ImgWidget::checkEditOperation);
+    connect(&d->file, &CbmdosFileWidget::checkEditOperation,
+	    this, &V1541ImgWidget::checkEditOperation);
     QShortcut *f3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
     connect(f3, SIGNAL(activated()), &d->dirList, SLOT(setFocus()));
     QShortcut *sup = new QShortcut(QKeySequence(Qt::SHIFT+Qt::Key_Up), this);
@@ -214,6 +221,55 @@ void V1541ImgWidget::modelModified()
 {
     d->fsstat.setStatus(CbmdosFs_status(d->fs));
     emit modified();
+}
+
+void V1541ImgWidget::checkEditOperation(EditOperationCheck &check)
+{
+    if (!d->fs) return;
+    check.setAllowed(true);
+    if (!check.oldFile() &&
+	    !(CbmdosFs_options(d->fs).flags & CFF_ALLOWLONGDIR) &&
+	    CbmdosVfs_fileCount(CbmdosFs_rvfs(d->fs)) >= 144)
+    {
+	if (cmdr.settings().warnDirCapacity())
+	{
+	    SkippableQuestion q(tr("Really add this file?"),
+		    tr("<p>Adding another file will overflow your directory "
+			"and require you to fix this later by either allowing "
+			"long directories for this disk or removing another "
+			"file.</p>"
+			"<p>Do you want to proceed adding this file?</p>"),
+		    window());
+	    check.setAllowed(q.exec() == QDialog::Accepted);
+	    if (q.skip()) cmdr.settings().setWarnDirCapacity(false);
+	}
+    }
+    if (check.allowed())
+    {
+	uint16_t requiredBlocks = CbmdosFile_realBlocks(check.newFile());
+	if (check.oldFile())
+	{
+	    uint16_t currentBlocks = CbmdosFile_realBlocks(check.oldFile());
+	    if (currentBlocks > requiredBlocks) requiredBlocks = 0;
+	    else requiredBlocks -= currentBlocks;
+	}
+	uint16_t freeBlocks = CbmdosFs_freeBlocks(d->fs);
+	if (freeBlocks == 0xffff || freeBlocks < requiredBlocks)
+	{
+	    if (cmdr.settings().warnDiskCapacity())
+	    {
+		SkippableQuestion q(tr("Really write this file?"),
+			tr("<p>Writing this file will overflow your current "
+			    "disk image and require you to fix this later by "
+			    "either changing filesystem options or removing "
+			    "another file.</p>"
+			    "<p>Do you want to proceed writing this "
+			    "file?</p>"), window());
+		check.setAllowed(q.exec() == QDialog::Accepted);
+		if (q.skip()) cmdr.settings().setWarnDiskCapacity(false);
+	    }
+	}
+    }
 }
 
 void V1541ImgWidget::keyPressEvent(QKeyEvent *event)

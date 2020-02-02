@@ -1,5 +1,6 @@
 #include "cbmdosfsmodel.h"
 #include "cbmdosfilemimedata.h"
+#include "editoperationcheck.h"
 #include "v1541commander.h"
 #include "petsciistr.h"
 #include "settings.h"
@@ -171,6 +172,13 @@ void CbmdosFsModel::deleteAt(const QModelIndex &at)
 
 void CbmdosFsModel::addFile(const QModelIndex &at, CbmdosFile *newFile)
 {
+    EditOperationCheck check(newFile);
+    emit checkEditOperation(check);
+    if (!check.allowed())
+    {
+	CbmdosFile_destroy(newFile);
+	return;
+    }
     if (at.isValid() && at.row() > 0)
     {
 	beginInsertRows(QModelIndex(), at.row(), at.row());

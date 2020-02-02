@@ -5,6 +5,7 @@
 
 struct CbmdosFile;
 struct CbmdosFileEventArgs;
+class EditOperationCheck;
 class PetsciiStr;
 
 class CbmdosFileWidget: public QGroupBox
@@ -33,6 +34,9 @@ class CbmdosFileWidget: public QGroupBox
 	CbmdosFile *file() const;
 	void setFile(CbmdosFile *file);
 	void fileChanged(const CbmdosFileEventArgs *args);
+
+    signals:
+	void checkEditOperation(EditOperationCheck &check);
 };
 
 #endif
