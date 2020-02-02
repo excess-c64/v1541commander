@@ -1,6 +1,7 @@
 #include "cbmdosfilewidget.h"
 #include "petsciistr.h"
 #include "petsciiedit.h"
+#include "settings.h"
 #include "utils.h"
 #include "v1541commander.h"
 
@@ -440,7 +441,8 @@ void CbmdosFileWidget::exportFile()
     uint8_t namelen;
     const char *name = CbmdosFile_name(d->file, &namelen);
     char utf8name[65];
-    petscii_toUtf8(utf8name, 65, name, namelen, cmdr.lowerCase(), 1, 0, 0);
+    petscii_toUtf8(utf8name, 65, name, namelen,
+	    cmdr.settings().lowercase(), 1, 0, 0);
     QString hostFile = QFileDialog::getSaveFileName(this, tr("Export file"),
 	    qfnsan(QString::fromUtf8(utf8name)),
             getFilterForType(CbmdosFile_type(d->file)));

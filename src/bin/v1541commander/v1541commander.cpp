@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "petsciiwindow.h"
 #include "petsciiedit.h"
+#include "settings.h"
 
 #include <QAction>
 #include <QCryptographicHash>
@@ -19,7 +20,6 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QSet>
-#include <QSettings>
 #include <QScreen>
 #include <QTranslator>
 #include <QWindow>
@@ -75,8 +75,7 @@ class V1541Commander::priv
 	QString instanceServerName;
 	QLocalServer instanceServer;
 	bool isPrimaryInstance;
-        bool lowerCase;
-	bool autoMapToLc;
+	Settings settings;
 	QSet<QLocalSocket *> activeClients;
         
         MainWindow *addWindow(bool show = true);
@@ -118,8 +117,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     instanceServerName(),
     instanceServer(),
     isPrimaryInstance(false),
-    lowerCase(false),
-    autoMapToLc(false),
+    settings(),
     activeClients()
 {
     newAction.setShortcuts(QKeySequence::New);
@@ -331,13 +329,12 @@ void V1541Commander::priv::removeWindow(MainWindow *w)
     w->close();
     if (allWindows.count() == 0)
     {
-        QSettings settings(QCoreApplication::organizationName(),
-                QCoreApplication::applicationName());
-        settings.setValue("geometry", w->saveGeometry());
-	settings.setValue("petsciiGeometry", petsciiWindow.saveGeometry());
-	settings.setValue("logGeometry", logWindow.saveGeometry());
-	settings.setValue("lowercase", lowerCase);
-	settings.setValue("automap", autoMapToLc);
+	if (settings.rememberWindowPositions())
+	{
+	    settings.setMainGeometry(w->saveGeometry());
+	    settings.setPetsciiGeometry(petsciiWindow.saveGeometry());
+	    settings.setLogGeometry(logWindow.saveGeometry());
+	}
         closeAllWindows();
     }
     w->deleteLater();
@@ -374,18 +371,15 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
     installTranslator(translator);
     d = new priv(this);
     d->addWindow(false);
-    QSettings settings(QCoreApplication::organizationName(),
-            QCoreApplication::applicationName());
-    d->lastActiveWindow->restoreGeometry(
-            settings.value("geometry").toByteArray());
-    d->petsciiWindow.restoreGeometry(
-	    settings.value("petsciiGeometry").toByteArray());
-    d->logWindow.restoreGeometry(
-	    settings.value("logGeometry").toByteArray());
-    d->lowerCase = settings.value("lowercase", false).toBool();
-    d->lowerCaseAction.setChecked(d->lowerCase);
-    d->autoMapToLc = settings.value("automap", false).toBool();
-    d->autoMapLcAction.setChecked(d->autoMapToLc);
+    if (d->settings.rememberWindowPositions())
+    {
+	d->lastActiveWindow->restoreGeometry(d->settings.mainGeometry());
+	d->petsciiWindow.restoreGeometry(d->settings.petsciiGeometry());
+	d->logWindow.restoreGeometry(d->settings.logGeometry());
+    }
+    d->lowerCaseAction.setChecked(d->settings.lowercase());
+    d->petsciiWindow.setLowercase(d->settings.lowercase());
+    d->autoMapLcAction.setChecked(d->settings.automapPetsciiToLc());
     connect(&d->newAction, &QAction::triggered,
 	    this, &V1541Commander::newImage);
     connect(&d->openAction, SIGNAL(triggered()),
@@ -423,13 +417,14 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
     connect(&d->petsciiWindow, &PetsciiWindow::petsciiInput,
 	    this, &V1541Commander::petsciiInput);
     connect(&d->lowerCaseAction, &QAction::triggered, this, [this](){
-            d->lowerCase = !d->lowerCase;
-            emit lowerCaseChanged(d->lowerCase);
-            d->petsciiWindow.setLowercase(d->lowerCase);
+	    d->settings.setLowercase(!d->settings.lowercase());
+            emit lowerCaseChanged(d->settings.lowercase());
+            d->petsciiWindow.setLowercase(d->settings.lowercase());
         });
     connect(&d->autoMapLcAction, &QAction::triggered, this, [this](){
-	    d->autoMapToLc = !d->autoMapToLc;
-	    emit autoMapToLcChanged(d->autoMapToLc);
+	    d->settings.setAutomapPetsciiToLc(
+		    !d->settings.automapPetsciiToLc());
+	    emit autoMapToLcChanged(d->settings.automapPetsciiToLc());
 	});
     connect(&d->logWindow, &LogWindow::logLineAppended,
 	    this, &V1541Commander::logLineAppended);
@@ -953,14 +948,9 @@ bool V1541Commander::isPrimaryInstance() const
     return d->isPrimaryInstance;
 }
 
-bool V1541Commander::lowerCase() const
+Settings &V1541Commander::settings()
 {
-    return d->lowerCase;
-}
-
-bool V1541Commander::autoMapToLc() const
-{
-    return d->autoMapToLc;
+    return d->settings;
 }
 
 V1541Commander &V1541Commander::instance()

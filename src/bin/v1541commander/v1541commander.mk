@@ -3,7 +3,7 @@ v1541commander_PREPROCMODULES:= v1541commander mainwindow v1541imgwidget \
 	cbmdosfsstatuswidget petsciiedit petsciibutton petsciiwindow \
 	logwindow aboutbox cbmdosfslistview cbmdosfilemimedata
 v1541commander_CXXMODULES:= $(v1541commander_PREPROCMODULES) main petsciistr \
-	petsciiconvert
+	petsciiconvert settings
 v1541commander_QRC:= resources
 ifneq ($(PLATFORM),win32)
 v1541commander_QRC+= icon

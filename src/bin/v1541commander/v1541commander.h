@@ -9,6 +9,7 @@ class QIcon;
 #endif
 class QPixmap;
 class QTranslator;
+class Settings;
 
 #define cmdr (V1541Commander::instance())
 
@@ -75,8 +76,7 @@ class V1541Commander: public QApplication
         QAction &lowerCaseAction();
 	const QString &instanceServerName() const;
 	bool isPrimaryInstance() const;
-        bool lowerCase() const;
-	bool autoMapToLc() const;
+	Settings &settings();
 
         static V1541Commander &instance();
 

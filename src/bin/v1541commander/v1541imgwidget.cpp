@@ -6,6 +6,7 @@
 #include "cbmdosfsstatuswidget.h"
 #include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
+#include "settings.h"
 #include "utils.h"
 
 #include <QFileInfo>
@@ -258,7 +259,7 @@ void V1541ImgWidget::newImage()
     if (optDlg.exec() == QDialog::Accepted)
     {
 	d->fs = CbmdosFs_create(opts);
-	if (cmdr.autoMapToLc())
+	if (cmdr.settings().automapPetsciiToLc())
 	{
 	    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs), true, true);
 	}
@@ -381,7 +382,7 @@ void V1541ImgWidget::open(const QString& filename)
 	    d->fs = CbmdosFs_fromImage(d64, opts);
 	    if (d->fs)
 	    {
-		if (cmdr.autoMapToLc())
+		if (cmdr.settings().automapPetsciiToLc())
 		{
 		    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs), true, true);
 		}
@@ -435,7 +436,7 @@ void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
     d->fs = CbmdosFs_fromVfs(vfs, CFO_DEFAULT);
     if (d->fs)
     {
-	if (cmdr.autoMapToLc())
+	if (cmdr.settings().automapPetsciiToLc())
 	{
 	    CbmdosVfs_setAutoMapToLc(CbmdosFs_vfs(d->fs), true, true);
 	}
@@ -609,7 +610,7 @@ void V1541ImgWidget::newFile()
 {
     if (!hasValidImage()) return;
     CbmdosFile *newFile = CbmdosFile_create();
-    if (cmdr.autoMapToLc())
+    if (cmdr.settings().automapPetsciiToLc())
     {
 	CbmdosFile_setAutoMapToLc(newFile, true);
     }

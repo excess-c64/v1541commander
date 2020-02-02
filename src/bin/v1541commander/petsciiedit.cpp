@@ -1,6 +1,7 @@
 #include "petsciiedit.h"
 #include "petsciiconvert.h"
 #include "petsciistr.h"
+#include "settings.h"
 #include "v1541commander.h"
 
 #include <QKeyEvent>
@@ -49,7 +50,8 @@ void PetsciiEdit::editText(const QString &text)
     QString translated;
     for (QString::const_iterator i = text.cbegin(); i != text.cend(); ++i)
     {
-	QChar tc = PetsciiConvert::unicodeToFont(*i, cmdr.lowerCase());
+	QChar tc = PetsciiConvert::unicodeToFont(*i,
+		cmdr.settings().lowercase());
 	if (tc.isNull())
 	{
 	    if (pos > 0) --pos;
@@ -68,7 +70,7 @@ void PetsciiEdit::editText(const QString &text)
 void PetsciiEdit::setPetscii(const PetsciiStr &petscii, bool keepCursorPos)
 {
     int pos = cursorPosition();
-    bool lc = cmdr.lowerCase();
+    bool lc = cmdr.settings().lowercase();
     setText(petscii.toString(lc).replace(lc ? 0xe1a0 : 0xe0a0, 0xefa3));
     if (keepCursorPos) setCursorPosition(pos);
 }

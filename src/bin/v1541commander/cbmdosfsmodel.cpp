@@ -2,6 +2,7 @@
 #include "cbmdosfilemimedata.h"
 #include "v1541commander.h"
 #include "petsciistr.h"
+#include "settings.h"
 #include "utils.h"
 
 #include <QFont>
@@ -230,7 +231,7 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 	const CbmdosFile *file = CbmdosVfs_rfile(vfs, row-1);
 	CbmdosFile_getDirLine(file, buffer);
 	PetsciiStr dirLine((char *)buffer, 28);
-	return dirLine.toString(cmdr.lowerCase());
+	return dirLine.toString(cmdr.settings().lowercase());
     }
 
     if (row == 0)
@@ -238,13 +239,13 @@ QVariant CbmdosFsModel::data(const QModelIndex &index, int role) const
 	QString heading("0 ");
 	CbmdosVfs_getDirHeader(vfs, buffer);
 	PetsciiStr dirHeader((char *)buffer, 24);
-	heading.append(dirHeader.toString(cmdr.lowerCase(), true));
+	heading.append(dirHeader.toString(cmdr.settings().lowercase(), true));
 	return heading;
     }
 
     CbmdosFs_getFreeBlocksLine(d->fs, buffer);
     PetsciiStr freeLine((char *)buffer, 16);
-    return freeLine.toString(cmdr.lowerCase());
+    return freeLine.toString(cmdr.settings().lowercase());
 }
 
 Qt::ItemFlags CbmdosFsModel::flags(const QModelIndex &index) const

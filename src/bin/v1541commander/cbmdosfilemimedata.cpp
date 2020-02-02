@@ -1,5 +1,6 @@
 #include "cbmdosfilemimedata.h"
 #include "cbmdosfsmodel.h"
+#include "settings.h"
 #include "utils.h"
 #include "v1541commander.h"
 
@@ -37,7 +38,8 @@ void CbmdosFileMimeData::priv::addFile(const CbmdosFile *file, int pos)
     uint8_t namelen;
     const char *name = CbmdosFile_name(file, &namelen);
     char utf8name[65];
-    petscii_toUtf8(utf8name, 65, name, namelen, cmdr.lowerCase(), 1, 0, 0);
+    petscii_toUtf8(utf8name, 65, name, namelen,
+	    cmdr.settings().lowercase(), 1, 0, 0);
     QString hostFileName = qfnsan(QString::fromUtf8(utf8name));
     switch (CbmdosFile_type(file))
     {
