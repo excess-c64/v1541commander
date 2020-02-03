@@ -361,6 +361,47 @@ For the keyboard shortcuts for some other actions in the menus, see the
 display of the menu items -- they might differ, depending on what operating
 system you are running V1541Commander on.
 
+## Drag & Drop
+
+V1541Commander supports a variety of drag&drop operations:
+
+* Drag one or multiple files inside the same directory list to reorder, they
+  will be placed where you drop them.
+* Drag one or multiple files from one directory list to another one to copy
+  the files to the other disk.
+* Drag one or multiple files from a directory list to a file manager (for
+  example Windows Explorer) to export them. They are exported either as plain
+  binary data or as a PC64 container file, depending on your current settings.
+* Drag one or multiple files from a file manager (for example Windows
+  Explorer) to a directory list to import them. The correct 1541 file type
+  (SEQ, PRG, USR, REL) is guessed by the original filename and, if it can't be
+  guessed, a default from your settings is used.
+* Drag one or multiple files from a file manager (for example Windows
+  Explorer) to a V1541Commander window (outside the directory list) to open
+  them in the same way as picking them from the "File > Open" dialog.
+* Drag one or multiple files from a directory list to an application accepting
+  plain text (like e.g. Wordpad on Windows) to insert the file names there as
+  text converted from PETSCII to Unicode.
+
+## Settings
+
+Select *Settings* from the *File* menu to configure some V1541Commander
+settings:
+
+* *Remember window positions* will save the positions of the PETSCII input
+  window, the lib1541img log window and the last main window used on exit,
+  and restore them when starting V1541Commander again.
+* *drag & drop exports as PC64 file*: If this is selected, a file dragged to
+  a file manager will be exported as a PC64 container file (P00/S00/U00/R00),
+  otherwise it will be exported as a plain/raw binary.
+* *import unknown dropped files as*: Select here the 1541 file type to use for
+  dropped files when the type cannot be guessed from the original file name.
+* *warn when disk would overflow* gives you a warning question before writing
+  a file to disk that won't fit, so you can cancel the operation.
+* *warn when directory would overflow* gives you a warning question before
+  adding a file when it wouldn't fit in the directory, so you can cancel the
+  operation.
+
 ## Hints about official builds
 
 The official builds are "portable" and statically linked. This means
