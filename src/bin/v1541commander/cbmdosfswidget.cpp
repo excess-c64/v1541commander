@@ -68,6 +68,9 @@ CbmdosFsWidget::CbmdosFsWidget(QWidget *parent)
     d->dosVer.setMinimum(0);
     d->dosVer.setMaximum(0xff);
     d->dosVer.setDisplayIntegerBase(16);
+    QFont dosVerFont = d->dosVer.font();
+    dosVerFont.setCapitalization(QFont::AllUppercase);
+    d->dosVer.setFont(dosVerFont);
     d->idLayout.addWidget(&d->idLabel);
     d->idLayout.addWidget(&d->id);
     d->idLayout.addWidget(&d->dosVerLabel);
