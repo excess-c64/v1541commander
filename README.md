@@ -442,6 +442,11 @@ package directory**.
 
 ### Official build for Windows
 
+The official build for Windows requires at least Windows 7 to run. This is a
+requirement of the Qt version used. If you want to run V1541Commander on older
+versions of Windows, you can try to build it yourself with an older version of
+Qt.
+
 The package for Windows includes a `setup.exe` tool for registering
 V1541Commander and creating file type associations.
 
