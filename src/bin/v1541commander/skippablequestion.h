@@ -1,11 +1,9 @@
 #ifndef V1541C_SKIPPABLEQUESTION_H
 #define V1541C_SKIPPABLEQUESTION_H
 
-#include <QDialog>
+#include <QMessageBox>
 
-class QShowEvent;
-
-class SkippableQuestion: public QDialog
+class SkippableQuestion: public QMessageBox
 {
     Q_OBJECT
 
@@ -18,9 +16,6 @@ class SkippableQuestion: public QDialog
 		QWidget *parent = nullptr);
 	~SkippableQuestion();
 	bool skip() const;
-
-    protected:
-	virtual void showEvent(QShowEvent *event);
 };
 
 #endif

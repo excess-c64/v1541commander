@@ -240,7 +240,7 @@ void V1541ImgWidget::checkEditOperation(EditOperationCheck &check)
 			"file.</p>"
 			"<p>Do you want to proceed adding this file?</p>"),
 		    window());
-	    check.setAllowed(q.exec() == QDialog::Accepted);
+	    check.setAllowed(q.exec() == QMessageBox::Yes);
 	    if (q.skip()) cmdr.settings().setWarnDirCapacity(false);
 	}
     }
@@ -265,7 +265,7 @@ void V1541ImgWidget::checkEditOperation(EditOperationCheck &check)
 			    "another file.</p>"
 			    "<p>Do you want to proceed writing this "
 			    "file?</p>"), window());
-		check.setAllowed(q.exec() == QDialog::Accepted);
+		check.setAllowed(q.exec() == QMessageBox::Yes);
 		if (q.skip()) cmdr.settings().setWarnDiskCapacity(false);
 	    }
 	}
