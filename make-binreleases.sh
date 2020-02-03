@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=${1:-1.0}
+VERSION=${1:-1.1}
 NAME=v1541commander
 
 WINTARGET=i686-w64-mingw32.static

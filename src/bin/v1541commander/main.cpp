@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 
     QCoreApplication::setOrganizationName("Excess");
     QCoreApplication::setApplicationName("V1541Commander");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion("1.1");
 
     QTranslator translator;
     QString qmsuffix = QLocale::system().name();
