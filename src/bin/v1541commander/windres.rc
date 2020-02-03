@@ -4,8 +4,8 @@
 1003	ICON	DISCARDABLE	"gfx/icon-zipcode.ico"
 1004	ICON	DISCARDABLE	"gfx/icon-prg.ico"
 1 VERSIONINFO
-FILEVERSION	1,0,0,0
-PRODUCTVERSION	1,0,0,0
+FILEVERSION	1,1,0,0
+PRODUCTVERSION	1,1,0,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -13,12 +13,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "Excess"
       VALUE "FileDescription", "virtual 1541 disk commander"
-      VALUE "FileVersion", "1.0.0"
+      VALUE "FileVersion", "1.1.0"
       VALUE "InternalName", "v1541commander"
       VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
       VALUE "OriginalFilename", "v1541commander.exe"
       VALUE "ProductName", "V1541Commander"
-      VALUE "ProductVersion", "1.0.0"
+      VALUE "ProductVersion", "1.1.0"
     END
   END
   BLOCK "VarFileInfo"
@@ -35,8 +35,8 @@ BEGIN
 END
 LANGUAGE 0x0407, 0
 1 VERSIONINFO
-FILEVERSION	1,0,0,0
-PRODUCTVERSION	1,0,0,0
+FILEVERSION	1,1,0,0
+PRODUCTVERSION	1,1,0,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -44,12 +44,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "Excess"
       VALUE "FileDescription", "virtueller 1541 disk commander"
-      VALUE "FileVersion", "1.0.0"
+      VALUE "FileVersion", "1.1.0"
       VALUE "InternalName", "v1541commander"
       VALUE "LegalCopyright", "Zirias/Excess <felix@palmen-it.de>"
       VALUE "OriginalFilename", "v1541commander.exe"
       VALUE "ProductName", "V1541Commander"
-      VALUE "ProductVersion", "1.0.0"
+      VALUE "ProductVersion", "1.1.0"
     END
   END
   BLOCK "VarFileInfo"
