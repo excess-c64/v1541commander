@@ -145,7 +145,7 @@ QSize MainWindow::sizeHint() const
 {
     if (d->content == Content::None)
     {
-        return QSize(480,200);
+        return QSize(360 * logicalDpiX() / 72, 150 * logicalDpiY() / 72);
     }
     else
     {
