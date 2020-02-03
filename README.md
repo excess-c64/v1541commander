@@ -355,7 +355,7 @@ Most actions can be triggered by a keyboard shortcut, see this table:
 |    Ctrl + Shift + C | Toggle closed flag of selected file       |
 |    Ctrl + Shift + I | Import content to selected file           |
 |    Ctrl + Shift + E | Export content from selected file         |
-|       Shift + Space | Toggle character set                      |
+|        Ctrl + Space | Toggle character set                      |
 
 For the keyboard shortcuts for some other actions in the menus, see the
 display of the menu items -- they might differ, depending on what operating
