@@ -188,6 +188,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     logWindow.setWindowIcon(appIcon);
     aboutBox.setWindowIcon(appIcon);
     petsciiWindow.setWindowIcon(appIcon);
+    settingsDialog.setWindowIcon(appIcon);
 #endif
     QCryptographicHash appData(QCryptographicHash::Sha256);
     appData.addData(QCoreApplication::organizationName().toUtf8());

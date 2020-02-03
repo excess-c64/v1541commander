@@ -18,7 +18,7 @@ class AboutBox: public QDialog
 
     public:
 	AboutBox(const QFont &c64font);
-	~AboutBox();
+	virtual ~AboutBox();
 };
 
 #endif

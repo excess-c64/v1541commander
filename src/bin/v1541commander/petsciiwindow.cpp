@@ -38,9 +38,6 @@ PetsciiWindow::PetsciiWindow(const QFont &c64font, QWidget *parent) :
     setLayout(layout);
     setWindowTitle(tr("PETSCII Input"));
     setAttribute(Qt::WA_ShowWithoutActivating);
-#ifdef _WIN32
-    SetWindowLongPtr(HWND(winId()), GWL_EXSTYLE, WS_EX_NOACTIVATE);
-#endif
 }
 
 void PetsciiWindow::setLowercase(bool lowerCase)
@@ -61,6 +58,9 @@ void PetsciiWindow::buttonClicked(ushort val)
 
 void PetsciiWindow::showEvent(QShowEvent *event)
 {
-    (void)event;
+    QWidget::showEvent(event);
+#ifdef _WIN32
+    SetWindowLongPtr(HWND(winId()), GWL_EXSTYLE, WS_EX_NOACTIVATE);
+#endif
     setFixedSize(minimumSize());
 }

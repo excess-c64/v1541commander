@@ -15,28 +15,28 @@ class SettingsDialog::priv
 	priv();
 	void load();
 	void save();
+	QVBoxLayout mainLayout;
 	QCheckBox rememberWindowPositions;
 	QCheckBox exportAsPc64;
+	QHBoxLayout defaultImportTypeLayout;
 	QLabel defaultImportTypeLabel;
 	QComboBox defaultImportType;
-	QHBoxLayout defaultImportTypeLayout;
 	QCheckBox warnDiskCapacity;
 	QCheckBox warnDirCapacity;
 	QDialogButtonBox buttons;
-	QVBoxLayout mainLayout;
 };
 
 SettingsDialog::priv::priv() :
+    mainLayout(),
     rememberWindowPositions(tr("remember window positions")),
     exportAsPc64(tr("drag && drop exports as PC64 file")),
+    defaultImportTypeLayout(),
     defaultImportTypeLabel(tr("import unknown dropped files as: ")),
     defaultImportType(),
-    defaultImportTypeLayout(),
     warnDiskCapacity(tr("warn when disk would overflow")),
     warnDirCapacity(tr("warn when directory would overflow")),
     buttons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel
-	    |QDialogButtonBox::Apply),
-    mainLayout()
+	    |QDialogButtonBox::Apply)
 {}
 
 void SettingsDialog::priv::load()
@@ -61,8 +61,8 @@ void SettingsDialog::priv::save()
     cmdr.settings().setWarnDirCapacity(warnDirCapacity.isChecked());
 }
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
-    QDialog(parent, Qt::WindowSystemMenuHint
+SettingsDialog::SettingsDialog() :
+    QDialog(0, Qt::WindowSystemMenuHint
 	    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint
 	    | Qt::CustomizeWindowHint)
 {
@@ -83,7 +83,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     setWindowTitle(tr("V1541Commander settings"));
 
     connect(&d->buttons, &QDialogButtonBox::accepted,
-	    this, &SettingsDialog::accept);
+	    this, &SettingsDialog::save);
     connect(&d->buttons, &QDialogButtonBox::rejected,
 	    this, &QDialog::reject);
     connect(&d->buttons, &QDialogButtonBox::clicked,
@@ -102,10 +102,10 @@ void SettingsDialog::showEvent(QShowEvent *event)
     setFixedSize(size());
 }
 
-void SettingsDialog::accept()
+void SettingsDialog::save()
 {
     d->save();
-    QDialog::accept();
+    hide();
 }
 
 void SettingsDialog::buttonPressed(QAbstractButton *button)

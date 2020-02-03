@@ -15,16 +15,14 @@ class SettingsDialog: public QDialog
 	priv *d;
 
     public:
-	SettingsDialog(QWidget *parent = nullptr);
-	~SettingsDialog();
+	SettingsDialog();
+	virtual ~SettingsDialog();
 
     protected:
 	virtual void showEvent(QShowEvent *event);
 
-    public slots:
-	virtual void accept();
-
     private slots:
+	virtual void save();
 	void buttonPressed(QAbstractButton *button);
 };
 
