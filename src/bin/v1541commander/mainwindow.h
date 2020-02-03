@@ -3,8 +3,11 @@
 
 #include <QMainWindow>
 
-class QWidget;
+class QDragEnterEvent;
+class QDragMoveEvent;
+class QDropEvent;
 class QEvent;
+class QWidget;
 
 struct CbmdosVfs;
 
@@ -29,7 +32,7 @@ class MainWindow: public QMainWindow
         };
 
 	MainWindow();
-        ~MainWindow();
+        virtual ~MainWindow();
         Content content() const;
 	const QString &filename() const;
 	bool hasValidContent() const;
@@ -38,6 +41,11 @@ class MainWindow: public QMainWindow
         virtual bool event(QEvent *e);
         virtual void closeEvent(QCloseEvent *e);
         virtual QSize sizeHint() const;
+
+    protected:
+        virtual void dragEnterEvent(QDragEnterEvent *event);
+        virtual void dragMoveEvent(QDragMoveEvent *event);
+        virtual void dropEvent(QDropEvent *event);
 
     signals:
         void activated();

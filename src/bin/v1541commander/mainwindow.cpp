@@ -3,9 +3,14 @@
 #include "v1541imgwidget.h"
 
 #include <QCloseEvent>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QFileInfo>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QStatusBar>
 
 class MainWindow::priv
@@ -54,6 +59,7 @@ MainWindow::MainWindow()
     windowsMenu->addAction(&cmdr.logWindowAction());
     statusBar()->setStyleSheet("QStatusBar::item {border: none;}");
 
+    setAcceptDrops(true);
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander[*]"));
 }
 
@@ -144,6 +150,103 @@ QSize MainWindow::sizeHint() const
     else
     {
         return QWidget::sizeHint();
+    }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->source())
+    {
+        event->ignore();
+    }
+    else if (event->mimeData()->hasUrls())
+    {
+        bool ok = false;
+        QList<QUrl> urls = event->mimeData()->urls();
+        for (QList<QUrl>::const_iterator i = urls.cbegin();
+                i != urls.cend(); ++i)
+        {
+            if (i->isLocalFile()) ok = true;
+        }
+        if (ok)
+        {
+            event->setDropAction(Qt::CopyAction);
+            event->accept();
+        }
+        else
+        {
+            event->ignore();
+        }
+    }
+    else
+    {
+        event->ignore();
+    }
+}
+
+void MainWindow::dragMoveEvent(QDragMoveEvent *event)
+{
+    if (event->source())
+    {
+        event->ignore();
+    }
+    else if (event->mimeData()->hasUrls())
+    {
+        bool ok = false;
+        QList<QUrl> urls = event->mimeData()->urls();
+        for (QList<QUrl>::const_iterator i = urls.cbegin();
+                i != urls.cend(); ++i)
+        {
+            if (i->isLocalFile()) ok = true;
+        }
+        if (ok)
+        {
+            event->setDropAction(Qt::CopyAction);
+            event->accept();
+        }
+        else
+        {
+            event->ignore();
+        }
+    }
+    else
+    {
+        event->ignore();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    if (event->source())
+    {
+        event->ignore();
+    }
+    else if (event->mimeData()->hasUrls())
+    {
+        bool ok = false;
+        QList<QUrl> urls = event->mimeData()->urls();
+        for (QList<QUrl>::const_iterator i = urls.cbegin();
+                i != urls.cend(); ++i)
+        {
+            if (i->isLocalFile())
+            {
+                ok = true;
+                cmdr.open(QFileInfo(i->toLocalFile()).canonicalFilePath());
+            }
+        }
+        if (ok)
+        {
+            event->setDropAction(Qt::CopyAction);
+            event->accept();
+        }
+        else
+        {
+            event->ignore();
+        }
+    }
+    else
+    {
+        event->ignore();
     }
 }
 
