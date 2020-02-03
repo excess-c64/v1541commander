@@ -36,7 +36,7 @@ Settings::priv::priv() :
     exportAsPc64 = qsettings.value("exportPc64", false).toBool();
     defaultImportType = (CbmdosFileType)
 	qsettings.value("importType", CFT_USR).toInt();
-    if (defaultImportType < CFT_DEL || defaultImportType > CFT_REL)
+    if (defaultImportType <= CFT_DEL || defaultImportType > CFT_REL)
 	defaultImportType = CFT_USR;
     warnDiskCapacity = qsettings.value("warnDiskCapacity", true).toBool();
     warnDirCapacity = qsettings.value("warnDirCapacity", true).toBool();
@@ -143,7 +143,10 @@ CbmdosFileType Settings::defaultImportType() const
 
 void Settings::setDefaultImportType(CbmdosFileType type)
 {
-    d->defaultImportType = type;
+    if (type > CFT_DEL && type <= CFT_REL)
+    {
+        d->defaultImportType = type;
+    }
 }
 
 bool Settings::warnDiskCapacity() const
