@@ -360,25 +360,25 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
         <translation>Disketteneigenschaften</translation>
     </message>
     <message>
-        <location filename="cbmdosfswidget.cpp" line="94"/>
-        <location filename="cbmdosfswidget.cpp" line="95"/>
+        <location filename="cbmdosfswidget.cpp" line="97"/>
+        <location filename="cbmdosfswidget.cpp" line="98"/>
         <source>The name of the disk (Shift+F2)</source>
         <translation>Der Name der Diskette (Umschalt+F2)</translation>
     </message>
     <message>
-        <location filename="cbmdosfswidget.cpp" line="101"/>
-        <location filename="cbmdosfswidget.cpp" line="102"/>
+        <location filename="cbmdosfswidget.cpp" line="104"/>
+        <location filename="cbmdosfswidget.cpp" line="105"/>
         <source>The ID of the disk (Shift+F3)</source>
         <translation>Die ID der Diskette (Umschalt+F3)</translation>
     </message>
     <message>
-        <location filename="cbmdosfswidget.cpp" line="108"/>
-        <location filename="cbmdosfswidget.cpp" line="110"/>
+        <location filename="cbmdosfswidget.cpp" line="111"/>
+        <location filename="cbmdosfswidget.cpp" line="113"/>
         <source>DOS version, non-default value is &quot;soft write protection&quot; (F4)</source>
         <translation>DOS Version, nicht-standard Werte entsprechen einem &quot;Software Schreibschutz&quot; (F4)</translation>
     </message>
     <message>
-        <location filename="cbmdosfswidget.cpp" line="114"/>
+        <location filename="cbmdosfswidget.cpp" line="117"/>
         <source>Reset DOS version to default value (Shift+F4)</source>
         <translation>DOS Version auf den Standardwert zurücksetzen (Umschalt+F4)</translation>
     </message>
@@ -394,55 +394,55 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="mainwindow.cpp" line="27"/>
+        <location filename="mainwindow.cpp" line="32"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="32"/>
+        <location filename="mainwindow.cpp" line="37"/>
         <source>&amp;Export</source>
         <translation>&amp;Exportieren</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="41"/>
+        <location filename="mainwindow.cpp" line="46"/>
         <source>&amp;View</source>
         <translation>&amp;Anzeige</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="43"/>
+        <location filename="mainwindow.cpp" line="48"/>
         <source>&amp;CBM DOS</source>
         <translation>&amp;CBM DOS</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="46"/>
+        <location filename="mainwindow.cpp" line="51"/>
         <source>&amp;Map UC Gfx to LC</source>
         <translation>&amp;Map UC Grafik auf LC</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="52"/>
+        <location filename="mainwindow.cpp" line="57"/>
         <source>&amp;Windows</source>
         <translation>&amp;Fenster</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="57"/>
-        <location filename="mainwindow.cpp" line="357"/>
+        <location filename="mainwindow.cpp" line="63"/>
+        <location filename="mainwindow.cpp" line="460"/>
         <source>V1541Commander: virtual 1541 disk commander[*]</source>
         <translation>V1541Commander: virtueller 1541 disk commander[*]</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="161"/>
-        <location filename="mainwindow.cpp" line="201"/>
-        <location filename="mainwindow.cpp" line="236"/>
+        <location filename="mainwindow.cpp" line="264"/>
+        <location filename="mainwindow.cpp" line="304"/>
+        <location filename="mainwindow.cpp" line="339"/>
         <source>&lt;new disk image&gt;[*]</source>
         <translation>&lt;Neues Diskettenabbild&gt;[*]</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="327"/>
+        <location filename="mainwindow.cpp" line="430"/>
         <source>Discard unsaved changes?</source>
         <translation>Ungespeicherte Änderungen verwerfen?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="327"/>
+        <location filename="mainwindow.cpp" line="430"/>
         <source>%1 has unsaved changes. 
 Do you want to save now?</source>
         <translation>%1 hat nicht gespeicherte Änderungen.
@@ -460,27 +460,27 @@ Wollen Sie jetzt speichern?</translation>
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="settingsdialog.cpp" line="30"/>
+        <location filename="settingsdialog.cpp" line="31"/>
         <source>remember window positions</source>
         <translation>Fensterpositionen wiederherstellen</translation>
     </message>
     <message>
-        <location filename="settingsdialog.cpp" line="31"/>
+        <location filename="settingsdialog.cpp" line="32"/>
         <source>drag &amp;&amp; drop exports as PC64 file</source>
         <translation>Drag &amp;&amp; drop exportiert als PC64 Datei</translation>
     </message>
     <message>
-        <location filename="settingsdialog.cpp" line="32"/>
+        <location filename="settingsdialog.cpp" line="34"/>
         <source>import unknown dropped files as: </source>
         <translation>Unbekannte Dateitypen importieren als: </translation>
     </message>
     <message>
-        <location filename="settingsdialog.cpp" line="35"/>
+        <location filename="settingsdialog.cpp" line="36"/>
         <source>warn when disk would overflow</source>
         <translation>Warnen wenn die Diskette überlaufen würde</translation>
     </message>
     <message>
-        <location filename="settingsdialog.cpp" line="36"/>
+        <location filename="settingsdialog.cpp" line="37"/>
         <source>warn when directory would overflow</source>
         <translation>Warnen wenn das Inhaltsverzeichnis überlaufen würde</translation>
     </message>
@@ -493,7 +493,7 @@ Wollen Sie jetzt speichern?</translation>
 <context>
     <name>SkippableQuestion</name>
     <message>
-        <location filename="skippablequestion.cpp" line="28"/>
+        <location filename="skippablequestion.cpp" line="14"/>
         <source>Don&apos;t ask this question again</source>
         <translation>Diese Frage nicht wieder stellen</translation>
     </message>
@@ -696,53 +696,53 @@ Wollen Sie jetzt speichern?</translation>
         <translation>Umschalten zwischen Kleinbuchstaben- und Grafikmodus</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="531"/>
+        <location filename="v1541commander.cpp" line="532"/>
         <source>Error reading file</source>
         <translation>Fehler beim Lesen der Datei</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="532"/>
+        <location filename="v1541commander.cpp" line="533"/>
         <source>&lt;p&gt;The file you selected couldn&apos;t be read.&lt;/p&gt;&lt;p&gt;This means you either haven&apos;t permission to read it or it doesn&apos;t contain a valid 1541 disc image.&lt;/p&gt;</source>
         <translation>&lt;p&gt;Die ausgewählte Datei konnte nicht gelesen werden.&lt;/p&gt;&lt;p&gt;Entweder Sie haben keine ausreichenden Berechtigungen, diese Datei zu lesen, oder sie beinhaltet kein gültiges 1541 Diskettenabbild.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="548"/>
+        <location filename="v1541commander.cpp" line="549"/>
         <source>Open disk image</source>
         <translation>Diskettenabbild öffnen</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="549"/>
+        <location filename="v1541commander.cpp" line="550"/>
         <source>1541 disk images (*.d64);;Zipcode files (*!*.prg);;LyNX files (*.lnx);;all files (*)</source>
         <translation>1541 Diskettenabbilddateien (*.d64);;Zipcode Dateien (*!*.prg);;LyNX Dateien (*.lnx);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="562"/>
+        <location filename="v1541commander.cpp" line="563"/>
         <source>1541 disk images (*.d64);;all files (*)</source>
         <translation>1541 Diskettenabbilddateien (*.d64);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="565"/>
+        <location filename="v1541commander.cpp" line="566"/>
         <source>all files (*)</source>
         <translation>Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="584"/>
+        <location filename="v1541commander.cpp" line="585"/>
         <source>Save as ...</source>
         <translation>Speichern als ...</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="602"/>
-        <location filename="v1541commander.cpp" line="633"/>
+        <location filename="v1541commander.cpp" line="603"/>
+        <location filename="v1541commander.cpp" line="634"/>
         <source>Export as ...</source>
         <translation>Exportieren als ...</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="603"/>
+        <location filename="v1541commander.cpp" line="604"/>
         <source>Zipcode files (*.prg);;all files (*)</source>
         <translation>Zipcode Dateien (*.prg);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="v1541commander.cpp" line="634"/>
+        <location filename="v1541commander.cpp" line="635"/>
         <source>LyNX files (*.lnx);;all files (*)</source>
         <translation>LyNX Dateien (*.lnx);;Alle Dateien (*)</translation>
     </message>
