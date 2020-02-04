@@ -1,0 +1,19 @@
+v1541commander changelog
+========================
+
+
+v1.1
+----
+
+ * Allow to disable automatic image rewrite when opening an image with broken
+   filesystem
+ * Images with broken filesystems are read-only
+ * Allow saving an image with broken filesystem
+ * Warn before overflowing disk capacity or directory
+ * Add a "settings" dialog
+ * Full drag&drop support (files and text)
+ * fix: set correct window icon on win32
+ * several UI improvements: calculate sizes more reliably. Especially the
+   directory list should now look ok on any screen resolution (DPI).
+
+
