@@ -21,7 +21,8 @@ v1541commander_MIMEICONS:= v1541commander-d64 v1541commander-zipcode \
 	v1541commander-lynx v1541commander-prg
 v1541commander_DESKTOPFILE:= v1541commander
 v1541commander_SHAREDMIMEINFO:= v1541commander
-v1541commander_DOCS:= README.md BUILDING.md LICENSE.txt LICENSE-font.txt
+v1541commander_DOCS:= README.md BUILDING.md LICENSE.txt LICENSE-font.txt \
+	CHANGES.txt FAQ.txt
 v1541commander_win32_LDFLAGS:= -mwindows
 v1541commander_win32_RES:= windres
 ifneq ($(EMBEDQTL10N),)
