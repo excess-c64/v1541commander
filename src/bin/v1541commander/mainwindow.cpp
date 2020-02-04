@@ -429,7 +429,8 @@ void MainWindow::closeDocument()
 	QMessageBox::StandardButton btn = QMessageBox::question(this,
 		tr("Discard unsaved changes?"), QString(tr("%1 has unsaved "
 			"changes. \nDo you want to save now?"))
-		.arg(d->filename.isEmpty() ? "<new disk image>" : d->filename),
+		.arg(d->filename.isEmpty() ?
+                    tr("<new disk image>") : d->filename),
 		QMessageBox::Save|QMessageBox::Cancel|QMessageBox::Discard,
 		QMessageBox::Save);
 	if (btn == QMessageBox::Cancel) return;

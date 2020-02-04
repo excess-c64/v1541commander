@@ -430,7 +430,7 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
     </message>
     <message>
         <location filename="mainwindow.cpp" line="63"/>
-        <location filename="mainwindow.cpp" line="460"/>
+        <location filename="mainwindow.cpp" line="461"/>
         <source>V1541Commander: virtual 1541 disk commander[*]</source>
         <translation>V1541Commander: virtueller 1541 disk commander[*]</translation>
     </message>
@@ -452,6 +452,11 @@ Wenn Sie die Datei als rohe Daten exportieren fehlt die Information über die Da
 Do you want to save now?</source>
         <translation>%1 hat nicht gespeicherte Änderungen.
 Wollen Sie jetzt speichern?</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="433"/>
+        <source>&lt;new disk image&gt;</source>
+        <translation>&lt;Neues Diskettenabbild&gt;</translation>
     </message>
 </context>
 <context>
