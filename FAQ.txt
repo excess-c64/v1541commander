@@ -1,0 +1,96 @@
+v1541commander -- frequently asked questions
+============================================
+
+This document contains actual questions asked by the users and might be
+updated from time to time.
+
+
+1. BAM
+------
+
+Q: What does an "invalid BAM" mean?
+
+A: On a 1541 disk, the BAM (block availability map) stores which sectors (or
+   blocks) are used by files and which are available. It also stores the
+   number of available blocks per track.
+
+   When V1541Commander opens a disk, it tries to read a CBM DOS filesystem
+   from it and doing this, the BAM is validated. First, it is checked whether
+   the available blocks per track actually match the BAM data. It is also
+   acceptable if this number is 0 for *all* tracks, because there are disks
+   using this to report a fake "0 blocks free." line.
+
+   Then, the BAM data is compared to the blocks actually used by the
+   directory and files found on the disk. This check will fail if there are
+   things on the disk V1541Commander doesn't know, like for example
+   trackloaders, C128 boot sectors, GEOS files, etc.
+
+   When the BAM is found to be invalid, V1541Commander suggests to treat the
+   image as a "new" image, so you don't accidentally overwrite your original
+   image when saving after making some changes.
+
+
+Q: What happens when I edit a disk with an "invalid BAM"?
+
+A: This depends on how the BAM is invalid. If there are some additional blocks
+   marked as used, you just can't use these when writing files. If some blocks
+   actually used by files are marked "available", writing files to this disk
+   *could* overwrite these blocks, destroying other files.
+
+   It's probably best to save your edited disk as a new image and thoroughly
+   test it.
+
+
+Q: How can I fix an "invalid BAM"?
+
+A: Use "rewrite image" from the "CBM DOS" menu. But be warned that this
+   creates a new disk image from the current filesystem. Any data
+   V1541Commander doesn't understand (like trackloaders, C128 boot sectors,
+   etc) will be missing on the disk after rewriting the image.
+
+
+2. Broken filesystem and recovery mode
+--------------------------------------
+
+Q: What is a broken filesystem?
+
+A: A filesystem stored on a 1541 disk can have some severe consistency
+   problems. A typical problem would be a sector that is used twice (e.g.
+   by the directory and a file, or by two different files). If such a problem
+   is found, V1541Commander tells you the filesystem is broken and will be
+   opened in recovery mode. The default action is to rewrite the image
+   directly after opening, so you have a clean image with the data that could
+   be recovered, but you can disable this.
+
+
+Q: What does open in recovery mode mean?
+
+A: Recovery mode is automatically used to open a filesystem from a disk image
+   when severe problems with the filesystem are found. In recovery mode,
+   V1541Commander tries to read as much file data as possible, while avoiding
+   to read a sector twice. There is no guarantee that everything can be read.
+
+
+Q: Can I edit a broken filesystem?
+
+A: Short answer: no. A broken filesystem will be read-only. But you can copy
+   files from it to another disk image or to your file manager using
+   drag&drop. Of course, you can rewrite the disk image to get a new, clean
+   image from whatever was successfully read, and then you can fully edit
+   the image. Be aware you might lose data doing this.
+
+
+Q: I downloaded a Zipcode compressed disk and V1541Commander tells me it has
+   a broken filesystem, what should I do?
+
+A: In most cases, your download is probably fine. Even a broken filesystem
+   *could* work flawlessly for reading on a 1541 drive. To save the extracted
+   image without any changes, do the following:
+   - In the options dialog popping up, uncheck the checkbox saying to rewrite
+     the image after recovery.
+   - Then, save the disk from the file menu (or by hitting Ctrl+S).
+   - Answer yes to the safety question asking you whether you really want to
+     save an image with a broken filesystem.
+   This process will save the exact image that was found in the Zipcode files.
+
+
