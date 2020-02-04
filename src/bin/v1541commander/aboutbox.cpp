@@ -64,8 +64,8 @@ AboutBox::priv::priv() :
 }
 
 AboutBox::AboutBox(const QFont &c64font) :
-    QDialog(0, Qt::WindowSystemMenuHint
-            | Qt::WindowTitleHint | Qt::WindowCloseButtonHint)
+    QDialog(0, Qt::WindowSystemMenuHint | Qt::WindowTitleHint
+            | Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint)
 {
     d = new priv();
     d->excessLogo.setFont(c64font);

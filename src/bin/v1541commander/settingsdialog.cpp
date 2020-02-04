@@ -64,7 +64,7 @@ void SettingsDialog::priv::save()
 SettingsDialog::SettingsDialog() :
     QDialog(0, Qt::WindowSystemMenuHint
 	    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint
-	    | Qt::CustomizeWindowHint)
+	    | Qt::CustomizeWindowHint | Qt::MSWindowsFixedSizeDialogHint)
 {
     d = new priv();
     d->mainLayout.addWidget(&d->rememberWindowPositions);

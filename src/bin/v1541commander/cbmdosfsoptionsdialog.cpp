@@ -266,7 +266,7 @@ void CbmdosFsOptionsDialog::priv::changed(QObject *sender, int value)
 CbmdosFsOptionsDialog::CbmdosFsOptionsDialog(CbmdosFsOptions *options,
 	QWidget *parent, bool canCancel) :
     QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint |
-	    Qt::CustomizeWindowHint)
+	    Qt::CustomizeWindowHint | Qt::MSWindowsFixedSizeDialogHint)
 {
     d = new priv(options, canCancel);
     d->optionsLayout.addWidget(&d->tracks35Button, 0, 0, 1, 2);

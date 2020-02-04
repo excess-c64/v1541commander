@@ -10,7 +10,7 @@
 PetsciiWindow::PetsciiWindow(const QFont &c64font, QWidget *parent) :
     QWidget(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint
 	    | Qt::WindowCloseButtonHint | Qt::WindowDoesNotAcceptFocus
-	    | Qt::CustomizeWindowHint)
+	    | Qt::CustomizeWindowHint | Qt::MSWindowsFixedSizeDialogHint)
 {
     QGridLayout *layout = new QGridLayout(this);
     layout->setContentsMargins(0,0,0,0);
