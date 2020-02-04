@@ -57,7 +57,9 @@ MainWindow::MainWindow()
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
     windowsMenu->addAction(&cmdr.petsciiWindowAction());
     windowsMenu->addAction(&cmdr.logWindowAction());
+    menuBar()->setFont(cmdr.menufont());
     statusBar()->setStyleSheet("QStatusBar::item {border: none;}");
+    statusBar()->setFont(cmdr.statusfont());
 
     setAcceptDrops(true);
     setWindowTitle(tr("V1541Commander: virtual 1541 disk commander[*]"));

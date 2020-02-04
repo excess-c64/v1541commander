@@ -50,6 +50,8 @@ class V1541Commander: public QApplication
         V1541Commander(int &argc, char **argv, QTranslator *translator);
         ~V1541Commander();
         const QFont &c64font() const;
+        const QFont &menufont() const;
+        const QFont &statusfont() const;
         const QPixmap &statusLedRed() const;
         const QPixmap &statusLedYellow() const;
         const QPixmap &statusLedGreen() const;

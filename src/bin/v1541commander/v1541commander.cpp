@@ -41,6 +41,8 @@ class V1541Commander::priv
         priv(V1541Commander *commander);
         V1541Commander *commander;
         QFont c64font;
+        QFont menufont;
+        QFont statusfont;
         QPixmap statusLedRed;
         QPixmap statusLedYellow;
         QPixmap statusLedGreen;
@@ -89,6 +91,8 @@ class V1541Commander::priv
 V1541Commander::priv::priv(V1541Commander *commander) :
     commander(commander),
     c64font("C64 Pro Mono", 10),
+    menufont(QFontDatabase::systemFont(QFontDatabase::GeneralFont)),
+    statusfont(QFontDatabase::systemFont(QFontDatabase::GeneralFont)),
     statusLedRed(":/statusled_red.png"),
     statusLedYellow(":/statusled_yellow.png"),
     statusLedGreen(":/statusled_green.png"),
@@ -180,6 +184,23 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     HINSTANCE inst = GetModuleHandleW(0);
     appIcon = LoadIcon(inst, MAKEINTRESOURCE(1000));
     SetClassLong(HWND(aboutBox.winId()), GCL_HICON, (LONG)appIcon);
+    NONCLIENTMETRICSW ncm;
+    ncm.cbSize = sizeof ncm;
+    if (SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof ncm, &ncm, 0))
+    {
+        if (ncm.lfMessageFont.lfHeight < 0) ncm.lfMessageFont.lfHeight *= -1;
+        if (ncm.lfMenuFont.lfHeight < 0) ncm.lfMenuFont.lfHeight *= -1;
+        if (ncm.lfStatusFont.lfHeight < 0) ncm.lfStatusFont.lfHeight *= -1;
+        QFont sysfont(QString::fromWCharArray(ncm.lfMessageFont.lfFaceName));
+        sysfont.setPixelSize(ncm.lfMessageFont.lfHeight);
+        commander->setFont(sysfont);
+        QFont mfont(QString::fromWCharArray(ncm.lfMenuFont.lfFaceName));
+        mfont.setPixelSize(ncm.lfMenuFont.lfHeight);
+        menufont = mfont;
+        QFont sfont(QString::fromWCharArray(ncm.lfStatusFont.lfFaceName));
+        sfont.setPixelSize(ncm.lfStatusFont.lfHeight);
+        statusfont = sfont;
+    }
 #else
     appIcon.addPixmap(QPixmap(":/icon_256.png"));
     appIcon.addPixmap(QPixmap(":/icon_48.png"));
@@ -858,6 +879,16 @@ void V1541Commander::petsciiInput(ushort val)
 const QFont &V1541Commander::c64font() const
 {
     return d->c64font;
+}
+
+const QFont &V1541Commander::menufont() const
+{
+    return d->menufont;
+}
+
+const QFont &V1541Commander::statusfont() const
+{
+    return d->statusfont;
 }
 
 const QPixmap &V1541Commander::statusLedRed() const

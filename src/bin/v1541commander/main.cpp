@@ -14,7 +14,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <QFont>
 #include <QtGlobal>
 #else
 #include <signal.h>
@@ -98,16 +97,6 @@ int main(int argc, char **argv)
     // work around a QSpinBox layout bug in Qt 5.13:
     commander.setStyleSheet("QFoo{}");
 #endif
-    // correct the default font:
-    NONCLIENTMETRICSW ncm;
-    ncm.cbSize = sizeof ncm;
-    if (SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof ncm, &ncm, 0))
-    {
-        if (ncm.lfMessageFont.lfHeight < 0) ncm.lfMessageFont.lfHeight *= -1;
-        QFont sysfont(QString::fromWCharArray(ncm.lfMessageFont.lfFaceName));
-        sysfont.setPixelSize(ncm.lfMessageFont.lfHeight);
-        commander.setFont(sysfont);
-    }
 #endif
 
     QCommandLineParser parser;
