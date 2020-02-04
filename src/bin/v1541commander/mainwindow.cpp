@@ -363,7 +363,7 @@ void MainWindow::save(const QString &imgFile)
 	case Content::Image:
 	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
 	    imgWidget->save(imgFile.isEmpty() ? d->filename : imgFile);
-	    if (!imgFile.isEmpty())
+	    if (!imgFile.isEmpty() && !isWindowModified())
 	    {
 		d->filename = imgFile;
 		setWindowTitle(QString(imgFile).append("[*]"));

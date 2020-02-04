@@ -36,6 +36,7 @@ class CbmdosFsOptionsDialog::priv
 	QLabel fileInterleaveLabel;
 	QSpinBox fileInterleaveSpinBox;
 	QLabel recoverWarningLabel;
+        QCheckBox rewriteAfterRecover;
 	QDialogButtonBox buttons;
 
 	void reset();
@@ -62,9 +63,10 @@ CbmdosFsOptionsDialog::priv::priv(CbmdosFsOptions *options, bool canCancel) :
     fileInterleaveLabel(tr("default file interleave: ")),
     fileInterleaveSpinBox(),
     recoverWarningLabel(tr("WARNING: this disk image is broken, trying to "
-		"recover data from it. It will be recreated after opening, "
-		"but data could be lost. It is therefore treated like a new "
-		"disk image.")),
+		"recover data from it. It will be treated like a new disk "
+                "image. It's recommended to rewrite the disk image after "
+                "recovery, so you can edit it.")),
+    rewriteAfterRecover(tr("Rewrite image after recovery")),
     buttons(canCancel ?
 	    QDialogButtonBox::Ok|QDialogButtonBox::Cancel
 	    |QDialogButtonBox::Reset
@@ -283,6 +285,8 @@ CbmdosFsOptionsDialog::CbmdosFsOptionsDialog(CbmdosFsOptions *options,
     if (options->flags & CbmdosFsFlags::CFF_RECOVER)
     {
 	d->optionsLayout.addWidget(&d->recoverWarningLabel, 6, 0, 1, 3);
+        d->rewriteAfterRecover.setChecked(true);
+        d->optionsLayout.addWidget(&d->rewriteAfterRecover, 7, 0, 1, 3);
     }
     d->mainLayout.addLayout(&d->optionsLayout);
     d->mainLayout.addWidget(&d->buttons);
@@ -371,6 +375,11 @@ void CbmdosFsOptionsDialog::disableZeroFree()
 void CbmdosFsOptionsDialog::reset()
 {
     d->reset();
+}
+
+bool CbmdosFsOptionsDialog::wantRewrite()
+{
+    return d->rewriteAfterRecover.isChecked();
 }
 
 void CbmdosFsOptionsDialog::showEvent(QShowEvent *event)

@@ -88,11 +88,21 @@ bool V1541ImgWidget::priv::canSaveImage(V1541ImgWidget *w)
     }
     if (status & CbmdosFsStatus::CFS_BROKEN)
     {
-	QMessageBox::critical(w->window(), tr("Unable to save"),
-		tr("<p>The filesystem on the virtual disk is broken for "
-		    "unknown reasons. You can try to change some filesystem "
-		    "options and rewrite the disk.</p>"));
-	return false;
+	if (QMessageBox::question(w->window(),
+                    tr("Save with broken filesystem?"),
+                    tr("<p>The filesystem on the virtual disk is broken for "
+                        "unknown reasons. You can try to change some "
+                        "filesystem options and rewrite the disk.</p>"
+                        "<p>Do you still want to save the disk in the "
+                        "current state?</p>"),
+                    QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+        {
+            return true;
+        }
+        else
+        {
+	    return false;
+        }
     }
     if (status & CbmdosFsStatus::CFS_INVALIDBAM)
     {
@@ -453,16 +463,25 @@ void V1541ImgWidget::open(const QString& filename)
 		d->dirList.setMinimumHeight(
 			d->dirList.sizeHintForRow(0) * minItems
 			+ 2 * d->dirList.frameWidth());
+                bool isModified = false;
 		if (opts.flags & CFF_RECOVER)
 		{
-		    CbmdosFs_rewrite(d->fs);
+                    if (optDlg.wantRewrite())
+                    {
+		        CbmdosFs_rewrite(d->fs);
+                    }
 		    emit modified();
+                    isModified = true;
 		}
-		if (extracted) emit modified();
+		if (!isModified && extracted)
+                {
+                    emit modified();
+                    isModified = true;
+                }
 		d->dirList.setFocus();
                 CbmdosFsStatus status = CbmdosFs_status(d->fs);
                 d->fsstat.setStatus(status);
-                if (status == CbmdosFsStatus::CFS_INVALIDBAM
+                if (!isModified && status == CbmdosFsStatus::CFS_INVALIDBAM
                         && QMessageBox::question(window(),
                             tr("Invalid BAM -- save as new file?"),
                             tr("<p>This disk's BAM seems invalid. This could "

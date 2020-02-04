@@ -24,6 +24,7 @@ class CbmdosFsOptionsDialog: public QDialog
 	void disable42Tracks();
 	void disableZeroFree();
 	void reset();
+        bool wantRewrite();
 
     protected:
 	virtual void showEvent(QShowEvent *event);
