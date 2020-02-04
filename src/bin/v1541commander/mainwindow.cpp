@@ -125,6 +125,21 @@ bool MainWindow::hasValidSelection() const
     }
 }
 
+bool MainWindow::isReadOnly() const
+{
+    switch (d->content)
+    {
+	V1541ImgWidget *imgWidget;
+
+	case Content::Image:
+	    imgWidget = static_cast<V1541ImgWidget *>(centralWidget());
+	    return imgWidget->isReadOnly();
+
+	default:
+	    return true;
+    }
+}
+
 bool MainWindow::event(QEvent *e)
 {
     if (e->type() == QEvent::WindowActivate)

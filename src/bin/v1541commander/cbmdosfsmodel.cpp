@@ -315,6 +315,7 @@ bool CbmdosFsModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 {
     (void) parent;
     if (!d->fs) return false;
+    if (CbmdosFs_status(d->fs) & CFS_BROKEN) return false;
     const CbmdosFileMimeData *fileData =
 	qobject_cast<const CbmdosFileMimeData *>(data);
     if (fileData)

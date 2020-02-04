@@ -47,6 +47,7 @@ class V1541ImgWidget::priv
         CbmdosFsStatusWidget fsstat;
 
 	bool canSaveImage(V1541ImgWidget *w);
+        void setStatus(CbmdosFsStatus status);
 };
 
 V1541ImgWidget::priv::priv() :
@@ -123,6 +124,23 @@ bool V1541ImgWidget::priv::canSaveImage(V1541ImgWidget *w)
 	}
     }
     return true;
+}
+
+void V1541ImgWidget::priv::setStatus(CbmdosFsStatus status)
+{
+    fsstat.setStatus(status);
+    if (status & CFS_BROKEN)
+    {
+        file.setEnabled(false);
+        fsprop.setEnabled(false);
+        dirList.setAcceptDrops(false);
+    }
+    else
+    {
+        file.setEnabled(file.file());
+        fsprop.setEnabled(true);
+        dirList.setAcceptDrops(true);
+    }
 }
 
 V1541ImgWidget::V1541ImgWidget(QWidget *parent) : QWidget(parent)
@@ -224,18 +242,23 @@ void V1541ImgWidget::selected(const QModelIndex &current,
 	}
     }
     d->file.setFile(file);
+    if (file && CbmdosFs_status(d->fs) & CFS_BROKEN)
+    {
+        d->file.setEnabled(false);
+    }
     emit selectionChanged();
 }
 
 void V1541ImgWidget::modelModified()
 {
-    d->fsstat.setStatus(CbmdosFs_status(d->fs));
+    d->setStatus(CbmdosFs_status(d->fs));
     emit modified();
 }
 
 void V1541ImgWidget::checkEditOperation(EditOperationCheck &check)
 {
     if (!d->fs) return;
+    if (CbmdosFs_status(d->fs) & CFS_BROKEN) return;
     check.setAllowed(true);
     if (!check.oldFile() &&
 	    !(CbmdosFs_options(d->fs).flags & CFF_ALLOWLONGDIR) &&
@@ -338,7 +361,7 @@ void V1541ImgWidget::newImage()
 		d->dirList.sizeHintForRow(0) * 10
 		+ 2 * d->dirList.frameWidth());
 	d->dirList.setFocus();
-        d->fsstat.setStatus(CbmdosFs_status(d->fs));
+        d->setStatus(CbmdosFs_status(d->fs));
     }
 }
 
@@ -480,7 +503,7 @@ void V1541ImgWidget::open(const QString& filename)
                 }
 		d->dirList.setFocus();
                 CbmdosFsStatus status = CbmdosFs_status(d->fs);
-                d->fsstat.setStatus(status);
+                d->setStatus(status);
                 if (!isModified && status == CbmdosFsStatus::CFS_INVALIDBAM
                         && QMessageBox::question(window(),
                             tr("Invalid BAM -- save as new file?"),
@@ -527,7 +550,7 @@ void V1541ImgWidget::openVfs(CbmdosVfs *vfs)
 		d->dirList.sizeHintForRow(0) * minItems
 		+ 2 * d->dirList.frameWidth());
 	d->dirList.setFocus();
-        d->fsstat.setStatus(CbmdosFs_status(d->fs));
+        d->setStatus(CbmdosFs_status(d->fs));
     }
     else
     {
@@ -661,14 +684,14 @@ void V1541ImgWidget::rewriteImage()
     if (reply == QMessageBox::Ok)
     {
 	CbmdosFs_rewrite(d->fs);
-        d->fsstat.setStatus(CbmdosFs_status(d->fs));
+        d->setStatus(CbmdosFs_status(d->fs));
 	emit modified();
     }
 }
 
 void V1541ImgWidget::mapToLc()
 {
-    if (!hasValidImage()) return;
+    if (isReadOnly()) return;
     QMessageBox::StandardButton reply = QMessageBox::question(this,
 	    tr("Map UC gfx to LC?"), tr("This will possibly modify the disk "
 		"name, id and all the file names. Are you sure you want to "
@@ -683,7 +706,7 @@ void V1541ImgWidget::mapToLc()
 
 void V1541ImgWidget::newFile()
 {
-    if (!hasValidImage()) return;
+    if (isReadOnly()) return;
     CbmdosFile *newFile = CbmdosFile_create();
     if (cmdr.settings().automapPetsciiToLc())
     {
@@ -695,7 +718,7 @@ void V1541ImgWidget::newFile()
 
 void V1541ImgWidget::deleteFile(bool skipConfirmation)
 {
-    if (!hasValidImage() || !hasValidSelection()) return;
+    if (isReadOnly() || !hasValidSelection()) return;
     if (skipConfirmation || QMessageBox::question(window(),
                 tr("Delete this file?"),
                 tr("A deleted file cannot be restored. "
@@ -717,4 +740,9 @@ bool V1541ImgWidget::hasValidSelection() const
     const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
     if (!index.isValid()) return false;
     return (index.row() > 0 && index.row() < d->model.rowCount() - 1);
+}
+
+bool V1541ImgWidget::isReadOnly() const
+{
+    return !hasValidImage() || (CbmdosFs_status(d->fs) & CFS_BROKEN);
 }

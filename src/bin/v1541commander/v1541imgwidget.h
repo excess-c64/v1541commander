@@ -44,6 +44,7 @@ class V1541ImgWidget: public QWidget
         QWidget *statusWidget() const;
 	bool hasValidImage() const;
 	bool hasValidSelection() const;
+        bool isReadOnly() const;
 	CbmdosVfs *exportZipcodeVfs();
 
     signals:

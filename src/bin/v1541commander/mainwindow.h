@@ -37,6 +37,7 @@ class MainWindow: public QMainWindow
 	const QString &filename() const;
 	bool hasValidContent() const;
 	bool hasValidSelection() const;
+        bool isReadOnly() const;
 	CbmdosVfs *exportZipcodeVfs();
         virtual bool event(QEvent *e);
         virtual void closeEvent(QCloseEvent *e);

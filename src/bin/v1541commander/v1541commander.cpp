@@ -361,11 +361,11 @@ void V1541Commander::priv::updateActions(MainWindow *w)
     rewriteImageAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && w->hasValidContent());
     newFileAction.setEnabled(w->content() == MainWindow::Content::Image
-	    && w->hasValidContent());
+	    && !w->isReadOnly());
     mapLcAction.setEnabled(w->content() == MainWindow::Content::Image
-	    && w->hasValidContent());
+	    && !w->isReadOnly());
     deleteFileAction.setEnabled(w->content() == MainWindow::Content::Image
-	    && w->hasValidContent() && w->hasValidSelection());
+	    && !w->isReadOnly() && w->hasValidSelection());
 }
 
 V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
