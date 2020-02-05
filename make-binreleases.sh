@@ -29,6 +29,7 @@ cp ${DOCS} ${WINPKGDIR}
 for D in ${DOCS}; do
 	vim -c "set ff=dos" -c ":wq" ${WINPKGDIR}/${D}
 done
+upx --best --compress-icons=0 --compress-resources=0 ${WINPKGDIR}/${NAME}.exe
 zip -9r ${WINPKG} ${WINPKGDIR}
 rm -fr ${WINPKGDIR}
 
@@ -45,6 +46,7 @@ done
 cp ${DESKTOP} ${LINPKGDIR}
 cp -R ${ICONS} ${LINPKGDIR}/
 cp -R ${MIMETYPES} ${LINPKGDIR}/
+upx --best ${LINPKGDIR}/${NAME}
 tar cJvf ${LINPKG} ${LINPKGDIR}
 rm -fr ${LINPKGDIR}
 
