@@ -5,8 +5,8 @@ This document contains actual questions asked by the users and might be
 updated from time to time.
 
 
-1. BAM
-------
+1. About the BAM
+----------------
 
 Q: What does an "invalid BAM" mean?
 
@@ -93,4 +93,78 @@ A: In most cases, your download is probably fine. Even a broken filesystem
      save an image with a broken filesystem.
    This process will save the exact image that was found in the Zipcode files.
 
+
+3. Official builds
+------------------
+
+Q: My virus scanner reports V1541Commander to be infected / be malware / eat
+   my cat / ... ?
+
+A: Virus scanners use heuristics, so "false positives" happen all the time.
+   If you downloaded your copy from csdb.dk (released by "Excess"), you can be
+   very sure there is no virus. The only risk would be someone hacked csdb and
+   tampered with the files there ...
+
+   Official releases are built on a FreeBSD machine using GNU GCC-based cross-
+   compilers for Windows and Linux, you can see the scripts used in the git
+   repository. Still, if you don't trust our official builds, you can always
+   build your own from the source :)
+
+
+Q: But why does a virus scanner think there is some malware?
+
+A: Most likely, one of the heuristics used by the scanner found a pattern that
+   resembles something used in malware before. Unfortunately, this can't be
+   fully avoided. At the time of the V1.1 release, the official windows build
+   was checked at virustotal.com, with one out of 70 virus scanners (falsely!)
+   reporting some malware.
+
+   If you use an older virus scanner, it's also possible that your scanner
+   thinks the cruncher used on the official builds (UPX) is suspicious. This
+   isn't an issue any more with recent AV software, they all know UPX and will
+   scan the decrunched executable.
+
+
+Q: Why are the official builds crunched?
+
+A: The official builds use static linking. This means all libraries used are
+   embedded in the executable. Static linking is a good way to ensure the
+   program runs on any system without problems and doesn't require
+   installation. An alternative would be to ship all required libraries (DLLs
+   on Windows) with the executable, but this would even take up more space.
+   Static linking also ensures the executable is self-contained, so it will
+   work no matter where you put it, not requiring any additional files.
+
+   Still, a statically linked executable is quite large and a cruncher can
+   drastically reduce the size. At the time of writing, the Windows build of
+   V1541Commander has around 14.5 MB uncrunched, but only 5.1 MB crunched.
+   Given today's standards, this doesn't sound like much, but imagine you want
+   to carry your copy of V1541Commander on your USB key ...
+
+
+Q: Doesn't crunching have drawbacks?
+
+A: In short: no, not for V1541Commander. There are several typical drawbacks:
+
+   - decrunching takes time: Well, this isn't an issue nowadays. Decrunching 
+     a few MB happens faster than you can look on your typical PC, you won't
+     be able to notice.
+
+   - decrunching needs more RAM: This depends on the cruncher. UPX decrunches
+     "in place" (just like the famous exomizer for the C64 does), so it
+     doesn't need any additional RAM.
+
+   - multiple instances of crunched programs can't share the memory pages for
+     code: This is actually true. If you run multiple copies of a program on
+     a modern OS, the OS knows the code is the same and keeps it in RAM only
+     once. This won't work with decrunched code because it's changed compared
+     to the code on disk. But V1541Commander is designed as a "single
+     instance" application: Any second instance will just talk to the already
+     running one and immediately quit. So, this isn't a drawback for
+     V1541Commander.
+
+   - virus scanners consider crunched programs suspicious: At least for
+     programs crunched with UPX, this is a thing from the past. Nowadays, all
+     major virus scanners know UPX and decrunch before scanning. If your virus
+     scanner is unhappy with V1541Commander, consider to upgrade.
 
