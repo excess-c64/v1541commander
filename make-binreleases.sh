@@ -26,6 +26,9 @@ cp bin/${WINTARGET}/release/${NAME}.exe ${WINPKGDIR}
 cp bin/${WINTARGET}/release/setup.exe ${WINPKGDIR}
 cp bin/${WINTARGET}/release/uninstall.exe ${WINPKGDIR}
 cp ${DOCS} ${WINPKGDIR}
+for D in ${DOCS}; do
+	vim -c "set ff=dos" -c ":wq" ${WINPKGDIR}/${D}
+done
 zip -9r ${WINPKG} ${WINPKGDIR}
 rm -fr ${WINPKGDIR}
 
@@ -36,6 +39,9 @@ cp scripts/uninstall.sh ${LINPKGDIR}
 chmod 755 ${LINPKGDIR}/setup.sh
 chmod 755 ${LINPKGDIR}/uninstall.sh
 cp ${DOCS} ${LINPKGDIR}
+for D in ${DOCS}; do
+	vim -c "set ff=unix" -c ":wq" ${LINPKGDIR}/${D}
+done
 cp ${DESKTOP} ${LINPKGDIR}
 cp -R ${ICONS} ${LINPKGDIR}/
 cp -R ${MIMETYPES} ${LINPKGDIR}/
