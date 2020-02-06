@@ -164,6 +164,8 @@ int main(int argc, char **argv)
 	    }
 	    sock.flush();
 	    sock.disconnectFromServer();
+            sock.state() == QLocalSocket::UnconnectedState ||
+                sock.waitForDisconnected(1000);
 	}
 	return 0;
     }
