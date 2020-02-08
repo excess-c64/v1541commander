@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
@@ -35,6 +36,14 @@ class CbmdosFsOptionsDialog::priv
 	QSpinBox dirInterleaveSpinBox;
 	QLabel fileInterleaveLabel;
 	QSpinBox fileInterleaveSpinBox;
+	QGroupBox allocationOptions;
+	QGridLayout allocationLayout;
+	QRadioButton allocOriginalButton;
+	QRadioButton allocTrackloaderButton;
+	QRadioButton allocSimpleButton;
+	QCheckBox simpleInterleaveCheckBox;
+	QCheckBox prefDirTrackCheckBox;
+	QCheckBox chainInterlvCheckBox;
 	QLabel recoverWarningLabel;
         QCheckBox rewriteAfterRecover;
 	QDialogButtonBox buttons;
@@ -62,6 +71,14 @@ CbmdosFsOptionsDialog::priv::priv(CbmdosFsOptions *options, bool canCancel) :
     dirInterleaveSpinBox(),
     fileInterleaveLabel(tr("default file interleave: ")),
     fileInterleaveSpinBox(),
+    allocationOptions(tr("Track/block allocation options")),
+    allocationLayout(),
+    allocOriginalButton(tr("CBM DOS strategy")),
+    allocTrackloaderButton(tr("Trackloader strategy")),
+    allocSimpleButton(tr("Simple strategy")),
+    simpleInterleaveCheckBox(tr("Use simple interleave")),
+    prefDirTrackCheckBox(tr("Prefer dir track for files")),
+    chainInterlvCheckBox(tr("Apply interleave on track change")),
     recoverWarningLabel(tr("WARNING: this disk image is broken, trying to "
 		"recover data from it. It will be treated like a new disk "
                 "image. It's recommended to rewrite the disk image after "
@@ -77,6 +94,94 @@ CbmdosFsOptionsDialog::priv::priv(CbmdosFsOptions *options, bool canCancel) :
     fileInterleaveSpinBox.setMinimum(1);
     fileInterleaveSpinBox.setMaximum(20);
     recoverWarningLabel.setWordWrap(true);
+    tracks35Button.setToolTip(
+	    tr("Filesystem uses 35 tracks on disk (default)."));
+    tracks40Button.setToolTip(
+	    tr("Filesystem uses 40 tracks on disk, like some speeder DOS "
+		"versions do."));
+    tracks42Button.setToolTip(
+	    tr("Filesystem uses 42 tracks on disk.\nNOT RECOMMENDED, not all "
+		"drives can physically access these tracks."));
+    allowLongDirCheckBox.setToolTip(
+	    tr("Allow directories longer than 144 files.\n"
+		"Directory blocks will be allocated on tracks other than "
+		"track 18.\n"
+		"The original 1541 DOS can read this, but corrupts the "
+		"directory on write."));
+    filesOnDirTrackCheckBox.setToolTip(
+	    tr("Allow to use track 18 also for files when all other tracks "
+		"are full.\n"
+		"The original 1541 DOS can still read such a filesystem."));
+    dolphinDosBamCheckBox.setToolTip(
+	    tr("Write BAM entries for tracks 36-40 in the format "
+		"DolphinDOS uses."));
+    speedDosBamCheckBox.setToolTip(
+	    tr("Write BAM entries for tracks 36-40 in the format "
+		"SpeedDOS uses."));
+    prologicDosBamCheckBox.setToolTip(
+	    tr("Write BAM entries for tracks 36-40 in the format "
+		"Prologic DOS uses.\n"
+		"This is NOT compatible with the other extended "
+		"BAM formats."));
+    zeroFreeCheckBox.setToolTip(
+	    tr("Write 0 as the number of free blocks per track for every "
+		"track in the BAM.\n"
+		"As a result, the directory listing shows "
+		"\"0 blocks free.\""));
+    QString dirInterleaveToolTip(
+	    tr("Interleave value to use for blocks of the directory "
+		"(default: 3)"));
+    QString fileInterleaveToolTip(
+	    tr("Interleave value to use by default for blocks of files "
+		"(default: 10)"));
+    dirInterleaveLabel.setToolTip(dirInterleaveToolTip);
+    dirInterleaveSpinBox.setToolTip(dirInterleaveToolTip);
+    fileInterleaveLabel.setToolTip(fileInterleaveToolTip);
+    fileInterleaveSpinBox.setToolTip(fileInterleaveToolTip);
+    allocOriginalButton.setToolTip(
+	    tr("Use the original CBM DOS strategy for allocating blocks.\n"
+		"For starting a new file, a track as close as possible to "
+		"track 18 is used.\n"
+		"While writing a file, when the current track is full, the "
+		"next track in the direction away from track 18 is used.\n"
+		"Good for random access to different files, with the files "
+		"at the top of the directory preferred."));
+    allocTrackloaderButton.setToolTip(
+	    tr("Use an allocation strategy often used with trackloaders.\n"
+		"Tracks are used starting at track 1 and strictly "
+		"incrementing.\n"
+		"Good for a set of files that's always read in the same "
+		"order."));
+    allocSimpleButton.setToolTip(
+	    tr("Use a simplified allocation strategy.\n"
+		"Tracks are used starting at track 19 and strictly "
+		"incrementing up to track 40, then wrapping around to "
+		"track 1.\n"
+		"On 42-track images, tracks 41 and 42 are still used last.\n"
+		"This is a compromise between the other strategies, with "
+		"the first files close to track 18, and the files "
+		"\"following\" each other on disk."));
+    simpleInterleaveCheckBox.setToolTip(
+	    tr("When adding interleave, use a simple \"modulo\" to get a "
+		"valid sector number on the current track.\n"
+		"If this is not checked, interleave is applied like the "
+		"original CBM DOS does it:\n"
+		"When wrapping over sector 0, 1 is subtracted from "
+		"the result."));
+    prefDirTrackCheckBox.setToolTip(
+	    tr("Put files on the directory track first.\n"
+		"This has only an effect if files on the directory track "
+		"are allowed.\n"
+		"When this option is set, you should \"rewrite\" your image "
+		"from time to time,\n"
+		"to ensure exactly the sectors on track 18 not used by the "
+		"directory are allocated."));
+    chainInterlvCheckBox.setToolTip(
+	    tr("When having to switch to another track, still apply "
+		"interleave to the sector number.\n"
+		"If this is not checked, looking for a free sector on a new "
+		"track\n"
+		"always starts at sector 0 (original CBM DOS behavior)."));
     reset();
 }
 
@@ -106,8 +211,19 @@ void CbmdosFsOptionsDialog::priv::reset()
     }
     allowLongDirCheckBox.setChecked(
 	    opts.flags & CbmdosFsFlags::CFF_ALLOWLONGDIR);
-    filesOnDirTrackCheckBox.setChecked(
-	    opts.flags & CbmdosFsFlags::CFF_FILESONDIRTRACK);
+    if (opts.flags & CbmdosFsFlags::CFF_FILESONDIRTRACK)
+    {
+	filesOnDirTrackCheckBox.setChecked(true);
+	prefDirTrackCheckBox.setChecked(
+		opts.flags & CbmdosFsFlags::CFF_TALLOC_PREFDIRTRACK);
+	prefDirTrackCheckBox.setEnabled(true);
+    }
+    else
+    {
+	filesOnDirTrackCheckBox.setChecked(false);
+	prefDirTrackCheckBox.setChecked(false);
+	prefDirTrackCheckBox.setEnabled(false);
+    }
     dolphinDosBamCheckBox.setChecked(
 	    opts.flags & CbmdosFsFlags::CFF_DOLPHINDOSBAM);
     speedDosBamCheckBox.setChecked(
@@ -118,6 +234,22 @@ void CbmdosFsOptionsDialog::priv::reset()
 	    opts.flags & CbmdosFsFlags::CFF_ZEROFREE);
     dirInterleaveSpinBox.setValue(opts.dirInterleave);
     fileInterleaveSpinBox.setValue(opts.fileInterleave);
+    if (opts.flags & CbmdosFsFlags::CFF_TALLOC_TRACKLOAD)
+    {
+	allocTrackloaderButton.setChecked(true);
+    }
+    else if (opts.flags & CbmdosFsFlags::CFF_TALLOC_SIMPLE)
+    {
+	allocSimpleButton.setChecked(true);
+    }
+    else
+    {
+	allocOriginalButton.setChecked(true);
+    }
+    simpleInterleaveCheckBox.setChecked(
+	    opts.flags & CbmdosFsFlags::CFF_SIMPLEINTERLEAVE);
+    chainInterlvCheckBox.setChecked(
+	    opts.flags & CbmdosFsFlags::CFF_TALLOC_CHAININTERLV);
 }
 
 void CbmdosFsOptionsDialog::priv::clicked(QObject *sender, bool checked)
@@ -229,11 +361,13 @@ void CbmdosFsOptionsDialog::priv::clicked(QObject *sender, bool checked)
 	{
 	    opts.flags = (CbmdosFsFlags)
 		(opts.flags | CbmdosFsFlags::CFF_FILESONDIRTRACK);
+	    prefDirTrackCheckBox.setEnabled(true);
 	}
 	else
 	{
 	    opts.flags = (CbmdosFsFlags)
 		(opts.flags & ~CbmdosFsFlags::CFF_FILESONDIRTRACK);
+	    prefDirTrackCheckBox.setEnabled(false);
 	}
     }
     else if (sender == &zeroFreeCheckBox)
@@ -247,6 +381,66 @@ void CbmdosFsOptionsDialog::priv::clicked(QObject *sender, bool checked)
 	{
 	    opts.flags = (CbmdosFsFlags)
 		(opts.flags & ~CbmdosFsFlags::CFF_ZEROFREE);
+	}
+    }
+    else if (sender == &allocOriginalButton)
+    {
+	opts.flags = (CbmdosFsFlags) (opts.flags & ~(
+		CbmdosFsFlags::CFF_TALLOC_TRACKLOAD |
+		CbmdosFsFlags::CFF_TALLOC_SIMPLE
+		));
+    }
+    else if (sender == &allocTrackloaderButton)
+    {
+	opts.flags = (CbmdosFsFlags)
+	    (opts.flags & ~CbmdosFsFlags::CFF_TALLOC_SIMPLE);
+	opts.flags = (CbmdosFsFlags)
+	    (opts.flags | CbmdosFsFlags::CFF_TALLOC_TRACKLOAD);
+    }
+    else if (sender == &allocSimpleButton)
+    {
+	opts.flags = (CbmdosFsFlags)
+	    (opts.flags & ~CbmdosFsFlags::CFF_TALLOC_TRACKLOAD);
+	opts.flags = (CbmdosFsFlags)
+	    (opts.flags | CbmdosFsFlags::CFF_TALLOC_SIMPLE);
+    }
+    else if (sender == &simpleInterleaveCheckBox)
+    {
+	if (checked)
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags | CbmdosFsFlags::CFF_SIMPLEINTERLEAVE);
+	}
+	else
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags & ~CbmdosFsFlags::CFF_SIMPLEINTERLEAVE);
+	}
+    }
+    else if (sender == &prefDirTrackCheckBox)
+    {
+	if (checked)
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags | CbmdosFsFlags::CFF_TALLOC_PREFDIRTRACK);
+	}
+	else
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags & ~CbmdosFsFlags::CFF_TALLOC_PREFDIRTRACK);
+	}
+    }
+    else if (sender == &chainInterlvCheckBox)
+    {
+	if (checked)
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags | CbmdosFsFlags::CFF_TALLOC_CHAININTERLV);
+	}
+	else
+	{
+	    opts.flags = (CbmdosFsFlags)
+		(opts.flags & ~CbmdosFsFlags::CFF_TALLOC_CHAININTERLV);
 	}
     }
 }
@@ -282,11 +476,19 @@ CbmdosFsOptionsDialog::CbmdosFsOptionsDialog(CbmdosFsOptions *options,
     d->optionsLayout.addWidget(&d->allowLongDirCheckBox, 3, 2);
     d->optionsLayout.addWidget(&d->filesOnDirTrackCheckBox, 4, 2);
     d->optionsLayout.addWidget(&d->zeroFreeCheckBox, 5, 2);
+    d->allocationLayout.addWidget(&d->allocOriginalButton, 0, 0);
+    d->allocationLayout.addWidget(&d->allocTrackloaderButton, 1, 0);
+    d->allocationLayout.addWidget(&d->allocSimpleButton, 2, 0);
+    d->allocationLayout.addWidget(&d->simpleInterleaveCheckBox, 0, 1);
+    d->allocationLayout.addWidget(&d->prefDirTrackCheckBox, 1, 1);
+    d->allocationLayout.addWidget(&d->chainInterlvCheckBox, 2, 1);
+    d->allocationOptions.setLayout(&d->allocationLayout);
+    d->optionsLayout.addWidget(&d->allocationOptions, 6, 0, 1, 3);
     if (options->flags & CbmdosFsFlags::CFF_RECOVER)
     {
-	d->optionsLayout.addWidget(&d->recoverWarningLabel, 6, 0, 1, 3);
+	d->optionsLayout.addWidget(&d->recoverWarningLabel, 7, 0, 1, 3);
         d->rewriteAfterRecover.setChecked(true);
-        d->optionsLayout.addWidget(&d->rewriteAfterRecover, 7, 0, 1, 3);
+        d->optionsLayout.addWidget(&d->rewriteAfterRecover, 8, 0, 1, 3);
     }
     d->mainLayout.addLayout(&d->optionsLayout);
     d->mainLayout.addWidget(&d->buttons);
@@ -315,6 +517,18 @@ CbmdosFsOptionsDialog::CbmdosFsOptionsDialog(CbmdosFsOptions *options,
     connect(&d->filesOnDirTrackCheckBox, &QAbstractButton::clicked,
 	    this, &CbmdosFsOptionsDialog::optionClicked);
     connect(&d->zeroFreeCheckBox, &QAbstractButton::clicked,
+	    this, &CbmdosFsOptionsDialog::optionClicked);
+    connect(&d->allocOriginalButton, &QAbstractButton::clicked,
+	    this, &CbmdosFsOptionsDialog::optionClicked);
+    connect(&d->allocTrackloaderButton, &QAbstractButton::clicked,
+	    this, &CbmdosFsOptionsDialog::optionClicked);
+    connect(&d->allocSimpleButton, &QAbstractButton::clicked,
+	    this, &CbmdosFsOptionsDialog::optionClicked);
+    connect(&d->simpleInterleaveCheckBox, &QAbstractButton::clicked,
+	    this, &CbmdosFsOptionsDialog::optionClicked);
+    connect(&d->prefDirTrackCheckBox, &QAbstractButton::clicked,
+	    this, &CbmdosFsOptionsDialog::optionClicked);
+    connect(&d->chainInterlvCheckBox, &QAbstractButton::clicked,
 	    this, &CbmdosFsOptionsDialog::optionClicked);
 
     connect(&d->dirInterleaveSpinBox, SIGNAL(valueChanged(int)),
