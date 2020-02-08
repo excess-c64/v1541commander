@@ -12,6 +12,11 @@ For instructions to build this yourself on your system, see
 For **downloads** of the latest binaries for **Windows or Linux**, search
 [CSDb](https://csdb.dk/) for "v1541commander".
 
+From time to time, pre-release builds are also available from
+[http://sekrit.de/v1541commander/](http://sekrit.de/v1541commander/). Use
+them at your own risk, they are not as thoroughly tested as the official
+releases on CSDb.
+
 The Windows binary download comes with a little `setup.exe` that can be used
 to associate V1541Commander with the file types it can open, and where you
 can select, for which file types V1541Commander should become the default
