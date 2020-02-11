@@ -57,7 +57,9 @@ int main(int argc, char **argv)
 #ifdef QT_STATICPLUGIN
 #ifdef _WIN32
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin);
+#endif
 #else
     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
 #endif
@@ -145,8 +147,11 @@ int main(int argc, char **argv)
 	    if (sock.waitForReadyRead(5000))
 	    {
 		qint64 mainpid;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
 		stream.startTransaction();
+#endif
 		stream >> mainpid;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
 #ifdef _WIN32
 		if (stream.commitTransaction())
 		{
@@ -154,6 +159,11 @@ int main(int argc, char **argv)
 		}
 #else
 		stream.commitTransaction();
+#endif
+#else
+#ifdef _WIN32
+		AllowSetForegroundWindow(DWORD(mainpid));
+#endif
 #endif
 	    }
 	    for (QStringList::const_iterator i = positionalArgs.constBegin();

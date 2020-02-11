@@ -44,7 +44,11 @@ void PetsciiWindow::setLowercase(bool lowerCase)
 {
     for (ushort i = 0; i < 0x100; ++i)
     {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
         ushort val = buttons[i]->text().front().unicode();
+#else
+        ushort val = buttons[i]->text()[0].unicode();
+#endif
         if (lowerCase) val |= 0x100;
         else val &= 0xfeff;
         buttons[i]->setText(QString(QChar(val)));

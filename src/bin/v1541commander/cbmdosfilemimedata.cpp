@@ -107,7 +107,12 @@ QVariant CbmdosFileMimeData::retrieveData(
 	const QTemporaryDir *td = d->model->tmpDir();
 	for (int i = 0; i < d->files.size(); ++i)
 	{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
 	    QString fullName = td->filePath(d->fileNames.at(i));
+#else
+	    QString fullName = QDir::cleanPath(td->path()
+		    + "/" + d->fileNames.at(i));
+#endif
 	    bool pc64 = cmdr.settings().exportAsPc64();
 	    switch (CbmdosFile_type(d->files.at(i)))
 	    {

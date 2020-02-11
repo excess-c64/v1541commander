@@ -97,26 +97,26 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     statusLedYellow(":/statusled_yellow.png"),
     statusLedGreen(":/statusled_green.png"),
     appIcon(),
-    newAction(tr("&New")),
-    openAction(tr("&Open")),
-    saveAction(tr("&Save")),
-    saveAsAction(tr("Save &As")),
-    exportZipcodeAction(tr("&Zipcode")),
-    exportZipcodeD64Action(tr("Zipcode (&D64)")),
-    exportLynxAction(tr("&LyNX")),
-    closeAction(tr("&Close")),
-    settingsAction(tr("Se&ttings")),
-    aboutAction(tr("&About")),
-    exitAction(tr("E&xit")),
-    petsciiWindowAction(tr("&PETSCII Input")),
-    logWindowAction(tr("lib1541img &log")),
-    fsOptionsAction(tr("Filesystem &Options")),
-    rewriteImageAction(tr("&Rewrite Image")),
-    autoMapLcAction(tr("&Auto map on input")),
-    mapLcAction(tr("&Map current disk")),
-    newFileAction(tr("&New File")),
-    deleteFileAction(tr("&Delete File")),
-    lowerCaseAction(tr("&Lowercase")),
+    newAction(tr("&New"), 0),
+    openAction(tr("&Open"), 0),
+    saveAction(tr("&Save"), 0),
+    saveAsAction(tr("Save &As"), 0),
+    exportZipcodeAction(tr("&Zipcode"), 0),
+    exportZipcodeD64Action(tr("Zipcode (&D64)"), 0),
+    exportLynxAction(tr("&LyNX"), 0),
+    closeAction(tr("&Close"), 0),
+    settingsAction(tr("Se&ttings"), 0),
+    aboutAction(tr("&About"), 0),
+    exitAction(tr("E&xit"), 0),
+    petsciiWindowAction(tr("&PETSCII Input"), 0),
+    logWindowAction(tr("lib1541img &log"), 0),
+    fsOptionsAction(tr("Filesystem &Options"), 0),
+    rewriteImageAction(tr("&Rewrite Image"), 0),
+    autoMapLcAction(tr("&Auto map on input"), 0),
+    mapLcAction(tr("&Map current disk"), 0),
+    newFileAction(tr("&New File"), 0),
+    deleteFileAction(tr("&Delete File"), 0),
+    lowerCaseAction(tr("&Lowercase"), 0),
     allWindows(),
     lastActiveWindow(0),
     petsciiWindow(c64font),
@@ -855,11 +855,18 @@ void V1541Commander::readyRead()
 	d->activeClients.insert(sock);
 	QDataStream recvStream(sock);
 	QString filename;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
 	for (;;)
 	{
 	    recvStream.startTransaction();
+#else
+	while (!recvStream.atEnd())
+	{
+#endif
 	    recvStream >> filename;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
 	    if (!recvStream.commitTransaction()) break;
+#endif
 	    open(filename);
 	}
 	d->activeClients.remove(sock);
