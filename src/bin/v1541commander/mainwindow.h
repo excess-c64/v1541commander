@@ -68,6 +68,7 @@ class MainWindow: public QMainWindow
 	void mapToLc();
 	void newFile();
 	void deleteFile();
+	void fileOverrides();
 	void showStatusLine(const QString &line);
 };
 

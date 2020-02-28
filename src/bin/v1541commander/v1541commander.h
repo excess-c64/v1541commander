@@ -41,6 +41,7 @@ class V1541Commander: public QApplication
 	void mapToLc();
 	void newFile();
 	void deleteFile();
+	void fileOverrides();
 	void logLineAppended(const QString &line);
 	void newConnection();
 	void disconnected();
@@ -74,6 +75,7 @@ class V1541Commander: public QApplication
 	QAction &mapLcAction();
 	QAction &newFileAction();
 	QAction &deleteFileAction();
+	QAction &fileOverridesAction();
         QAction &lowerCaseAction();
 	const QString &instanceServerName() const;
 	bool isPrimaryInstance() const;

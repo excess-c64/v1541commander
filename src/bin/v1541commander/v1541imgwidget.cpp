@@ -7,6 +7,7 @@
 #include "cbmdosfswidget.h"
 #include "cbmdosfilewidget.h"
 #include "editoperationcheck.h"
+#include "fsoptoverridesdialog.h"
 #include "settings.h"
 #include "skippablequestion.h"
 #include "utils.h"
@@ -727,6 +728,18 @@ void V1541ImgWidget::deleteFile(bool skipConfirmation)
     {
 	const QModelIndex &index = d->dirList.selectionModel()->currentIndex();
 	d->model.deleteAt(index);
+    }
+}
+
+void V1541ImgWidget::fileOverrides()
+{
+    if (isReadOnly() || !hasValidSelection() || !d->file.file()) return;
+    CbmdosFile *file = d->file.file();
+    CbmdosFsOptOverrides overrides = CbmdosFile_optOverrides(file);
+    FsOptOverridesDialog ovrdDlg(&overrides, parentWidget());
+    if (ovrdDlg.exec() == QDialog::Accepted)
+    {
+	CbmdosFile_setOptOverrides(file, overrides);
     }
 }
 

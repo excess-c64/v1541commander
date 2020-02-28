@@ -70,6 +70,7 @@ class V1541Commander::priv
 	QAction mapLcAction;
 	QAction newFileAction;
 	QAction deleteFileAction;
+	QAction fileOverridesAction;
         QAction lowerCaseAction;
         QVector<MainWindow *> allWindows;
         MainWindow *lastActiveWindow;
@@ -116,6 +117,7 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     mapLcAction(tr("&Map current disk"), 0),
     newFileAction(tr("&New File"), 0),
     deleteFileAction(tr("&Delete File"), 0),
+    fileOverridesAction(tr("File O&verrides"), 0),
     lowerCaseAction(tr("&Lowercase"), 0),
     allWindows(),
     lastActiveWindow(0),
@@ -177,6 +179,10 @@ V1541Commander::priv::priv(V1541Commander *commander) :
     newFileAction.setStatusTip(tr("Create new file at selection"));
     deleteFileAction.setShortcut(QKeySequence::Delete);
     deleteFileAction.setStatusTip(tr("Delete selected file"));
+    fileOverridesAction.setShortcut(
+	    QKeySequence(Qt::CTRL+Qt::SHIFT+Qt::Key_V));
+    fileOverridesAction.setStatusTip(tr("Configure filesystem option "
+		"overrides for selected file"));
     lowerCaseAction.setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
     lowerCaseAction.setStatusTip(tr("Toggle lowercase / graphics font mode"));
     lowerCaseAction.setCheckable(true);
@@ -387,6 +393,8 @@ void V1541Commander::priv::updateActions(MainWindow *w)
 	    && !w->isReadOnly());
     deleteFileAction.setEnabled(w->content() == MainWindow::Content::Image
 	    && !w->isReadOnly() && w->hasValidSelection());
+    fileOverridesAction.setEnabled(w->content() == MainWindow::Content::Image
+	    && !w->isReadOnly() && w->hasValidSelection());
 }
 
 V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
@@ -444,6 +452,8 @@ V1541Commander::V1541Commander(int &argc, char **argv, QTranslator *translator)
             this, &V1541Commander::newFile);
     connect(&d->deleteFileAction, &QAction::triggered,
             this, &V1541Commander::deleteFile);
+    connect(&d->fileOverridesAction, &QAction::triggered,
+	    this, &V1541Commander::fileOverrides);
     connect(&d->petsciiWindow, &PetsciiWindow::petsciiInput,
 	    this, &V1541Commander::petsciiInput);
     connect(&d->lowerCaseAction, &QAction::triggered, this, [this](){
@@ -808,6 +818,14 @@ void V1541Commander::deleteFile()
     w->deleteFile();
 }
 
+void V1541Commander::fileOverrides()
+{
+    MainWindow *w = d->lastActiveWindow;
+    if (!w) return;
+
+    w->fileOverrides();
+}
+
 void V1541Commander::logLineAppended(const QString &line)
 {
     MainWindow *w = d->lastActiveWindow;
@@ -1006,6 +1024,11 @@ QAction &V1541Commander::newFileAction()
 QAction &V1541Commander::deleteFileAction()
 {
     return d->deleteFileAction;
+}
+
+QAction &V1541Commander::fileOverridesAction()
+{
+    return d->fileOverridesAction;
 }
 
 QAction &V1541Commander::lowerCaseAction()

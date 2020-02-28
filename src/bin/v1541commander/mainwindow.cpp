@@ -54,6 +54,7 @@ MainWindow::MainWindow()
     cbmdosMenu->addSeparator();
     cbmdosMenu->addAction(&cmdr.newFileAction());
     cbmdosMenu->addAction(&cmdr.deleteFileAction());
+    cbmdosMenu->addAction(&cmdr.fileOverridesAction());
     QMenu *windowsMenu = menuBar()->addMenu(tr("&Windows"));
     windowsMenu->addAction(&cmdr.petsciiWindowAction());
     windowsMenu->addAction(&cmdr.logWindowAction());
@@ -506,6 +507,12 @@ void MainWindow::deleteFile()
 {
     if (d->content != Content::Image) return;
     static_cast<V1541ImgWidget *>(centralWidget())->deleteFile();
+}
+
+void MainWindow::fileOverrides()
+{
+    if (d->content != Content::Image) return;
+    static_cast<V1541ImgWidget *>(centralWidget())->fileOverrides();
 }
 
 void MainWindow::showStatusLine(const QString &line)

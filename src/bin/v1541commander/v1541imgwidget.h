@@ -37,6 +37,7 @@ class V1541ImgWidget: public QWidget
 	void mapToLc();
 	void newFile();
 	void deleteFile(bool skipConfirmation = false);
+	void fileOverrides();
 
     public:
 	V1541ImgWidget(QWidget *parent = nullptr);

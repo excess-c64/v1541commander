@@ -6,7 +6,6 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
-#include <QPushButton>
 #include <QRadioButton>
 #include <QScreen>
 #include <QSpinBox>
