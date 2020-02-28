@@ -667,6 +667,7 @@ void V1541ImgWidget::fsOptions()
     if (!hasValidImage()) return;
     CbmdosFsOptions opts = CbmdosFs_options(d->fs);
     CbmdosFsOptionsDialog optDlg(&opts, parentWidget());
+    optDlg.setWindowTitle(tr("Options for current image"));
     if (optDlg.exec() == QDialog::Accepted)
     {
 	CbmdosFs_setOptions(d->fs, opts);
@@ -737,6 +738,7 @@ void V1541ImgWidget::fileOverrides()
     CbmdosFile *file = d->file.file();
     CbmdosFsOptOverrides overrides = CbmdosFile_optOverrides(file);
     FsOptOverridesDialog ovrdDlg(&overrides, parentWidget());
+    ovrdDlg.setWindowTitle(tr("Overridden options for selected file"));
     if (ovrdDlg.exec() == QDialog::Accepted)
     {
 	CbmdosFile_setOptOverrides(file, overrides);

@@ -56,6 +56,7 @@ FsOptOverridesDialog::priv::priv(CbmdosFsOptOverrides *overrides) :
     buttons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel
 	    |QDialogButtonBox::Reset)
 {
+    interleaveLabel.setAlignment(Qt::AlignRight);
     interleaveSpinBox.setMinimum(1);
     interleaveSpinBox.setMaximum(20);
     simpleInterleaveCheckBox.setTristate(true);

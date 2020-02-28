@@ -598,22 +598,22 @@ immer beginnend bei Sektor 0 gesucht (originales CBM DOS Verhalten).</translatio
         <translation>Interleave bei Spurwechsel anwenden</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="65"/>
+        <location filename="fsoptoverridesdialog.cpp" line="66"/>
         <source>Override interleave when writing this file</source>
         <translation>Interleave übersteuern wenn diese Datei geschrieben wird</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="67"/>
+        <location filename="fsoptoverridesdialog.cpp" line="68"/>
         <source>Interleave value to use for blocks of this file (default: 10)</source>
         <translation>Interleave Wert für die Sektoren dieser Datei (Standard: 10)</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="72"/>
+        <location filename="fsoptoverridesdialog.cpp" line="73"/>
         <source>Override the base track/block allocation strategy</source>
         <translation>Die grundlegende Spur/Sektor Belegungsstrategie übersteuern</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="74"/>
+        <location filename="fsoptoverridesdialog.cpp" line="75"/>
         <source>Use the original CBM DOS strategy for allocating blocks.
 For starting a new file, a track as close as possible to track 18 is used.
 While writing a file, when the current track is full, the next track in the direction away from track 18 is used.
@@ -624,7 +624,7 @@ Beim Schreiben einer Datei wird, wenn die Spur voll ist, die nächste Spur in Ri
 Gut für wahlfreien Zugriff auf verschiedene Dateien, wobei die Dateien am Anfang des Verzeichnisses bevorzugt werden.</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="82"/>
+        <location filename="fsoptoverridesdialog.cpp" line="83"/>
         <source>Use an allocation strategy often used with trackloaders.
 Tracks are used starting at track 1 and strictly incrementing.
 Good for a set of files that&apos;s always read in the same order.</source>
@@ -633,7 +633,7 @@ Spuren werden belegt beginnend bei Spur 1, die Zahl strikt erhöhend.
 Gut für einen Satz Dateien, die immer in derselben Reihenfolge gelesen werden.</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="88"/>
+        <location filename="fsoptoverridesdialog.cpp" line="89"/>
         <source>Use a simplified allocation strategy.
 Tracks are used starting at track 19 and strictly incrementing up to track 40, then wrapping around to track 1.
 On 42-track images, tracks 41 and 42 are still used last.
@@ -644,7 +644,7 @@ Auf 42-Spur Abbildern werden die Spuren 41 und 42 dennoch zuletzt genutzt.
 Das ist ein Kompromiss zwischen den beiden anderen Strategien; die ersten Dateien sind nahe an Spur 18, und doch folgen die Dateien aufeinander.</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="97"/>
+        <location filename="fsoptoverridesdialog.cpp" line="98"/>
         <source>When adding interleave, use a simple &quot;modulo&quot; to get a valid sector number on the current track.
 If this is not checked, interleave is applied like the original CBM DOS does it:
 When wrapping over sector 0, 1 is subtracted from the result.
@@ -655,7 +655,7 @@ Wenn Sektor 0 überstrichen wird, wird vom Resultat 1 abgezogen.
 Teilweise gewählt bedeutet, diese Einstellung nicht übersteuern.</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="105"/>
+        <location filename="fsoptoverridesdialog.cpp" line="106"/>
         <source>Put files on the directory track first.
 This has only an effect if files on the directory track are allowed.
 Partially checked means not to override this flag.</source>
@@ -666,7 +666,7 @@ dass genau die Sektoren auf Spur 18, die vom Verzeichnis nicht genutzt sind, ver
 Teilweise gewählt bedeutet, diese Einstellung nicht übersteuern.</translation>
     </message>
     <message>
-        <location filename="fsoptoverridesdialog.cpp" line="110"/>
+        <location filename="fsoptoverridesdialog.cpp" line="111"/>
         <source>When having to switch to another track, still apply interleave to the sector number.
 If this is not checked, looking for a free sector on a new track
 always starts at sector 0 (original CBM DOS behavior).
@@ -1235,34 +1235,44 @@ Ausgewählte Datei verschieben mit Umschalt + Pfeil hoch/runter</translation>
         <translation>Das Archivieren mit LyNX ist fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="v1541imgwidget.cpp" line="680"/>
+        <location filename="v1541imgwidget.cpp" line="670"/>
+        <source>Options for current image</source>
+        <translation>Optionen für aktuelles Abbild</translation>
+    </message>
+    <message>
+        <location filename="v1541imgwidget.cpp" line="681"/>
         <source>Rewrite the image?</source>
         <translation>Abbild neu erstellen?</translation>
     </message>
     <message>
-        <location filename="v1541imgwidget.cpp" line="680"/>
+        <location filename="v1541imgwidget.cpp" line="681"/>
         <source>When rewriting an image from scratch, you might lose data that isn&apos;t stored in standard CBM DOS format on the disk, like for example raw sectors in demos or games. Are you sure you want to proceed?</source>
         <translation>Wenn Sie das Abbild neu erstellen könnten Sie Daten verlieren, die nicht im Standard CBM DOS Format gespeichert sind, wie zum Beispiel rohe Sektoren in Spielen und Demos. Sind Sie sicher, dass Sie fortfahren wollen?</translation>
     </message>
     <message>
-        <location filename="v1541imgwidget.cpp" line="697"/>
+        <location filename="v1541imgwidget.cpp" line="698"/>
         <source>Map UC gfx to LC?</source>
         <translation>Uppercase Grafik auf lowercase mappen?</translation>
     </message>
     <message>
-        <location filename="v1541imgwidget.cpp" line="697"/>
+        <location filename="v1541imgwidget.cpp" line="698"/>
         <source>This will possibly modify the disk name, id and all the file names. Are you sure you want to proceed?</source>
         <translation>Diese Aktion könnte den Diskettennamen, die ID und alle Dateinamen ändern. Sind Sie sicher, dass Sie fortfahren wollen?</translation>
     </message>
     <message>
-        <location filename="v1541imgwidget.cpp" line="724"/>
+        <location filename="v1541imgwidget.cpp" line="725"/>
         <source>Delete this file?</source>
         <translation>Diese Datei löschen?</translation>
     </message>
     <message>
-        <location filename="v1541imgwidget.cpp" line="725"/>
+        <location filename="v1541imgwidget.cpp" line="726"/>
         <source>A deleted file cannot be restored. Are you sure you want to delete this file now?</source>
         <translation>Eine gelöschte Datei kann nicht wiederhergestellt werden. Sind Sie sicher, dass Sie diese Datei jetzt löschen wollen?</translation>
+    </message>
+    <message>
+        <location filename="v1541imgwidget.cpp" line="741"/>
+        <source>Overridden options for selected file</source>
+        <translation>Übersteuerte Optionen für ausgewählte Datei</translation>
     </message>
 </context>
 <context>
