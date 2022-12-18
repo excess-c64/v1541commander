@@ -6,16 +6,6 @@
     <glob pattern="*.d64" />
     <icon name="v1541commander-d64" />
   </mime-type>
-  <mime-type type="application/x.willcorley.lynx-archive">
-    <comment>C64 LyNX archive</comment>
-    <comment xml:lang="de">C64 LyNX Archiv</comment>
-    <glob pattern="*.lnx" />
-    <glob pattern="*.prg" />
-    <magic>
-      <match type="string" offset="4:240" value="\x4c\x59\x4e\x58\x20" />
-    </magic>
-    <icon name="v1541commander-lynx" />
-  </mime-type>
   <mime-type type="application/x.c64.zip-code">
     <comment>C64 Zip-Code archive file</comment>
     <comment xml:lang="de">C64 Zip-Code Archivdatei</comment>
@@ -51,5 +41,15 @@
       <match type="string" offset="0"
 	value="\x43\x36\x34\x46\x69\x6c\x65\x00" />
     </magic>
+  </mime-type>
+  <mime-type type="application/x.willcorley.lynx-archive">
+    <comment>C64 LyNX archive</comment>
+    <comment xml:lang="de">C64 LyNX Archiv</comment>
+    <glob pattern="*.lnx" />
+    <glob pattern="*.prg" />
+    <magic>
+      <match type="string" offset="4:240" value="\x4c\x59\x4e\x58\x20" />
+    </magic>
+    <icon name="v1541commander-lynx" />
   </mime-type>
 </mime-info>
