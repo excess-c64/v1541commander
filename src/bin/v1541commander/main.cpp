@@ -31,10 +31,11 @@ void handlesig(int sig)
 }
 #endif
 
+static int guimain(int argc, char **argv);
+
 int main(int argc, char **argv)
 {
 #ifndef _WIN32
-#ifndef __APPLE__
 #ifndef DEBUG
     pid_t pid = fork();
     if (pid < 0) return 1;
@@ -54,8 +55,11 @@ int main(int argc, char **argv)
     setsid();
 #endif
 #endif
-#endif
+    return guimain(argc, argv);
+}
 
+static int guimain(int argc, char **argv)
+{
 #ifdef QT_STATICPLUGIN
 #ifdef _WIN32
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
@@ -119,13 +123,11 @@ int main(int argc, char **argv)
     if (commander.isPrimaryInstance())
     {
 #ifndef _WIN32
-#ifndef __APPLE__
 #ifndef DEBUG
         freopen("/dev/null", "r", stdin);
         freopen("/dev/null", "w", stdout);
         freopen("/dev/null", "w", stderr);
 	kill(getppid(), SIGHUP);
-#endif
 #endif
 #endif
 
